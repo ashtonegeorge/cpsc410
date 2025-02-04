@@ -11,10 +11,19 @@
       http-equiv="X-Content-Security-Policy"
       content="default-src 'self'; script-src 'self'"
     />
-    <title>Hello from Electron renderer!</title>
+    <!-- tailwind stylesheet -->
+    <link href="./tailwind/output.css" rel="stylesheet">
+    <title>Evalu8</title>
   </head>
-  <body>
-    <h1>Hello from Electron renderer!</h1>
-    <p>👋</p>
+  <!-- This is the main content, the body, of the application. For now, I have 3 buttons that will be used -->
+  <!-- to navigate the application. -->
+  <body class="text-3xl font-bold bg-stone-700 text-white p-2 text-center w-full">
+    <h1>Evalu8</h1>
+    <div class="w-full flex font-bold text-sm justify-evenly py-12">
+      <!-- notice the classes, padding of 2, background colors, rounded edges, dropshadows -->
+      <button class="p-2 bg-red-700 hover:bg-red-600 rounded-lg shadow">Course Evaluations</button>
+      <button class="p-2 bg-red-700 hover:bg-red-600 rounded-lg shadow">Guest Speaker Evaluations</button>
+      <button class="p-2 bg-red-700 hover:bg-red-600 rounded-lg shadow">Module Grades</button>
+    </div>
   </body>
 </html>
