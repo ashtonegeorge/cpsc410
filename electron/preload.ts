@@ -19,11 +19,16 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke(channel, ...omit)
   },
 
-  // You can expose other APTs you need here.
-  // ...
   // NOTE: in order to suppress the type error for ipcRenderer, you must navigate to electron.d.ts
   // and specify the type definition of the function as defined below. 
-  getNames() { // calling the ipcMain event handler in the main process
+
+  /**
+   * getNames()
+   * This method invokes an event handler, "get-names", defined in the main.ts file at the bottom.
+   * From the front end, this event handler can be used by calling window.ipcRenderer.getNames().
+   * @returns {Promise<{Name: string}[]>}
+   */
+  getNames(): Promise<{ Name: string }[]> {
     return ipcRenderer.invoke('get-names');
-  }
+  } 
 })
