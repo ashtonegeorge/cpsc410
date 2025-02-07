@@ -4,16 +4,23 @@ import viteLogo from '/electron-vite.animate.svg'
 import './App.css'
 
 function App() {
+  // these two state variables are displayed in the UI.
   const [count, setCount] = useState(0)
   const [names, setNames] = useState<string[]>([])
 
+  /**
+   * useEffect()
+   * This is a test to see if I can call the main process from the renderer process.
+   * An event handler, "get-names", is defined in the main.ts file.
+   * This event handler is exposed to the renderer process via the preload.ts file. The event is called in the getNames() function.
+   */
   useEffect(() => {
     window.ipcRenderer.getNames().then((data: { Name: string }[]) => {
       const n = data.map((e) => e.Name);
       setNames(n);
       console.log(n);
     });
-  }, []);
+  }, []); // notice the empty array I pass as the second parameter to the useEffect hook. This is called the dependency array. The fact it is empty tells the hook to only run once, when the component is mounted (when it is rendered on the screen).
 
   return (
     <>

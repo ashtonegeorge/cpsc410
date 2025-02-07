@@ -70,7 +70,13 @@ app.on('activate', () => {
 
 app.whenReady().then(createWindow)
 
-ipcMain.handle('get-names', async () => { // this test for ipcMain.handle queries the sqlite db. this is called in the preload.ts file.
+/**
+ * ipcMain.handle('get-names'...)
+ * This event handler is used in the preload.ts file to call the sqlite db. 
+ * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
+ * This allows us to call window.ipcRenderer.getNames() in the App.tsx file.
+ */
+ipcMain.handle('get-names', async () => {
   const result = db.prepare('SELECT * FROM test').all();
   console.log(result);
   return result;
