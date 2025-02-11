@@ -2,14 +2,16 @@
 This readme is a work in progress. It will be updated as the project progresses.
 
 ## Folder structure
-├── src/
-│   ├── assets/
-│   ├── App.css
-│   ├── App.tsx
-│   ├── custom.d.ts
-│   ├── index.css
-│   ├── main.tsx
-│   ├── vite-env.d.ts
+```text
+src/
+├── assets/
+├── App.css
+├── App.tsx
+├── custom.d.ts
+├── index.css
+├── main.tsx
+└── vite-env.d.ts
+```
 
 ### assets
 The assets folder contains assets such as images and icons that are imported into the project as needed.
