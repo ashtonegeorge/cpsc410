@@ -5,8 +5,8 @@ This is an application for the PA department to store and report on data from su
 This application was developed by a team of students in Dr. Slonka's CPSC 410 class. The team members are:
 - Marcus Amerine
 - Ashton George
-- Casey Kuhn
 - Zachary Krepelka
+- Casey Kuhn
 - Aurembiaix Pifarre Planes
 - Preston Slagle
 - Thomas Urbain

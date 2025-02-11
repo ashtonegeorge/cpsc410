@@ -46,7 +46,7 @@ function App() {
       </p>
       <div>
         <h2>A special thanks to the following team members:</h2>
-        {names.map((n) => {
+        {names.toSorted().map((n) => {
           return <p>{n}</p>
         })}
       </div>
