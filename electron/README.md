@@ -2,10 +2,12 @@
 This readme is a work in progress. It will be updated as the project progresses.
 
 ## Folder structure
-├── electron/
-│   ├── electron-env.d.ts
-│   ├── main.ts
-│   ├── preload.ts
+```text
+electron/
+├── electron-env.d.ts
+├── main.ts
+└── preload.ts
+```
 
 ### electron-env.d.ts
 This file is used to declare types and interfaces for the Electron application. This file is used to provide type information for the Electron application and to help with type checking.
