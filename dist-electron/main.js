@@ -41,7 +41,6 @@ app.on("activate", () => {
 app.whenReady().then(createWindow);
 ipcMain.handle("get-names", async () => {
   const result = db.prepare("SELECT * FROM test").all();
-  console.log(result);
   return result;
 });
 export {
