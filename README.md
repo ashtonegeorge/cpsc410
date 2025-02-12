@@ -14,19 +14,25 @@ This application was developed by a team of students in Dr. Slonka's CPSC 410 cl
 ## Installation
 Instructions on how to install and set up the project.
 
+First, clone the repository to your local machine.
 ```bash
-
-# Clone the repository
 git clone https://github.com/ashtonegeorge/cpsc410
-# Navigate to the project directory
+```
+Then navigate to the project directory.
+```bash
 cd cpsc410
-# Install dependencies
+```
+Now install the project dependencies.
+```bash
 npm i
 ```
-## Usage
-Instructions on how to use the project.
+From here, you must run the postinstall script to initialize the database.
 ```bash
+npm run postinstall
+```
 
-# Run the project
+## Usage
+You can start the application by running the following command.
+```bash
 npm run dev
 ```

@@ -13,6 +13,7 @@ dist-ssr
 *.local
 
 csv
+release 
 
 # Editor directories and files
 .vscode/*
