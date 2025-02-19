@@ -2,7 +2,11 @@ import { useState } from 'react'
 import sfuLogo from './assets/redflash.png'
 import './App.css'
 
-function Home() {
+interface AppState {
+  setView: (view: string) => void;
+}
+
+function Home({setView}: AppState) {
   return (
     <div>
       <h2>Home</h2>
@@ -24,6 +28,14 @@ function Home() {
 
 function About() {
   return <h2>About</h2>;
+}
+
+function Course() {
+  return (
+    <>
+      Stuff
+    </>
+  )
 }
 
 function App() {
@@ -52,8 +64,9 @@ function App() {
         <h1 className='font-bold text-4xl'>Evalu8</h1>
         {/* the following lines are conditional rendering. each line employs "short-circuit evaluation" meaning */}
         {/* when the left statement is true, perform the right statement, which renders the component */}
-        {view === 'home' && <Home />} 
+        {view === 'home' && <Home setView={setView} />}
         {view === 'about' && <About />}
+        {view === 'courseEvaluations' && <Course />}
       </div>
     </main>
   )
