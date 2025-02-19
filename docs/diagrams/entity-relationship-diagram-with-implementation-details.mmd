@@ -1,0 +1,76 @@
+erDiagram
+
+	ANSWER            ||--|{ QUESTION          : using
+	COURSE            ||--|{ COURSE-EVALUATION : undergoes
+	COURSE            ||--|{ GRADE             : administers
+	COURSE            }|--o{ GUEST-EVALUATION  : performs
+	COURSE-EVALUATION ||--|| ACADEMIC-YEAR     : during
+	COURSE-EVALUATION ||--|{ ANSWER            : surveys
+	COURSE-EVALUATION ||--|| SEMESTER          : during
+	GRADE             ||--|| ACADEMIC-YEAR     : during
+	GRADE             ||--|| SEMESTER          : during
+	GUEST             ||--|| GUEST-EVALUATION  : undergoes
+	GUEST-EVALUATION  ||--|| ACADEMIC-YEAR     : during
+	GUEST-EVALUATION  ||--|{ ANSWER            : surveys
+	GUEST-EVALUATION  ||--|| SEMESTER          : during
+
+	%% sort in vim by typing vip:!sort -k1,1 -k3,3
+
+	ACADEMIC-YEAR {
+		int id PK
+		string name
+	}
+
+	ANSWER {
+		int guest_evaluation_id FK
+		int course_evaluation_id FK
+		int question_id FK
+		string answer
+	}
+
+	COURSE {
+		int code PK
+		string name
+	}
+
+	COURSE-EVALUATION {
+		int id PK
+		int course_id FK
+		int semester_id FK
+		int academic_year_id FK
+	}
+
+	GRADE {
+		int id PK
+		int course_id FK
+		int semester_id FK
+		int academic_year_id FK
+		int student_id
+		int grade
+		bool retake
+	}
+
+	GUEST {
+		int id PK
+		string fname
+		string lname
+	}
+
+	GUEST-EVALUATION {
+		int id PK
+		int guest_id FK
+		int course_id FK
+		int semester_id FK
+		int academic_year_id FK
+	}
+
+	QUESTION {
+		int id PK
+		string question
+		string type
+	}
+
+	SEMESTER {
+		int id PK
+		string name
+	}

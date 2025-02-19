@@ -1,0 +1,17 @@
+erDiagram
+
+	ANSWER            ||--|{ QUESTION          : using
+	COURSE            ||--|{ COURSE-EVALUATION : undergoes
+	COURSE            ||--|{ GRADE             : administers
+	COURSE            }|--o{ GUEST-EVALUATION  : performs
+	COURSE-EVALUATION ||--|| ACADEMIC-YEAR     : during
+	COURSE-EVALUATION ||--|{ ANSWER            : surveys
+	COURSE-EVALUATION ||--|| SEMESTER          : during
+	GRADE             ||--|| ACADEMIC-YEAR     : during
+	GRADE             ||--|| SEMESTER          : during
+	GUEST             ||--|| GUEST-EVALUATION  : undergoes
+	GUEST-EVALUATION  ||--|| ACADEMIC-YEAR     : during
+	GUEST-EVALUATION  ||--|{ ANSWER            : surveys
+	GUEST-EVALUATION  ||--|| SEMESTER          : during
+
+	%% sort in vim by typing vip:!sort -k1,1 -k3,3
