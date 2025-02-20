@@ -7,7 +7,8 @@ import path from 'node:path'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const db = require('better-sqlite3')('test.db');
+// const db = require('better-sqlite3')('test.db');
+const db = require('better-sqlite3')('dev.db');
 
 // The built directory structure
 //
@@ -48,6 +49,7 @@ function createWindow() {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
+  win.webContents.openDevTools();
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -76,7 +78,32 @@ app.whenReady().then(createWindow)
  * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
  * This allows us to call window.ipcRenderer.getNames() in the App.tsx file.
  */
-ipcMain.handle('get-names', async () => {
-  const result = db.prepare('SELECT * FROM test').all();
+// ipcMain.handle('get-names', async () => {
+//   const result = db.prepare('SELECT * FROM test').all();
+//   return result;
+// });
+
+ipcMain.handle('create-course', async (_event, courseName) => {
+  const result = db.prepare('INSERT INTO course (course_name) VALUES (?)').run(courseName);
+  return result;
+});
+
+ipcMain.handle('read-courses', async () => {
+  const result = db.prepare('SELECT * FROM course').all();
+  return result;
+});
+
+ipcMain.handle('read-course', async (_event, courseId) => {
+  const result = db.prepare('SELECT * FROM course WHERE id = ?').all(courseId);
+  return result;
+});
+
+ipcMain.handle('update-course', async (_event, courseId, courseName) => {
+  const result = db.prepare('UPDATE course SET course_name = ? WHERE id = ?').run(courseName, courseId);
+  return result;
+});
+
+ipcMain.handle('delete-course', async (_event, courseId) => {
+  const result = db.prepare('DELETE FROM course WHERE id = ?').run(courseId);
   return result;
 });

@@ -7,7 +7,6 @@ src/
 ├── assets/
 ├── App.css
 ├── App.tsx
-├── custom.d.ts
 ├── index.css
 ├── main.tsx
 └── vite-env.d.ts
@@ -21,9 +20,6 @@ App.css is a CSS file that contains the styles for the App component. Notice how
 
 ### App.tsx
 App.tsx is the main component of the application. It is responsible for rendering the other components and managing the state of the application. The App component is a functional component that uses hooks to manage state and side effects.
-
-### custom.d.ts
-custom.d.ts is a TypeScript declaration file that is used to declare custom types and interfaces that are used throughout the application. This file is used to provide type information for the application and to help with type checking.
 
 ### index.css
 index.css is a CSS file that contains the global styles for the application. It is imported into the main.tsx file to apply the styles to the entire application.

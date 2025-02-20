@@ -25,7 +25,22 @@ electron.contextBridge.exposeInMainWorld("ipcRenderer", {
    * From the front end, this event handler can be used by calling window.ipcRenderer.getNames().
    * @returns {Promise<{Name: string}[]>}
    */
-  getNames() {
-    return electron.ipcRenderer.invoke("get-names");
+  // getNames(): Promise<{ Name: string }[]> {
+  //   return ipcRenderer.invoke('get-names');
+  // }, 
+  createCourse(courseName) {
+    return electron.ipcRenderer.invoke("create-course", courseName);
+  },
+  readCourses() {
+    return electron.ipcRenderer.invoke("read-courses");
+  },
+  readCourse(courseId) {
+    return electron.ipcRenderer.invoke("read-course", courseId);
+  },
+  updateCourse(courseId, courseName) {
+    return electron.ipcRenderer.invoke("update-course", courseId, courseName);
+  },
+  deleteCourse(courseId) {
+    return electron.ipcRenderer.invoke("delete-course", courseId);
   }
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import sfuLogo from './assets/redflash.png'
 import './App.css'
 
@@ -31,9 +31,83 @@ function About() {
 }
 
 function Course() {
+  const [create, setCreate] = useState('');
+  const [read, setRead] = useState('');
+  const [updateId, setUpdateId] = useState('');
+  const [updateName, setUpdateName] = useState('');
+  const [del, setDelete] = useState('');
+  const [courses, setCourses] = useState<string[]>([]);
+
+  useEffect(() => {
+    window.ipcRenderer.readCourses().then((result: { course_name: string }[]) => {
+      const n = result.map((e) => e.course_name);
+      setCourses(n);
+    });
+  }, []);
+
+  const createCourse = async (courseName: string) => {
+    const result = window.ipcRenderer.createCourse(courseName);
+    console.log(result);
+  }
+
+  const updateCourses = async () => {
+    window.ipcRenderer.readCourses().then((result: { course_name: string }[]) => {
+      const n = result.map((e) => e.course_name);
+      setCourses(n);
+    });
+  }
+
+  const readCourse = async (courseId: string) => {
+    const result = await window.ipcRenderer.readCourse(courseId);
+    console.log(result[0].course_name);
+  }
+
+  const updateCourse = async (courseId: string, courseName: string) => {
+    const result = await window.ipcRenderer.updateCourse(courseId, courseName);
+    console.log(result);
+    updateCourses();
+  }
+
+  const deleteCourse = async (courseId: string) => {
+    const result = await window.ipcRenderer.deleteCourse(courseId);
+    console.log(result);
+    updateCourses();
+  }
+
   return (
     <>
-      Stuff
+      <h1>Testing</h1>
+      <div className='grid grid-cols-2 gap-4'>
+        <div className='flex flex-col justify-center w-full items-center'>
+          <h2>Create Course</h2>
+          <input placeholder='Name' className='bg-white rounded-lg h-12 w-2/3 focus:border-red-700 focus:border-4 text-black p-2' type='text' value={create} onChange={(e) => setCreate(e.target.value)} />
+          <button className='hover:cursor-pointer' onClick={() => createCourse(create)}>Submit</button>
+        </div>
+        <div className='flex flex-col justify-center w-full items-center'>
+          <h2>Read Course</h2>
+          <input placeholder='ID' className='bg-white rounded-lg h-12 w-2/3 focus:border-red-700 focus:border-4 text-black p-2' type='text' value={read} onChange={(e) => setRead(e.target.value)} />
+          <button className='hover:cursor-pointer' onClick={() => readCourse(read)}>Submit</button>
+        </div>
+        <div className='flex flex-col justify-center w-full items-center'>
+          <h2>Update Course</h2>
+          <input placeholder='ID' className='bg-white rounded-lg h-12 w-2/3 mb-2 focus:border-red-700 focus:border-4 text-black p-2' type='text' value={updateId} onChange={(e) => setUpdateId(e.target.value)} />
+          <input placeholder='New name' className='bg-white rounded-lg h-12 w-2/3 focus:border-red-700 focus:border-4 text-black p-2' type='text' value={updateName} onChange={(e) => setUpdateName(e.target.value)} />
+          <button className='hover:cursor-pointer' onClick={() => updateCourse(updateId, updateName)}>Submit</button>
+        </div>
+        <div className='flex flex-col justify-center w-full items-center'>
+          <h2>Delete Course</h2>
+          <input placeholder='ID' className='bg-white rounded-lg h-12 w-2/3 focus:border-red-700 focus:border-4 text-black p-2' type='text' value={del} onChange={(e) => setDelete(e.target.value)} />
+          <button className='hover:cursor-pointer' onClick={() => deleteCourse(del)}>Submit</button>
+        </div>
+      </div>
+      <div>
+        <h2 className='text-lg font-bold p-2'>Courses</h2>
+        <div className='text-sm'>
+          {courses.map((course: any) => {
+            return <p key={course}>{course}</p>
+          })}
+        </div>
+      </div>
     </>
   )
 }
