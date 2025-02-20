@@ -40,7 +40,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('read-courses');
   },
 
-  readCourse(courseId: string): Promise<{ id: number, course_name: string }[]> {
+  readCourse(courseId: string): Promise<{ id: number, name: string }[]> {
     return ipcRenderer.invoke('read-course', courseId);
   },
 

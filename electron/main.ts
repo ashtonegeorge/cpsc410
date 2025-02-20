@@ -84,7 +84,7 @@ app.whenReady().then(createWindow)
 // });
 
 ipcMain.handle('create-course', async (_event, courseName) => {
-  const result = db.prepare('INSERT INTO course (course_name) VALUES (?)').run(courseName);
+  const result = db.prepare('INSERT INTO course (name) VALUES (?)').run(courseName);
   return result;
 });
 
@@ -99,7 +99,7 @@ ipcMain.handle('read-course', async (_event, courseId) => {
 });
 
 ipcMain.handle('update-course', async (_event, courseId, courseName) => {
-  const result = db.prepare('UPDATE course SET course_name = ? WHERE id = ?').run(courseName, courseId);
+  const result = db.prepare('UPDATE course SET name = ? WHERE id = ?').run(courseName, courseId);
   return result;
 });
 

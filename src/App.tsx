@@ -39,8 +39,8 @@ function Course() {
   const [courses, setCourses] = useState<string[]>([]);
 
   useEffect(() => {
-    window.ipcRenderer.readCourses().then((result: { course_name: string }[]) => {
-      const n = result.map((e) => e.course_name);
+    window.ipcRenderer.readCourses().then((result: { name: string }[]) => {
+      const n = result.map((e) => e.name);
       setCourses(n);
     });
   }, []);
@@ -48,18 +48,19 @@ function Course() {
   const createCourse = async (courseName: string) => {
     const result = window.ipcRenderer.createCourse(courseName);
     console.log(result);
+    updateCourses();
   }
 
   const updateCourses = async () => {
-    window.ipcRenderer.readCourses().then((result: { course_name: string }[]) => {
-      const n = result.map((e) => e.course_name);
+    window.ipcRenderer.readCourses().then((result: { name: string }[]) => {
+      const n = result.map((e) => e.name);
       setCourses(n);
     });
   }
 
   const readCourse = async (courseId: string) => {
     const result = await window.ipcRenderer.readCourse(courseId);
-    console.log(result[0].course_name);
+    console.log(result[0].name);
   }
 
   const updateCourse = async (courseId: string, courseName: string) => {
@@ -103,7 +104,7 @@ function Course() {
       <div>
         <h2 className='text-lg font-bold p-2'>Courses</h2>
         <div className='text-sm'>
-          {courses.map((course: any) => {
+          {courses.map((course: string) => {
             return <p key={course}>{course}</p>
           })}
         </div>
