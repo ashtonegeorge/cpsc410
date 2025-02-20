@@ -28,7 +28,27 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
    * From the front end, this event handler can be used by calling window.ipcRenderer.getNames().
    * @returns {Promise<{Name: string}[]>}
    */
-  getNames(): Promise<{ Name: string }[]> {
-    return ipcRenderer.invoke('get-names');
-  } 
+  // getNames(): Promise<{ Name: string }[]> {
+  //   return ipcRenderer.invoke('get-names');
+  // }, 
+
+  createCourse(courseName: string): Promise<void> {
+    return ipcRenderer.invoke('create-course', courseName);
+  },
+
+  readCourses(): Promise<{ Name: string }[]> {
+    return ipcRenderer.invoke('read-courses');
+  },
+
+  readCourse(courseId: string): Promise<{ id: number, course_name: string }[]> {
+    return ipcRenderer.invoke('read-course', courseId);
+  },
+
+  updateCourse(courseId: string, courseName: string): Promise<void> {
+    return ipcRenderer.invoke('update-course', courseId, courseName);
+  },
+
+  deleteCourse(courseId: string): Promise<void> {
+    return ipcRenderer.invoke('delete-course', courseId);
+  }
 })

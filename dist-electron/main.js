@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 const require2 = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const db = require2("better-sqlite3")("test.db");
+const db = require2("better-sqlite3")("dev.db");
 process.env.APP_ROOT = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
@@ -26,6 +26,7 @@ function createWindow() {
   } else {
     win.loadFile(path.join(RENDERER_DIST, "index.html"));
   }
+  win.webContents.openDevTools();
 }
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -39,8 +40,24 @@ app.on("activate", () => {
   }
 });
 app.whenReady().then(createWindow);
-ipcMain.handle("get-names", async () => {
-  const result = db.prepare("SELECT * FROM test").all();
+ipcMain.handle("create-course", async (_event, courseName) => {
+  const result = db.prepare("INSERT INTO course (course_name) VALUES (?)").run(courseName);
+  return result;
+});
+ipcMain.handle("read-courses", async () => {
+  const result = db.prepare("SELECT * FROM course").all();
+  return result;
+});
+ipcMain.handle("read-course", async (_event, courseId) => {
+  const result = db.prepare("SELECT * FROM course WHERE id = ?").all(courseId);
+  return result;
+});
+ipcMain.handle("update-course", async (_event, courseId, courseName) => {
+  const result = db.prepare("UPDATE course SET course_name = ? WHERE id = ?").run(courseName, courseId);
+  return result;
+});
+ipcMain.handle("delete-course", async (_event, courseId) => {
+  const result = db.prepare("DELETE FROM course WHERE id = ?").run(courseId);
   return result;
 });
 export {
