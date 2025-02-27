@@ -4,7 +4,7 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  background-color: var(--color-stone-800);
+  background-color: var(--color-francis-grey);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,7 +12,12 @@
 }
 
 .glow {
-    filter:drop-shadow(0 0 0.5rem #d73838)
+    filter:drop-shadow(0 0 0.5rem #dda5a5)
 }
 
 @import "tailwindcss";
+
+@theme {
+  --color-francis-red: #990000;
+  --color-francis-grey: #777777;
+}

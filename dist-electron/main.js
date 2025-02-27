@@ -45,7 +45,7 @@ ipcMain.handle("create-course", async (_event, courseName) => {
   return result;
 });
 ipcMain.handle("read-courses", async () => {
-  const result = db.prepare("SELECT * FROM course").all();
+  const result = db.prepare("SELECT * FROM course WHERE id IS NOT NULL AND name IS NOT NULL AND name is not ''").all();
   return result;
 });
 ipcMain.handle("read-course", async (_event, courseId) => {
