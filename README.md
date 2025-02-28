@@ -36,3 +36,19 @@ You can start the application by running the following command.
 ```bash
 npm run dev
 ```
+
+## Technologies
+This project was built using the following technologies:
+- [Node.js][1]
+- [Electron][2]
+- [React][3]
+- [Typescript][4]
+- [SQLite3][5] 
+- [TailwindCSS][6]
+
+[1]: [https://nodejs.org/docs/latest/api/]
+[2]: [https://www.electronjs.org/docs/latest/]
+[3]: [https://react.dev/learn]
+[4]: [https://www.typescriptlang.org/docs/]
+[5]: [https://www.npmjs.com/package/better-sqlite3]
+[6]: [https://tailwindcss.com/docs/installation/using-vite]
