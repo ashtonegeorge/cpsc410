@@ -5,6 +5,8 @@ This readme is a work in progress. It will be updated as the project progresses.
 ```text
 src/
 ├── assets/
+├── components/
+├── pages/
 ├── App.css
 ├── App.tsx
 ├── index.css
@@ -14,6 +16,12 @@ src/
 
 ### assets
 The assets folder contains assets such as images and icons that are imported into the project as needed.
+
+### components
+The components folder contains various React components that are reused throughout the application.
+
+### pages
+The pages folder contains all of the pages (window sized components) within the application.
 
 ### App.css
 App.css is a CSS file that contains the styles for the App component. Notice how they are imported at the top of the App.tsx file. 
