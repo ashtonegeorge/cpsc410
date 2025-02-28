@@ -1,149 +1,19 @@
 import { useEffect, useState } from 'react'
 import sfuLogo from './assets/redflash.png'
-import TextField from './components/TextField';
-import Button from './components/Button';
 import './App.css'
-
-interface AppState {
-  setView: (view: string) => void;
-}
-
-function Home({setView}: AppState) {
-  return (
-    <div>
-      <h2>Home</h2>
-      <p>Welcome to Evalu8, the solution for your grade and survey reporting needs.</p>
-      <div className='flex justify-evenly pt-24'>
-        <button className='bg-(--color-francis-red) hover:bg-red-700 text-white font-bold py-2 px-4 rounded' onClick={() => setView('courseEvaluations')}>
-          Courses
-        </button>
-        <button className='bg-(--color-francis-red) hover:bg-red-700 text-white font-bold py-2 px-4 rounded' onClick={() => setView('guestSpeakerEvaluations')}>
-          Guest Speaker Evaluations
-        </button>
-        <button className='bg-(--color-francis-red) hover:bg-red-700 text-white font-bold py-2 px-4 rounded' onClick={() => setView('moduleGrades')}>
-          Module Grades
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function About() {
-  return <h2>About</h2>;
-}
-
-function Course() {
-  const [create, setCreate] = useState('');
-  const [read, setRead] = useState('');
-  const [updateId, setUpdateId] = useState('');
-  const [updateName, setUpdateName] = useState('');
-  const [del, setDelete] = useState('');
-  const [courses, setCourses] = useState<[string, string][]>([]);
-  
-  useEffect(() => {
-    window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
-      const n = result.map((e) => [e.id, e.name] as [string, string]);
-      setCourses(n);
-    });
-  }, []);
-
-  const createCourse = async (courseName: string) => {
-    const result = window.ipcRenderer.createCourse(courseName);
-    console.log(result);
-    updateCourses();
-  }
-
-  const updateCourses = async () => {
-    window.ipcRenderer.readCourses().then((result: { id:string, name: string }[]) => {
-      const n = result.map((e) => [e.id, e.name] as [string, string]);
-      setCourses(n);
-    });
-  }
-
-  const readCourse = async (courseId: string) => {
-    const result = await window.ipcRenderer.readCourse(courseId);
-    if(result == null || result.length == 0) {
-      console.log("No results found.");
-    } else {
-      console.log(result[0].name);
-    }
-  }
-
-  const updateCourse = async (courseId: string, courseName: string) => {
-    const result = await window.ipcRenderer.updateCourse(courseId, courseName);
-    console.log(result);
-    updateCourses();
-  }
-
-  const deleteCourse = async (courseId: string) => {
-    const result = await window.ipcRenderer.deleteCourse(courseId);
-    console.log(result);
-    updateCourses();
-  }
-
-  return (
-    <>
-      <h1>Testing</h1>
-      <div className='grid grid-cols-2 gap-4'>
-        <div className='flex flex-col justify-center w-full items-center'>
-          <h2>Create Course</h2>
-          <TextField label="Course Name" setValue={setCreate}/>
-          {/* <button className='hover:cursor-pointer' onClick={() => createCourse(create)}>Submit</button> */}
-          <div className='w-1/2'>
-            <Button label="Create Course" action={() => createCourse(create)}/>
-          </div>
-        </div>
-        <div className='flex flex-col justify-center w-full items-center'>
-          <h2>Read Course</h2>
-          <TextField label="Course ID" setValue={setRead}/>
-          <div className='w-1/2'>
-            <Button label="Read Course" action={() => readCourse(read)}/>
-          </div>
-        </div>
-        <div className='flex flex-col justify-center w-full items-center'>
-          <h2>Update Course</h2>
-          <TextField label="Course ID" setValue={setUpdateId}/>
-          <TextField label="New Course Name" setValue={setUpdateName} />
-          <div className='w-1/2'>
-            <Button label="Update Course" action={() => updateCourse(updateId, updateName)}/>
-          </div>
-        </div>
-        <div className='flex flex-col justify-center w-full items-center'>
-          <h2>Delete Course</h2>
-          <TextField label="Course ID" setValue={setDelete}/>
-          <div className='w-1/2'>
-            <Button label="Delete Course" action={() => deleteCourse(del)}/>
-          </div>
-        </div>
-      </div>
-      <div>
-        <h2 className='text-lg font-bold p-2'>Courses</h2>
-        <div className='text-sm'>
-          {courses.map((course: [string, string], index: number) => {
-            return (
-              <div key={course[0] + index}>
-                <p>{course[0]} : {course[1]}</p>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </>
-  )
-}
+// the following imports are dedicated pages
+import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval } from './pages';
 
 function App() {
-  const [view, setView] = useState('home'); // state to handle what view is displayed
+  const [view, setView] = useState('home'); // state to handle what page is displayed
 
   /**
    * useEffect()
-   * This is a test to see if I can call the main process from the renderer process.
-   * An event handler, "get-names", is defined in the main.ts file.
-   * This event handler is exposed to the renderer process via the preload.ts file. The event is called in the getNames() function.
+   * this function call is a React "hook" that allows us to perform side effects within components.
    */
-  // useEffect(() => {
-  // any code here
-  // }, []); // notice the empty array I pass as the second parameter to the useEffect hook. This is called the dependency array. The fact it is empty tells the hook to only run once, when the component is mounted (when it is rendered on the screen).
+  useEffect(() => {
+    console.log("homepage loaded!");
+  }, []); // notice the empty array I pass as the second parameter to the useEffect hook. This is called the dependency array. The fact it is empty tells the hook to only run once, when the component is mounted (when it is rendered on the screen).
 
   return (
     <main className='text-center'>
@@ -157,10 +27,14 @@ function App() {
       <div className='p-4'>
         <h1 className='font-bold text-4xl'>Evalu8</h1>
         {/* the following lines are conditional rendering. each line employs "short-circuit evaluation" meaning */}
-        {/* when the left statement is true, perform the right statement, which renders the component */}
+        {/* when the left statement is true, perform the right statement, which in our case renders a component */}
         {view === 'home' && <Home setView={setView} />}
         {view === 'about' && <About />}
-        {view === 'courseEvaluations' && <Course />}
+        {view === 'courses' && <Courses />}
+        {view === 'grades' && <Grades />}
+        {view === 'guestEval' && <GuestEval />}
+        {view === 'courseEval' && <CourseEval />}
+        {view === 'academicYear' && <AcademicYear />}
       </div>
     </main>
   )
