@@ -61765,9 +61765,11 @@ ipcMain.handle("delete-course", async (_event, courseId) => {
   const result = db.prepare("DELETE FROM course WHERE id = ?").run(courseId);
   return result;
 });
-ipcMain.handle("read-spreadsheet-file", async (_event, filePath) => {
+ipcMain.handle("read-grade-file", async (_event, filePath) => {
   const workbook2 = new ExcelJS.Workbook();
   const ext2 = path$d.extname(filePath).toLowerCase();
+  const idCol = 2;
+  const gradeCol = 60;
   if (ext2 === ".xlsx") {
     await workbook2.xlsx.readFile(filePath);
   } else if (ext2 === ".csv") {
@@ -61777,8 +61779,28 @@ ipcMain.handle("read-spreadsheet-file", async (_event, filePath) => {
     throw new Error("Unsupported file format");
   }
   const worksheet2 = workbook2.worksheets[0];
-  const rows = worksheet2.getSheetValues();
-  return rows;
+  let pairs = [];
+  for (let i = 0; i < worksheet2.getSheetValues().length; i++) {
+    const row2 = worksheet2.getRow(i);
+    const id = row2.getCell(idCol).value;
+    const grade = row2.getCell(gradeCol).value;
+    if (id && grade && grade.toString().length == 2 && Number.parseInt(id.toString())) {
+      pairs.push([id, grade]);
+    }
+  }
+  return pairs;
+});
+ipcMain.handle("import-grades", async (_event, studentId, courseId, semesterId, academicYearId, isRetake, grade) => {
+  const result = db.prepare("INSERT INTO grade (student_id, course_id, semester_id, academic_year_id, retake, final_grade) VALUES (?, ?, ?, ?, ?, ?)").run(studentId, courseId, semesterId, academicYearId, isRetake, grade);
+  return result;
+});
+ipcMain.handle("read-semesters", async () => {
+  const result = db.prepare("SELECT * FROM semester").all();
+  return result;
+});
+ipcMain.handle("read-academic-years", async () => {
+  const result = db.prepare('SELECT * FROM "academic-year"').all();
+  return result;
 });
 export {
   MAIN_DIST,

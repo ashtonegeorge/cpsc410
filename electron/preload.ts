@@ -68,11 +68,42 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 
   /**
-   * readSpreadsheetFile() is a function that reads a spreadsheet file from the file system.
+   * readGradeFile() is a function that reads a grade file from the file system.
    * @param filePath 
-   * @returns rows from the spreadsheet
+   * @returns void
   */
-  readSpreadsheetFile(filePath: string): Promise<void> {
-    return ipcRenderer.invoke('read-spreadsheet-file', filePath)
-  } 
+  readGradeFile(filePath: string): Promise<void> {
+    return ipcRenderer.invoke('read-grade-file', filePath)
+  },
+
+  /**
+   * importGrades() is a function that imports grades into the database.
+   * @param studentId
+   * @param courseId
+   * @param semesterId
+   * @param academicYearId
+   * @param retake
+   * @param grade
+   * @returns void
+   */ 
+  importGrades(studentId: string, courseId: string, semesterId: string, academicYearId: string, retake: number, grade: string): Promise<void> {
+    return ipcRenderer.invoke('import-grades', studentId, courseId, semesterId, academicYearId, retake, grade); 
+  },
+
+  /**
+   * readSemesters() is a function that reads all semesters from the sqlite database.
+   * @returns semester sqlite objects
+   */
+  readSemesters(): Promise<{ id: string, name: string }[]> {
+    return ipcRenderer.invoke('read-semesters');
+  },
+
+  /**
+   * readAcademicYears() is a function that reads all academic years from the sqlite database.
+   * @returns academic year sqlite objects
+   */
+  readAcademicYears(): Promise<{ id: string, name: string }[]> {
+    return ipcRenderer.invoke('read-academic-years');
+  },
+  
 })
