@@ -23,11 +23,7 @@ electron.contextBridge.exposeInMainWorld("ipcRenderer", {
    * getNames()
    * This method invokes an event handler, "get-names", defined in the main.ts file at the bottom.
    * From the front end, this event handler can be used by calling window.ipcRenderer.getNames().
-   * @returns {Promise<{Name: string}[]>}
    */
-  // getNames(): Promise<{ Name: string }[]> {
-  //   return ipcRenderer.invoke('get-names');
-  // }, 
   createCourse(courseName) {
     return electron.ipcRenderer.invoke("create-course", courseName);
   },
@@ -42,5 +38,8 @@ electron.contextBridge.exposeInMainWorld("ipcRenderer", {
   },
   deleteCourse(courseId) {
     return electron.ipcRenderer.invoke("delete-course", courseId);
+  },
+  readSpreadsheetFile(filePath) {
+    return electron.ipcRenderer.invoke("read-spreadsheet-file", filePath);
   }
 });
