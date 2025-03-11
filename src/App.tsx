@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import sfuLogo from './assets/redflash.png'
 import './App.css'
 // the following imports are dedicated pages
-import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval } from './pages';
+import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval, ImportGrades } from './pages';
 
 function App() {
   const [view, setView] = useState('home'); // state to handle what page is displayed
@@ -31,7 +31,8 @@ function App() {
         {view === 'home' && <Home setView={setView} />}
         {view === 'about' && <About />}
         {view === 'courses' && <Courses />}
-        {view === 'grades' && <Grades />}
+        {view === 'grades' && <Grades setView={setView} />}
+        {view === 'importGrades' && <ImportGrades />}
         {view === 'guestEval' && <GuestEval />}
         {view === 'courseEval' && <CourseEval />}
         {view === 'academicYear' && <AcademicYear />}
