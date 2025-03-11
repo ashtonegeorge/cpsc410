@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { createRequire } from 'node:module'
-
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import ExcelJS from 'exceljs';
+import fs from 'fs';
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -86,27 +87,93 @@ app.whenReady().then(createWindow)
 //   return result;
 // });
 
+/**
+ * ipcMain.handle('create-course'...)
+ * This event handler is used in the preload.ts file to call the sqlite db.
+ * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
+ * This allows us to call window.ipcRenderer.createCourse() in the Courses.tsx file.
+ * @param courseName
+ * @returns course sqlite objects
+ */
 ipcMain.handle('create-course', async (_event, courseName) => {
   const result = db.prepare('INSERT INTO course (name) VALUES (?)').run(courseName);
   return result;
 });
 
+/**
+ * ipcMain.handle('read-courses'...)
+ * This event handler is used in the preload.ts file to call the sqlite db.
+ * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
+ * This allows us to call window.ipcRenderer.readCourses() in the Courses.tsx file.
+ * @returns course sqlite objects
+ */
 ipcMain.handle('read-courses', async () => {
   const result = db.prepare("SELECT * FROM course WHERE id IS NOT NULL AND name IS NOT NULL AND name is not ''").all();
   return result;
 });
 
+/**
+ * ipcMain.handle('read-course'...)
+ * This event handler is used in the preload.ts file to call the sqlite db.
+ * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
+ * This allows us to call window.ipcRenderer.readCourse() in the Courses.tsx file.
+ * @param courseId
+ * @returns a single course sqlite object
+ */
 ipcMain.handle('read-course', async (_event, courseId) => {
   const result = db.prepare('SELECT * FROM course WHERE id = ?').all(courseId);
   return result;
 });
 
+/**
+ * ipcMain.handle('update-course'...)
+ * This event handler is used in the preload.ts file to call the sqlite db.
+ * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
+ * This allows us to call window.ipcRenderer.updateCourse() in the Courses.tsx file.
+ * @param courseId
+ * @param courseName
+ * @returns course sqlite objects
+ */
 ipcMain.handle('update-course', async (_event, courseId, courseName) => {
   const result = db.prepare('UPDATE course SET name = ? WHERE id = ?').run(courseName, courseId);
   return result;
 });
 
+/**
+ * ipcMain.handle('delete-course'...)
+ * This event handler is used in the preload.ts file to call the sqlite db.
+ * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
+ * This allows us to call window.ipcRenderer.deleteCourse() in the Courses.tsx file.
+ * @param courseId
+ * @returns course sqlite objects
+ */
 ipcMain.handle('delete-course', async (_event, courseId) => {
   const result = db.prepare('DELETE FROM course WHERE id = ?').run(courseId);
   return result;
+});
+
+/**
+ * ipcMain.handle('read-spreadsheet-file'...)
+ * This event handler is used in the preload.ts file to read a spreadsheet file.
+ * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
+ * This allows us to call window.ipcRenderer.readSpreadsheetFile() in the ImportGrades.tsx file.
+ * @param filePath
+ * @returns rows
+ */
+ipcMain.handle('read-spreadsheet-file', async (_event, filePath) => {
+  const workbook = new ExcelJS.Workbook();
+  const ext = path.extname(filePath).toLowerCase();
+
+  if (ext === '.xlsx') {
+    await workbook.xlsx.readFile(filePath);
+  } else if (ext === '.csv') {
+    const fileStream = fs.createReadStream(filePath);
+    await workbook.csv.read(fileStream);
+  } else {
+    throw new Error('Unsupported file format');
+  }
+
+  const worksheet = workbook.worksheets[0];
+  const rows = worksheet.getSheetValues();
+  return rows;
 });

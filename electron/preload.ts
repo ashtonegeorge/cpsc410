@@ -1,4 +1,4 @@
-import { ipcRenderer, contextBridge } from 'electron'
+import { ipcRenderer, contextBridge } from 'electron';
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -23,32 +23,56 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // and specify the type definition of the function as defined below. 
 
   /**
-   * getNames()
-   * This method invokes an event handler, "get-names", defined in the main.ts file at the bottom.
-   * From the front end, this event handler can be used by calling window.ipcRenderer.getNames().
-   * @returns {Promise<{Name: string}[]>}
+   * createCourse() is a function that creates a course in the sqlite database.
+   * @param courseName 
+   * @returns course sqlite objects
    */
-  // getNames(): Promise<{ Name: string }[]> {
-  //   return ipcRenderer.invoke('get-names');
-  // }, 
-
   createCourse(courseName: string): Promise<void> {
     return ipcRenderer.invoke('create-course', courseName);
   },
 
+  /**
+   * readCourses() is a function that reads all courses from the sqlite database.
+   * @returns course sqlite objects
+   */
   readCourses(): Promise<{ Name: string }[]> {
     return ipcRenderer.invoke('read-courses');
   },
 
+  /**
+   * readCourse() is a function that reads a course from the sqlite database.
+   * @param courseId 
+   * @returns a single course sqlite object
+   */
   readCourse(courseId: string): Promise<{ id: number, name: string }[]> {
     return ipcRenderer.invoke('read-course', courseId);
   },
 
+  /**
+   * updateCourse() is a function that updates a course in the sqlite database.
+   * @param courseId 
+   * @param courseName 
+   * @returns course sqlite objects
+   */
   updateCourse(courseId: string, courseName: string): Promise<void> {
     return ipcRenderer.invoke('update-course', courseId, courseName);
   },
 
+  /**
+   * deleteCourse() is a function that deletes a course from the sqlite database.
+   * @param courseId 
+   * @returns course sqlite objects
+   */
   deleteCourse(courseId: string): Promise<void> {
     return ipcRenderer.invoke('delete-course', courseId);
-  }
+  },
+
+  /**
+   * readSpreadsheetFile() is a function that reads a spreadsheet file from the file system.
+   * @param filePath 
+   * @returns rows from the spreadsheet
+  */
+  readSpreadsheetFile(filePath: string): Promise<void> {
+    return ipcRenderer.invoke('read-spreadsheet-file', filePath)
+  } 
 })
