@@ -4,7 +4,7 @@ export default function Grades({setView}: {setView: React.Dispatch<React.SetStat
     return (
         <div>
             <h2>Module Grades</h2>
-            <Button label='Import Grade File' action={() => Promise.resolve(setView('importGrades'))} />
+            <Button icon="/upload.svg" label='Import Grade File' action={() => Promise.resolve(setView('importGrades'))} />
         </div>
     );
 }

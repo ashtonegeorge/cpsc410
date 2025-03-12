@@ -4,18 +4,22 @@ import Button from '../components/Button';
 export default function ImportGrades() {
     const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
     const [success, setSuccess] = useState(false);
+    // the following three state variables are arrays of tuples, where the first element is the id and the second is the name
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [semesters, setSemesters] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
+
+    // these three state variables correspond to the dropdowns for course, semester, and academic year
     const [selectedCourse, setSelectedCourse] = useState('');
     const [selectedSemester, setSelectedSemester] = useState('');
     const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
 
     useEffect(() => {
         window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
+            // unfortunately we can't directly reference the state variable, so we have to create a new array
             const coursesArray = result.map((e) => [e.id, e.name] as [string, string]);
             setCourses(coursesArray);
-            if (coursesArray.length > 0) {
+            if (coursesArray.length > 0) { // we set the selected course to the first course in the array by default since that is the first (and automatically selected) course in the dropdown
                 setSelectedCourse(coursesArray[0][0]);
             }
         });
@@ -71,7 +75,7 @@ export default function ImportGrades() {
         <div className='pt-12 w-1/2 mx-auto'>
             <h2 className='font-semibold'>Import Grade File</h2>
             <p>Upload a CSV file to import module grades.</p>
-            <div className='w-full flex justify-center py-4'>
+            <div className='w-full flex justify-center my-4 cursor-pointer'>
                 <input 
                     id="upload" 
                     type="file" 
@@ -110,7 +114,7 @@ export default function ImportGrades() {
                     ))}
                 </select>
             </div>
-        <Button action={handleUpload} label="Upload" />
+        <Button icon={"/upload.svg"} action={handleUpload} label="Upload" />
         {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}
     </div>
   );
