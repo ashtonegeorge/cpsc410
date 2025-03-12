@@ -34,6 +34,7 @@ function App() {
         {view === 'grades' && <Grades setView={setView} />}
         {view === 'importGrades' && <ImportGrades />}
         {view === 'guestEval' && <GuestEval setView={setView} />}
+        {view === 'importGuestEval' && <ImportGuestEval />}
         {view === 'courseEval' && <CourseEval />}
         {view === 'academicYear' && <AcademicYear />}
       </div>
