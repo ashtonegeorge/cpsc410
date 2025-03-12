@@ -27,3 +27,5 @@ prod.db
 *.njsproj
 *.sln
 *.sw?
+
+dist-electron
