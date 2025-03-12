@@ -62,14 +62,14 @@ export default function Courses() {
                     <h2>Create Course</h2>
                     <TextField label="Course Name" setValue={setCreate}/>
                     <div className='w-1/2'>
-                        <Button label="Create Course" action={() => createCourse(create)}/>
+                        <Button icon={null} label="Create Course" action={() => createCourse(create)}/>
                     </div>
                 </div>
                 <div className='flex flex-col justify-center w-full items-center'>
                     <h2>Read Course</h2>
                     <TextField label="Course ID" setValue={setRead}/>
                     <div className='w-1/2'>
-                        <Button label="Read Course" action={() => readCourse(read)}/>
+                        <Button icon={null} label="Read Course" action={() => readCourse(read)}/>
                     </div>
                 </div>
                 <div className='flex flex-col justify-center w-full items-center'>
@@ -77,14 +77,14 @@ export default function Courses() {
                     <TextField label="Course ID" setValue={setUpdateId}/>
                     <TextField label="New Course Name" setValue={setUpdateName} />
                     <div className='w-1/2'>
-                        <Button label="Update Course" action={() => updateCourse(updateId, updateName)}/>
+                        <Button icon={null} label="Update Course" action={() => updateCourse(updateId, updateName)}/>
                     </div>
                 </div>
                 <div className='flex flex-col justify-center w-full items-center'>
                     <h2>Delete Course</h2>
                     <TextField label="Course ID" setValue={setDelete}/>
                     <div className='w-1/2'>
-                        <Button label="Delete Course" action={() => deleteCourse(del)}/>
+                        <Button icon={null} label="Delete Course" action={() => deleteCourse(del)}/>
                     </div>
                 </div>
             </div>
