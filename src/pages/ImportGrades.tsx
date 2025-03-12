@@ -14,6 +14,8 @@ export default function ImportGrades() {
     const [selectedSemester, setSelectedSemester] = useState('');
     const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
 
+    const [isRetake, setIsRetake] = useState(0);
+
     useEffect(() => {
         window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
             // unfortunately we can't directly reference the state variable, so we have to create a new array
@@ -49,13 +51,12 @@ export default function ImportGrades() {
     const handleUpload = async () => {
         if (filePath) { // if there is a file path, read the file
             const records = await window.ipcRenderer.readGradeFile(filePath); // read the file and get student id and grade pairs
-            const retake = 0; // need to determine how to get retake value, for now it is set to 0 (not a retake)
             records.forEach((record: [string, string]) => {
                 window.ipcRenderer.importGrades(record[0], 
                                                 selectedCourse, 
                                                 selectedSemester, 
                                                 selectedAcademicYear, 
-                                                retake, 
+                                                isRetake, 
                                                 record[1]);
             });
 
@@ -70,6 +71,7 @@ export default function ImportGrades() {
     const handleSelectedCourseChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedCourse(event.target.value); };
     const handleSelectedSemesterChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedSemester(event.target.value); };
     const handleSelectedAcademicYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedAcademicYear(event.target.value); };
+    const handleIsRetakeChange = (event: React.ChangeEvent<HTMLInputElement>) => { setIsRetake(event.target.checked === true ? 1 : 0); }
 
     return (
         <div className='pt-12 w-1/2 mx-auto'>
@@ -113,6 +115,10 @@ export default function ImportGrades() {
                         </option>
                     ))}
                 </select>
+            </div>
+            <div className='flex w-full justify-center gap-2 py-2'>
+                <input onChange={handleIsRetakeChange} type="checkbox" id="retake" name="retake"  />
+                <label htmlFor="vehicle1" className='font-semibold'>Retakes?</label><br/>
             </div>
         <Button icon={"/upload.svg"} action={handleUpload} label="Upload" />
         {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}
