@@ -1,3 +1,10 @@
-export default function CourseEval() {
-    return <h2>Course Evaluations</h2>;
+import Button from '../components/Button';
+
+export default function CourseEval({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
+    return (
+            <div>
+                <h2>Course Evaluation</h2>
+                <Button icon="/upload.svg" label='Import Grade File' action={() => Promise.resolve(setView('importCourseEval'))} />
+            </div>
+        );
 }

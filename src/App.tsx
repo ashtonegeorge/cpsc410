@@ -36,7 +36,7 @@ function App() {
         {view === 'guestEval' && <GuestEval setView={setView} />}
         {view === 'importGuestEval' && <ImportGuestEval />}
         {view === 'guestEvalmetrics' && <GuestEvalMetrics />}
-        {view === 'courseEval' && <CourseEval />}
+        {view === 'courseEval' && <CourseEval setView={setView} />}
         {view === 'academicYear' && <AcademicYear />}
         {view === 'editGuestEval' && <EditGuestEval />}
 
