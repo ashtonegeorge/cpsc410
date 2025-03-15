@@ -3,6 +3,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import os from 'os'
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 
@@ -206,3 +207,114 @@ ipcMain.handle('read-academic-years', async () => {
     const result = db.prepare('SELECT * FROM "academic-year"').all();
     return result;
 });
+
+ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearId) => {
+    interface GradeRow {
+        student_id: string;
+        course_id: string;
+        semester_name: string;
+        academic_year_name: string;
+        retake: number;
+        final_grade: string;
+    }
+
+    let query = `
+        SELECT g.*, s.name as semester_name, ay.name as academic_year_name
+        FROM grade g
+        LEFT JOIN semester s ON g.semester_id = s.id
+        LEFT JOIN "academic-year" ay ON g.academic_year_id = ay.id
+        WHERE 1=1
+    `;    
+
+    const params = [];
+
+    if (studentId !== '*') {
+        query += ' AND student_id = ?';
+        params.push(studentId);
+    }
+    if (courseId !== '*') {
+        query += ' AND course_id = ?';
+        params.push(courseId);
+    }
+    if (academicYearId !== '*') {
+        query += ' AND academic_year_id = ?';
+        params.push(academicYearId);
+    }
+
+    const result = db.prepare(query).all(...params);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile('grade-template.xlsx');
+    const rawGradeSheet = workbook.getWorksheet('Raw Grades');
+    rawGradeSheet!.columns = [
+        { header: 'Student ID', key: 'student_id', width: 10 },
+        { header: 'Course ID', key: 'course_id', width: 10 },
+        { header: 'Semester ID', key: 'semester_name', width: 10 },
+        { header: 'Academic Year ID', key: 'academic_year_name', width: 10 },
+        { header: 'Retake', key: 'retake', width: 10 },
+        { header: 'Grade', key: 'final_grade', width: 10 },
+    ];
+    rawGradeSheet!.addRows(result);
+
+    const metricsSheet = workbook.getWorksheet('Metrics');
+    metricsSheet!.columns = [
+        { header: 'Letter Grade', key: 'letter_grade', width: 10 },
+        { header: 'Count', key: 'count', width: 10 },
+        { header: 'Percentage', key: 'percentage', width: 10 },
+        { header: 'Pass Rate', key: 'pass_rate', width: 10 },
+        { header: 'Total Grades', key: 'total_grades', width: 10 },
+    ]
+
+    const gradeCounts: { [key: string]: number } = {
+        'A+': 0,
+        'A': 0,
+        'A-': 0,
+        'B+': 0,
+        'B': 0,
+        'B-': 0,
+        'C+': 0,
+        'C': 0,
+        'C-': 0,
+        'D+': 0,
+        'D': 0,
+        'D-': 0,
+        'F': 0,
+    };
+    result.forEach((row: GradeRow) => {
+        if (gradeCounts.hasOwnProperty(row.final_grade)) {
+            gradeCounts[row.final_grade]++;
+        }
+    });
+
+    metricsSheet!.addRows(Object.entries(gradeCounts).map(([letterGrade, count]) => {
+        return {
+            letter_grade: letterGrade,
+            count,
+            percentage: count / result.length,
+        }
+    }));
+
+    const passRate = ((gradeCounts['A+'] + gradeCounts['A'] + gradeCounts['A-'] + gradeCounts['B+'] + gradeCounts['B'] + gradeCounts['B-'] + gradeCounts['C+'] + gradeCounts['C']) / result.length) * 100 + "%";
+    const totalGrades = result.length;
+
+    metricsSheet!.getCell('D2').value = passRate;
+    metricsSheet!.getCell('E2').value = totalGrades;
+
+    const downloadsFolder = path.join(os.homedir(), 'Downloads');
+    const filePath = path.join(downloadsFolder, 'grade-report.xlsx');
+    const uniqueFilePath = getUniqueFilePath(filePath);
+    await workbook.xlsx.writeFile(uniqueFilePath);
+    return result;
+});
+
+function getUniqueFilePath(filePath: string): string {
+    let uniqueFilePath = filePath;
+    let counter = 1;
+
+    while (fs.existsSync(uniqueFilePath)) {
+        const parsedPath = path.parse(filePath);
+        uniqueFilePath = path.join(parsedPath.dir, `${parsedPath.name} (copy${counter > 1 ? ` ${counter}` : ''})${parsedPath.ext}`);
+        counter++;
+    }
+
+    return uniqueFilePath;
+}

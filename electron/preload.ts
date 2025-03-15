@@ -105,5 +105,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   readAcademicYears(): Promise<{ id: string, name: string }[]> {
     return ipcRenderer.invoke('read-academic-years');
   },
+
+  generateGradeReport(studentId: string, courseId: string, academicYearId: string): Promise<void> {
+    return ipcRenderer.invoke('generate-grade-report', studentId, courseId, academicYearId);
+  }
   
 })
