@@ -60,83 +60,90 @@ export default function GradeMetrics() {
     }
 
     return (
-        <div className="w-1/2 mx-auto">
-            <h2>Grade Metrics</h2>
-            <div className="pt-12 flex">
-                <h3 className="w-full place-self-center text-left">Filter results by: </h3>
-                <select className="text-black bg-white p-2 rounded-lg my-2 w-full" defaultValue={"sid"} onChange={(e) => setFilter(e.target.value)}>
-                    <option value="sid">Student</option>
-                    <option value="course">Course</option>
-                    <option value="ayear">Academic Year</option>
-                </select>
+        <div className="flex justify-between gap-8 h-full">
+            
+            <div className="w-1/3">
+                <h2>Grade Metrics</h2>
+                <div className="pt-12 flex">
+                    <h3 className="w-full place-self-center text-left">Filter results by: </h3>
+                    <select className="text-black bg-white p-2 rounded-lg my-2 w-full" defaultValue={"sid"} onChange={(e) => setFilter(e.target.value)}>
+                        <option value="sid">Student</option>
+                        <option value="course">Course</option>
+                        <option value="ayear">Academic Year</option>
+                    </select>
+                </div>
+                {filter === 'sid' && 
+                    <>
+                        <div className="w-full flex flex-col text-left">
+                            <h3>Enter Student ID</h3>
+                            <input value={studentId} onChange={handleStudentIdChange} type="text" placeholder="ID" className="text-black bg-white p-2 rounded-lg my-2" />
+                            <h3>Select Course</h3>
+                            <select defaultValue={"*"} className="text-black bg-white p-2 rounded-lg my-2" onChange={handleSelectedCourseChange}>
+                                <option value="*">All courses</option>
+                                {courses.map((course) => <option key={course[0]} value={course[0]}>{course[0]}: {course[1]}</option>)}
+                            </select>
+                            <h3>Select Academic Year</h3>
+                            <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
+                                <option value="*">All courses</option>
+                                {academicYears.map(([id, name]) => (  
+                                    <option className='flex p-1 w-full' value={id} key={id}>
+                                        {name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </>
+                }
+                {filter === 'course' && 
+                    <>
+                        <div className="w-full flex flex-col text-left">
+                            <h3>Select Course</h3>
+                            <select onChange={handleSelectedCourseChange} value={selectedCourse} className="text-black bg-white p-2 rounded-lg my-2" >
+                                <option value="*">All courses</option>
+                                {courses.map((course) => <option key={course[0]} value={course[0]}>{course[0]}: {course[1]}</option>)}
+                            </select>
+                            <h3>Select Academic Year</h3>
+                            <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
+                                <option value="*">All academic years</option>
+                                {academicYears.map(([id, name]) => (  
+                                    <option className='flex p-1 w-full' value={id} key={id}>
+                                        {name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </>
+                }
+                {filter === 'ayear' && 
+                    <>
+                        <div className="w-full flex flex-col text-left">
+                            <h3>Select Academic Year</h3>
+                            <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
+                                <option value="*">All academic years</option>
+                                {academicYears.map(([id, name]) => (  
+                                    <option className='flex p-1 w-full' value={id} key={id}>
+                                        {name}
+                                    </option>
+                                ))}
+                            </select>
+                            <h3>Select Course</h3>
+                            <select value={selectedCourse} className="text-black bg-white p-2 rounded-lg my-2" onChange={handleSelectedCourseChange}>
+                                <option value="*">All courses</option>
+                                {courses.map((course) => <option key={course[0]} value={course[0]}>{course[0]}: {course[1]}</option>)}
+                            </select>
+                        </div>
+                    </>
+                }
+                <div className="w-1/2 mx-auto py-6">
+                    <Button icon={null} label="Generate Report" action={handleGenerateReport} />
+                </div>
+                {success && <p className="w-full text-green-500 font-semibold">Report generated successfully!</p>}
+                {error && <p className="w-full text-red-500 font-semibold">Report generation failed, please try again.</p>}
             </div>
-            {filter === 'sid' && 
-                <>
-                    <div className="w-full flex flex-col text-left">
-                        <h3>Enter Student ID</h3>
-                        <input value={studentId} onChange={handleStudentIdChange} type="text" placeholder="ID" className="text-black bg-white p-2 rounded-lg my-2" />
-                        <h3>Select Course</h3>
-                        <select defaultValue={"*"} className="text-black bg-white p-2 rounded-lg my-2" onChange={handleSelectedCourseChange}>
-                            <option value="*">All courses</option>
-                            {courses.map((course) => <option key={course[0]} value={course[0]}>{course[0]}: {course[1]}</option>)}
-                        </select>
-                        <h3>Select Academic Year</h3>
-                        <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
-                            <option value="*">All courses</option>
-                            {academicYears.map(([id, name]) => (  
-                                <option className='flex p-1 w-full' value={id} key={id}>
-                                    {name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </>
-            }
-            {filter === 'course' && 
-                <>
-                    <div className="w-full flex flex-col text-left">
-                        <h3>Select Course</h3>
-                        <select onChange={handleSelectedCourseChange} value={selectedCourse} className="text-black bg-white p-2 rounded-lg my-2" >
-                            <option value="*">All courses</option>
-                            {courses.map((course) => <option key={course[0]} value={course[0]}>{course[0]}: {course[1]}</option>)}
-                        </select>
-                        <h3>Select Academic Year</h3>
-                        <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
-                            <option value="*">All academic years</option>
-                            {academicYears.map(([id, name]) => (  
-                                <option className='flex p-1 w-full' value={id} key={id}>
-                                    {name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </>
-            }
-            {filter === 'ayear' && 
-                <>
-                    <div className="w-full flex flex-col text-left">
-                        <h3>Select Academic Year</h3>
-                        <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
-                            <option value="*">All academic years</option>
-                            {academicYears.map(([id, name]) => (  
-                                <option className='flex p-1 w-full' value={id} key={id}>
-                                    {name}
-                                </option>
-                            ))}
-                        </select>
-                        <h3>Select Course</h3>
-                        <select value={selectedCourse} className="text-black bg-white p-2 rounded-lg my-2" onChange={handleSelectedCourseChange}>
-                            <option value="*">All courses</option>
-                            {courses.map((course) => <option key={course[0]} value={course[0]}>{course[0]}: {course[1]}</option>)}
-                        </select>
-                    </div>
-                </>
-            }
-            <div className="w-1/2 mx-auto py-6">
-                <Button icon={null} label="Generate Report" action={handleGenerateReport} />
+
+            <div className="bg-stone-300 w-full border-2 border-stone-900 rounded-xl h-full">
+                Output
             </div>
-            {success && <p className="w-full text-green-500 font-semibold">Report generated successfully!</p>}
-            {error && <p className="w-full text-red-500 font-semibold">Report generation failed, please try again.</p>}
         </div>
     );
 }
