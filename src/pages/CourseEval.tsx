@@ -4,7 +4,7 @@ export default function CourseEval({setView}: {setView: React.Dispatch<React.Set
     return (
             <div>
                 <h2>Course Evaluation</h2>
-                <Button icon="/upload.svg" label='Import Grade File' action={() => Promise.resolve(setView('importCourseEval'))} />
+                <Button icon="/upload.svg" label='Import Course Evaluation File' action={() => Promise.resolve(setView('importCourseEval'))} />
             </div>
         );
 }
