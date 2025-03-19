@@ -3,7 +3,6 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import os from 'os'
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 
@@ -180,7 +179,7 @@ ipcMain.handle('read-grade-file', async (_event, filePath) => {
 
     const worksheet = workbook.worksheets[0]; // grab the first worksheet, as the grade workbooks only have one
 
-    let pairs = [];
+    const pairs = [];
     // for each row in the worksheet, extract the student's id and grade
     for(let i = 0; i<worksheet.getSheetValues().length; i++) {
         const row = worksheet.getRow(i);
@@ -281,7 +280,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         'F': 0,
     };
     result.forEach((row: GradeRow) => {
-        if (gradeCounts.hasOwnProperty(row.final_grade)) {
+        if (Object.prototype.hasOwnProperty.call(gradeCounts, row.final_grade)) {
             gradeCounts[row.final_grade]++;
         }
     });

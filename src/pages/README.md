@@ -25,6 +25,9 @@ This file contains the course evaluation homepage. The intention behind this fil
 ### Courses.tsx
 This file contains the courses page. The intention behind this file is that it allows the user to maintain the available course selections for evaluations and grades.
 
+### GradeMetrics.tsx
+This file contains the grade metrics page. The intention behind this file is that it will serve as the place where the user can generate Excel reports based on various criteria that they might need for accreditation.
+
 ### Grades.tsx
 This file contains the module grades page. The intention behind this file is that it will serve as intermediate navigation between the homepage and whatever grade-related actions the user wants to do.
 

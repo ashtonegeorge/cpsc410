@@ -48,7 +48,7 @@ export default function GradeMetrics() {
                 setError(false);
             }, 7000);
             return;
-        }; 
+        }
 
         const res = window.ipcRenderer.generateGradeReport(studentId === "" ? "*" : studentId, selectedCourse, selectedAcademicYear);
         if(await res) setSuccess(true); else (setError(true));
