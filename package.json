@@ -13,6 +13,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
     "better-sqlite3": "^11.8.1",
+    "dotenv": "^16.4.7",
     "electron-store": "^10.0.1",
     "exceljs": "^4.4.0",
     "react": "^18.2.0",
@@ -35,5 +36,23 @@
     "vite-plugin-electron": "^0.28.6",
     "vite-plugin-electron-renderer": "^0.14.5"
   },
-  "main": "dist-electron/main.js"
+  "main": "dist-electron/main.js",
+  "build": {
+    "appId": "evalu8.app",
+    "productName": "Evalu8",
+    "files": [
+      "dist/",
+      "dist-electron/",
+      "node_modules/**/*",
+      "public/**/*",
+      "node_modules",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "extraResources": [
+      "./dev.db"
+    ]
+  }
 }

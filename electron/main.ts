@@ -5,11 +5,14 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import ExcelJS from 'exceljs';
 import fs from 'fs';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-// const db = require('better-sqlite3')('test.db');
-const db = require('better-sqlite3')('dev.db');
+const dbPath = process.env.NODE_ENV === 'development' ? './dev.db' : path.join(process.resourcesPath, "./dev.db") 
+const db = require('better-sqlite3')(dbPath);
 
 // The built directory structure
 //
