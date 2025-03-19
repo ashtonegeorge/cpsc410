@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import os from 'os'
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 
@@ -204,5 +205,116 @@ ipcMain.handle('read-semesters', async () => {
 
 ipcMain.handle('read-academic-years', async () => {
     const result = db.prepare('SELECT * FROM "academic-year"').all();
+    return result;
+});
+
+ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearId) => {
+    interface GradeRow { // interface for the data we are querying from the db
+        student_id: string;
+        course_id: string;
+        semester_name: string;
+        academic_year_name: string;
+        retake: number;
+        final_grade: string;
+    }
+
+    // initial query, includes the verbose academic year name and semester name 
+    let query = `
+        SELECT g.*, s.name as semester_name, ay.name as academic_year_name
+        FROM grade g
+        LEFT JOIN semester s ON g.semester_id = s.id
+        LEFT JOIN "academic-year" ay ON g.academic_year_id = ay.id
+        WHERE 1=1
+    `;    
+
+    // if we are filtering, dynamically append those to our SQL query and add their corresponding parameters to the params array
+    const params = [];
+    if (studentId !== '*') {
+        query += ' AND student_id = ?';
+        params.push(studentId);
+    }
+    if (courseId !== '*') {
+        query += ' AND course_id = ?';
+        params.push(courseId);
+    }
+    if (academicYearId !== '*') {
+        query += ' AND academic_year_id = ?';
+        params.push(academicYearId);
+    }
+
+    const result = db.prepare(query).all(...params); // utilize our dynamically generated query and the passed-in params
+    const workbook = new ExcelJS.Workbook();
+    const rawGradeSheet = workbook.addWorksheet('Raw Grades'); // create a sheet with some cols for our raw data
+    rawGradeSheet!.columns = [
+        { header: 'Student ID', key: 'student_id', width: 10 },
+        { header: 'Course ID', key: 'course_id', width: 10 },
+        { header: 'Semester ID', key: 'semester_name', width: 10 },
+        { header: 'Academic Year ID', key: 'academic_year_name', width: 10 },
+        { header: 'Retake', key: 'retake', width: 10 },
+        { header: 'Grade', key: 'final_grade', width: 10 },
+    ];
+    rawGradeSheet!.addRows(result);
+
+    const metricsSheet = workbook.addWorksheet('Metrics'); // create a sheet for our calculated data
+    metricsSheet!.columns = [
+        { header: 'Letter Grade', key: 'letter_grade', width: 10 },
+        { header: 'Count', key: 'count', width: 10 },
+        { header: 'Percentage', key: 'percentage', width: 10 },
+        { header: 'Pass Rate', key: 'pass_rate', width: 10 },
+        { header: 'Total Grades', key: 'total_grades', width: 10 },
+    ]
+
+    // create a dictionary for each possible grade and add our queried grades
+    const gradeCounts: { [key: string]: number } = {
+        'A+': 0,
+        'A': 0,
+        'A-': 0,
+        'B+': 0,
+        'B': 0,
+        'B-': 0,
+        'C+': 0,
+        'C': 0,
+        'C-': 0,
+        'D+': 0,
+        'D': 0,
+        'D-': 0,
+        'F': 0,
+    };
+    result.forEach((row: GradeRow) => {
+        if (gradeCounts.hasOwnProperty(row.final_grade)) {
+            gradeCounts[row.final_grade]++;
+        }
+    });
+
+    // add the data we've calculated to the sheet
+    metricsSheet!.addRows(Object.entries(gradeCounts).map(([letterGrade, count]) => {
+        return {
+            letter_grade: letterGrade,
+            count,
+            percentage: count / result.length,
+        }
+    }));
+
+    // add two additional columns for our single-field data
+    const passRate = ((gradeCounts['A+'] + gradeCounts['A'] + gradeCounts['A-'] + gradeCounts['B+'] + gradeCounts['B'] + gradeCounts['B-'] + gradeCounts['C+'] + gradeCounts['C']) / result.length) * 100 + "%";
+    const totalGrades = result.length;
+
+    metricsSheet!.getCell('D2').value = passRate;
+    metricsSheet!.getCell('E2').value = totalGrades;
+
+    // utilize the file explorer to save to the user's desired destination
+    const path = await dialog.showSaveDialog(win!, {
+        title: 'Save Grade Report',
+        defaultPath: 'grade-report.xlsx',
+        filters: [
+            { name: 'Excel Files', extensions: ['xlsx'] },
+            { name: 'All Files', extensions: ['*'] }
+        ]
+    });
+    try {
+        await workbook.xlsx.writeFile(path.filePath);
+    } catch {
+        return false;
+    }
     return result;
 });
