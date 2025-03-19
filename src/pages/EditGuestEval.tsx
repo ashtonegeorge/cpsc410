@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react'; 
 
 export default function EditGuestEval() {
-    return <h2>Edit Guest Evaluation Data</h2>;
+    return (<h2>Edit Guest Evaluation Data</h2>) ; 
 }
