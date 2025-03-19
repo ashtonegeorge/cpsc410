@@ -1,10 +1,9 @@
-import { useState, useEffect, ReactEventHandler } from "react";
+import { useState, useEffect } from "react";
 import Button from "../components/Button";
 
 export default function GradeMetrics() {
     const [filter, setFilter] = useState('sid');
     const [courses, setCourses] = useState<[string, string][]>([]);
-    const [semesters, setSemesters] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
     const [studentId, setStudentId] = useState('');
     const [selectedCourse, setSelectedCourse] = useState('');
@@ -17,10 +16,6 @@ export default function GradeMetrics() {
             // unfortunately we can't directly reference the state variable, so we have to create a new array
             const coursesArray = result.map((e) => [e.id, e.name] as [string, string]);
             setCourses(coursesArray);
-        });
-        window.ipcRenderer.readSemesters().then((result: { id: string, name: string }[]) => {
-            const semestersArray = result.map((e) => [e.id, e.name] as [string, string]);
-            setSemesters(semestersArray);
         });
         window.ipcRenderer.readAcademicYears().then((result: { id: string, name: string }[]) => {
             const academicYearsArray = result.map((e) => [e.id, e.name] as [string, string]);
@@ -56,10 +51,11 @@ export default function GradeMetrics() {
         }; 
 
         const res = window.ipcRenderer.generateGradeReport(studentId === "" ? "*" : studentId, selectedCourse, selectedAcademicYear);
-        if(await res) setSuccess(true);
+        if(await res) setSuccess(true); else (setError(true));
 
         setTimeout(() => {
             setSuccess(false);
+            setError(false);
         }, 5000);
     }
 
@@ -139,8 +135,8 @@ export default function GradeMetrics() {
             <div className="w-1/2 mx-auto py-6">
                 <Button icon={null} label="Generate Report" action={handleGenerateReport} />
             </div>
-            {success && <p className="w-full text-green-500 font-semibold">Report generated successfully! It is now in your Downloads folder.</p>}
-            {error && <p className="w-full text-red-500 font-semibold">Report generation failed, ensure required fields are filled and please try again.</p>}
+            {success && <p className="w-full text-green-500 font-semibold">Report generated successfully!</p>}
+            {error && <p className="w-full text-red-500 font-semibold">Report generation failed, please try again.</p>}
         </div>
     );
 }

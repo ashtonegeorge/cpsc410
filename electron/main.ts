@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -209,7 +209,7 @@ ipcMain.handle('read-academic-years', async () => {
 });
 
 ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearId) => {
-    interface GradeRow {
+    interface GradeRow { // interface for the data we are querying from the db
         student_id: string;
         course_id: string;
         semester_name: string;
@@ -218,6 +218,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         final_grade: string;
     }
 
+    // initial query, includes the verbose academic year name and semester name 
     let query = `
         SELECT g.*, s.name as semester_name, ay.name as academic_year_name
         FROM grade g
@@ -226,8 +227,8 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         WHERE 1=1
     `;    
 
+    // if we are filtering, dynamically append those to our SQL query and add their corresponding parameters to the params array
     const params = [];
-
     if (studentId !== '*') {
         query += ' AND student_id = ?';
         params.push(studentId);
@@ -241,10 +242,9 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         params.push(academicYearId);
     }
 
-    const result = db.prepare(query).all(...params);
+    const result = db.prepare(query).all(...params); // utilize our dynamically generated query and the passed-in params
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile('grade-template.xlsx');
-    const rawGradeSheet = workbook.getWorksheet('Raw Grades');
+    const rawGradeSheet = workbook.addWorksheet('Raw Grades'); // create a sheet with some cols for our raw data
     rawGradeSheet!.columns = [
         { header: 'Student ID', key: 'student_id', width: 10 },
         { header: 'Course ID', key: 'course_id', width: 10 },
@@ -255,7 +255,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
     ];
     rawGradeSheet!.addRows(result);
 
-    const metricsSheet = workbook.getWorksheet('Metrics');
+    const metricsSheet = workbook.addWorksheet('Metrics'); // create a sheet for our calculated data
     metricsSheet!.columns = [
         { header: 'Letter Grade', key: 'letter_grade', width: 10 },
         { header: 'Count', key: 'count', width: 10 },
@@ -264,6 +264,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         { header: 'Total Grades', key: 'total_grades', width: 10 },
     ]
 
+    // create a dictionary for each possible grade and add our queried grades
     const gradeCounts: { [key: string]: number } = {
         'A+': 0,
         'A': 0,
@@ -285,6 +286,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         }
     });
 
+    // add the data we've calculated to the sheet
     metricsSheet!.addRows(Object.entries(gradeCounts).map(([letterGrade, count]) => {
         return {
             letter_grade: letterGrade,
@@ -293,28 +295,26 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         }
     }));
 
+    // add two additional columns for our single-field data
     const passRate = ((gradeCounts['A+'] + gradeCounts['A'] + gradeCounts['A-'] + gradeCounts['B+'] + gradeCounts['B'] + gradeCounts['B-'] + gradeCounts['C+'] + gradeCounts['C']) / result.length) * 100 + "%";
     const totalGrades = result.length;
 
     metricsSheet!.getCell('D2').value = passRate;
     metricsSheet!.getCell('E2').value = totalGrades;
 
-    const downloadsFolder = path.join(os.homedir(), 'Downloads');
-    const filePath = path.join(downloadsFolder, 'grade-report.xlsx');
-    const uniqueFilePath = getUniqueFilePath(filePath);
-    await workbook.xlsx.writeFile(uniqueFilePath);
+    // utilize the file explorer to save to the user's desired destination
+    const path = await dialog.showSaveDialog(win!, {
+        title: 'Save Grade Report',
+        defaultPath: 'grade-report.xlsx',
+        filters: [
+            { name: 'Excel Files', extensions: ['xlsx'] },
+            { name: 'All Files', extensions: ['*'] }
+        ]
+    });
+    try {
+        await workbook.xlsx.writeFile(path.filePath);
+    } catch {
+        return false;
+    }
     return result;
 });
-
-function getUniqueFilePath(filePath: string): string {
-    let uniqueFilePath = filePath;
-    let counter = 1;
-
-    while (fs.existsSync(uniqueFilePath)) {
-        const parsedPath = path.parse(filePath);
-        uniqueFilePath = path.join(parsedPath.dir, `${parsedPath.name} (copy${counter > 1 ? ` ${counter}` : ''})${parsedPath.ext}`);
-        counter++;
-    }
-
-    return uniqueFilePath;
-}
