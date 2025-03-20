@@ -1,4 +1,5 @@
 import { ipcRenderer, contextBridge } from 'electron';
+import ExcelJS from 'exceljs';
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -108,6 +109,14 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   generateGradeReport(studentId: string, courseId: string, academicYearId: string): Promise<void> {
     return ipcRenderer.invoke('generate-grade-report', studentId, courseId, academicYearId);
+  },
+
+  async saveGradeReport(buffer: ExcelJS.Buffer): Promise<void> {
+    const result = ipcRenderer.invoke('save-grade-report', buffer);
+    if (!result) {
+        console.error('Error saving grade report:', result);
+        throw new Error(result);
+    }
+    return result;
   }
-  
 })

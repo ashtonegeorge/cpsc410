@@ -244,7 +244,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         params.push(academicYearId);
     }
 
-    const result = db.prepare(query).all(...params); // utilize our dynamically generated query and the passed-in params
+    const result: GradeRow[] = db.prepare(query).all(...params); // utilize our dynamically generated query and the passed-in params
     const workbook = new ExcelJS.Workbook();
     const rawGradeSheet = workbook.addWorksheet('Raw Grades'); // create a sheet with some cols for our raw data
     rawGradeSheet!.columns = [
@@ -267,45 +267,62 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
     ]
 
     // create a dictionary for each possible grade and add our queried grades
-    const gradeCounts: { [key: string]: number } = {
-        'A+': 0,
-        'A': 0,
-        'A-': 0,
-        'B+': 0,
-        'B': 0,
-        'B-': 0,
-        'C+': 0,
-        'C': 0,
-        'C-': 0,
-        'D+': 0,
-        'D': 0,
-        'D-': 0,
-        'F': 0,
+    const gradeCounts: { [key: string]: number[] } = {
+        'A+': [],
+        'A': [],
+        'A-': [],
+        'B+': [],
+        'B': [],
+        'B-': [],
+        'C+': [],
+        'C': [],
+        'C-': [],
+        'D+': [],
+        'D': [],
+        'D-': [],
+        'F': [],
     };
     result.forEach((row: GradeRow) => {
         if (Object.prototype.hasOwnProperty.call(gradeCounts, row.final_grade)) {
-            gradeCounts[row.final_grade]++;
+            gradeCounts[row.final_grade].push(Number.parseInt(row.student_id));
         }
     });
 
+    const cpAndBelow: Set<number> = new Set([ // create a set of all student ids with C+ grade or lower and sort them
+        ...gradeCounts['C+'].sort((a, b) => a - b),
+        ...gradeCounts['C'].sort((a, b) => a - b),
+        ...gradeCounts['C-'].sort((a, b) => a - b),
+        ...gradeCounts['D+'].sort((a, b) => a - b),
+        ...gradeCounts['D'].sort((a, b) => a - b),
+        ...gradeCounts['D-'].sort((a, b) => a - b),
+        ...gradeCounts['F'].sort((a, b) => a - b),
+    ]);
+    const sortedCpAndBelow = Array.from(cpAndBelow).sort((a, b) => a - b);
+
     // add the data we've calculated to the sheet
-    metricsSheet!.addRows(Object.entries(gradeCounts).map(([letterGrade, count]) => {
+    metricsSheet!.addRows(Object.entries(gradeCounts).map(([letterGrade, studentIds]) => {
+        const count = studentIds.length;
         return {
             letter_grade: letterGrade,
             count,
-            percentage: count / result.length,
+            percentage: (count / result.length) * 100,        
         }
     }));
 
     // add two additional columns for our single-field data
-    const passRate = ((gradeCounts['A+'] + gradeCounts['A'] + gradeCounts['A-'] + gradeCounts['B+'] + gradeCounts['B'] + gradeCounts['B-'] + gradeCounts['C+'] + gradeCounts['C']) / result.length) * 100 + "%";
+    const passRate = ((gradeCounts['A+'].length + gradeCounts['A'].length + gradeCounts['A-'].length + gradeCounts['B+'].length + gradeCounts['B'].length + gradeCounts['B-'].length + gradeCounts['C+'].length + gradeCounts['C'].length) / result.length) * 100 + "%";
     const totalGrades = result.length;
 
     metricsSheet!.getCell('D2').value = passRate;
     metricsSheet!.getCell('E2').value = totalGrades;
 
-    // utilize the file explorer to save to the user's desired destination
-    const path = await dialog.showSaveDialog(win!, {
+    // store the excel spreadsheet as a buffer to retain spreadsheet values
+    const buffer = await workbook.xlsx.writeBuffer(); 
+    return { result, sortedCpAndBelow, gradeCounts, buffer }; // return all of the important information for the front-end in an object
+});
+
+ipcMain.handle('save-grade-report', async (_event, buffer: Buffer) => {
+    const { filePath } = await dialog.showSaveDialog(win!, {
         title: 'Save Grade Report',
         defaultPath: 'grade-report.xlsx',
         filters: [
@@ -313,10 +330,15 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
             { name: 'All Files', extensions: ['*'] }
         ]
     });
+
+    if (!filePath) return { success: false, message: 'User cancelled the save dialog' }; 
+
     try {
-        await workbook.xlsx.writeFile(path.filePath);
-    } catch {
-        return false;
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(buffer);
+        await workbook.xlsx.writeFile(filePath);
+        return { success: true };
+    } catch (error) {
+        return { success: false, message: error };
     }
-    return result;
 });
