@@ -2,11 +2,8 @@ import { useEffect, useState } from 'react'
 import sfuLogo from './assets/redflash.png'
 import './App.css'
 // the following imports are dedicated pages
-<<<<<<< HEAD
+
 import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval, ImportGrades, GradeMetrics, GuestEvalMetrics, ImportGuestEval, GuestEvalEdit, CourseEvalEdit, } from './pages';
-=======
-import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval, ImportGrades, GradeMetrics, GuestEvalMetrics, ImportGuestEval, GuestEvalEdit, ImportCourseEval, } from './pages';
->>>>>>> 14a53802d178b064005fc42b938a6c1b79f94f12
 
 function App() {
   const [view, setView] = useState('home'); // state to handle what page is displayed
