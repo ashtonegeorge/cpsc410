@@ -197,7 +197,7 @@ export default function GradeMetrics() {
                 }
                 <div className="w-2/3 mx-auto py-6 flex flex-col gap-4">
                     <Button icon={null} label="Generate Report" action={handleGenerateReport} />
-                    <Button icon={null} label="Save Report to Excel" action={handleSaveGradeReport} />
+                    {workbook && <Button icon={null} label="Save Report to Excel" action={handleSaveGradeReport} />}
                 </div>
                 {success && <p className="w-full text-green-300 font-semibold">Report generated successfully!</p>}
                 {error && <p className="w-full text-red-300 font-semibold">Saving report to Excel failed, ensure a report has been generated and please try again.</p>}
@@ -205,7 +205,7 @@ export default function GradeMetrics() {
 
             <div className="w-full h-full">
                 <div className="h-1/12 text-2xl">Output</div>
-                <div className="bg-stone-300 w-full min-h-11/12 border-2 border-stone-500 rounded-xl  text-stone-900 p-4 text-left">
+                <div className="bg-stone-300 w-full min-h-11/12 border-2 border-stone-600 rounded-xl  text-stone-900 p-4 text-left">
                     {cpAndBelow.length === 0 && !gradeCounts && 
                         <div>Run a report to show metrics here.</div>
                     }
