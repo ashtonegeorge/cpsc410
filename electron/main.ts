@@ -264,6 +264,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         { header: 'Percentage', key: 'percentage', width: 10 },
         { header: 'Pass Rate', key: 'pass_rate', width: 10 },
         { header: 'Total Grades', key: 'total_grades', width: 10 },
+        { header: 'Students w/ C+ and Below', key: 'cpAndBelow', width: 10 },
     ]
 
     // create a dictionary for each possible grade and add our queried grades
@@ -298,8 +299,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         ...gradeCounts['F'].sort((a, b) => a - b),
     ]);
     const sortedCpAndBelow = Array.from(cpAndBelow).sort((a, b) => a - b);
-
-    // add the data we've calculated to the sheet
+    
     metricsSheet!.addRows(Object.entries(gradeCounts).map(([letterGrade, studentIds]) => {
         const count = studentIds.length;
         return {
@@ -308,6 +308,9 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
             percentage: (count / result.length) * 100,        
         }
     }));
+
+    const cpAndBelowArr = Array.from(cpAndBelow); 
+    metricsSheet!.getColumn(6).values = ['Students w/ C+ and Below', ...cpAndBelowArr];
 
     // add two additional columns for our single-field data
     const passRate = ((gradeCounts['A+'].length + gradeCounts['A'].length + gradeCounts['A-'].length + gradeCounts['B+'].length + gradeCounts['B'].length + gradeCounts['B-'].length + gradeCounts['C+'].length + gradeCounts['C'].length) / result.length) * 100 + "%";
