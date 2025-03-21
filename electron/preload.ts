@@ -28,8 +28,8 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
    * @param courseName 
    * @returns course sqlite objects
    */
-  createCourse(courseName: string): Promise<void> {
-    return ipcRenderer.invoke('create-course', courseName);
+  createCourse(courseCode: string, courseName: string): Promise<void> {
+    return ipcRenderer.invoke('create-course', courseCode, courseName);
   },
 
   /**

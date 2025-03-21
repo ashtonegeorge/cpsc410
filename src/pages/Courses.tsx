@@ -4,7 +4,8 @@ import Button from '../components/Button';
 
 export default function Courses() {
     // the following 5 lines are React state variables that allow us to track the values of the input fields
-    const [create, setCreate] = useState('');
+    const [createCode, setCreateCode] = useState('');
+    const [createName, setCreateName] = useState('');
     const [read, setRead] = useState('');
     const [updateId, setUpdateId] = useState('');
     const [updateName, setUpdateName] = useState('');
@@ -20,8 +21,8 @@ export default function Courses() {
         });
     }, []);
 
-    const createCourse = async (courseName: string) => {
-        const result = window.ipcRenderer.createCourse(courseName);
+    const createCourse = async (courseCode: string, courseName: string) => {
+        const result = window.ipcRenderer.createCourse(courseCode, courseName);
         console.log(result);
         updateCourses();
     }
@@ -60,21 +61,22 @@ export default function Courses() {
             <div className='grid grid-cols-2 gap-4'>
                 <div className='flex flex-col justify-center w-full items-center'>
                     <h2>Create Course</h2>
-                    <TextField label="Course Name" setValue={setCreate}/>
+                    <TextField label="Course Code" setValue={setCreateCode}/>
+                    <TextField label="Course Name" setValue={setCreateName}/>
                     <div className='w-1/2'>
-                        <Button icon={null} label="Create Course" action={() => createCourse(create)}/>
+                        <Button icon={null} label="Create Course" action={() => createCourse(createCode, createName)}/>
                     </div>
                 </div>
                 <div className='flex flex-col justify-center w-full items-center'>
                     <h2>Read Course</h2>
-                    <TextField label="Course ID" setValue={setRead}/>
+                    <TextField label="Course Code" setValue={setRead}/>
                     <div className='w-1/2'>
                         <Button icon={null} label="Read Course" action={() => readCourse(read)}/>
                     </div>
                 </div>
                 <div className='flex flex-col justify-center w-full items-center'>
                     <h2>Update Course</h2>
-                    <TextField label="Course ID" setValue={setUpdateId}/>
+                    <TextField label="Course Code" setValue={setUpdateId}/>
                     <TextField label="New Course Name" setValue={setUpdateName} />
                     <div className='w-1/2'>
                         <Button icon={null} label="Update Course" action={() => updateCourse(updateId, updateName)}/>
@@ -82,22 +84,22 @@ export default function Courses() {
                 </div>
                 <div className='flex flex-col justify-center w-full items-center'>
                     <h2>Delete Course</h2>
-                    <TextField label="Course ID" setValue={setDelete}/>
+                    <TextField label="Course Code" setValue={setDelete}/>
                     <div className='w-1/2'>
                         <Button icon={null} label="Delete Course" action={() => deleteCourse(del)}/>
                     </div>
                 </div>
             </div>
-            <div>
+            <div className='p-8'>
                 <h2 className='text-lg font-bold p-2'>Courses</h2>
-                <div className='text-sm'>
-                {courses.map((course: [string, string], index: number) => { // here we map over the tuple array and render each course
-                    return (
-                    <div key={course[0] + index}>
-                        <p>{course[0]} : {course[1]}</p>
-                    </div>
-                    )
-                })}
+                <div className='text-md text-left xl:w-1/4 w-1/2 mx-auto'>
+                    {courses.map((course: [string, string], index: number) => { // here we map over the tuple array and render each course
+                        return (
+                        <div key={course[0] + index}>
+                            <p>{course[0]} : {course[1]}</p>
+                        </div>
+                        )
+                    })}
                 </div>
             </div>
         </>

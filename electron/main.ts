@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
@@ -98,8 +97,8 @@ app.whenReady().then(createWindow)
  * @param courseName
  * @returns course sqlite objects
  */
-ipcMain.handle('create-course', async (_event, courseName) => {
-    const result = db.prepare('INSERT INTO course (name) VALUES (?)').run(courseName);
+ipcMain.handle('create-course', async (_event, courseCode: string, courseName: string) => {
+    const result = db.prepare('INSERT INTO course (id, name) VALUES (?, ?)').run(courseCode, courseName);
     return result;
 });
 
