@@ -6,12 +6,12 @@ export default function GuestEval({setView}: {setView: React.Dispatch<React.SetS
         <h2>Guest Speaker Evaluations</h2>
             <div className='block pt-24'>
                 <div className="flex justify-evenly gap-12 pb-12">
-                <Button icon="/upload.svg" label='Import Guest Eval File' action={() => Promise.resolve(setView('importGuestEval'))} />
+                <Button icon={null} label='Import Guest Eval File' action={() => Promise.resolve(setView('importGuestEval'))} />
                     <Button icon={null} label="Guest Evaluations Metrics" action={() => Promise.resolve(setView('guestEvalmetrics'))}/>
                 </div>
                 <div className="flex justify-evenly gap-12 pb-12">
                     <Button icon={null} label="Import Evaluations Manually" action={() => Promise.resolve(setView('importGuestEvalMan'))}/>
-                    <Button icon="/edit.svg" label="Edit Guest Evaluation Data" action={() => Promise.resolve(setView('guestEvalEdit'))}/>
+                    <Button icon={null} label="Edit Guest Evaluation Data" action={() => Promise.resolve(setView('guestEvalEdit'))}/>
                 </div>
             </div>
     

@@ -6,7 +6,7 @@ export default function CourseEval({setView}: {setView: React.Dispatch<React.Set
                 <h2>Course Evaluation</h2>
                 <div className='block pt-24'>
                     <div className="flex justify-evenly gap-12 pb-12">
-                        <Button icon="/upload.svg" label='Import Course Evaluation File' action={() => Promise.resolve(setView('importCourseEval'))} />
+                        <Button icon={null} label='Import Course Evaluation File' action={() => Promise.resolve(setView('importCourseEval'))} />
                         <Button icon={null} label="Course Evaluations Metrics" action={() => Promise.resolve(setView('courseEvalmetrics'))}/>
                     </div>
                     <div className="flex justify-evenly gap-12 pb-12">

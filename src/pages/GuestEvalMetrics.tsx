@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
 
@@ -7,6 +7,7 @@ export default function GuestEvalMetrics() {
 
     const saveGradeMetric = () => {
         console.log('Saved Grade Metric:', gradeMetric);
+        return Promise.resolve();
     };
 
     return (
@@ -19,16 +20,13 @@ export default function GuestEvalMetrics() {
                             <TextField 
                                 label="Enter Grade Metric" 
                                 setValue={setGradeMetric} 
-                                value={gradeMetric}
-                                className="w-full" 
                             />
                         </div>
                         
                         <div className="mb-2"> 
                             <Button 
-                                label="Save" 
-                                action={saveGradeMetric} 
-                                className="w-full" 
+                                label="Save"
+                                action={saveGradeMetric} icon={null}
                             />
                         </div>
                     </div>

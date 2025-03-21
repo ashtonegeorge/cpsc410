@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
+import uploadIcon from '../assets/upload.png';
 
 export default function ImportGuestEval() { 
     const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
@@ -54,7 +55,6 @@ export default function ImportGuestEval() {
                                                     selectedCourse, 
                                                     selectedSemester, 
                                                     selectedAcademicYear, 
-                                                    isRetake, 
                                                     record[1]);
                 });
     
@@ -113,7 +113,7 @@ export default function ImportGuestEval() {
                             ))}
                         </select>
                     </div>
-                <Button icon={"/upload.svg"} action={handleUpload} label="Upload" />
+                <Button icon={uploadIcon} action={handleUpload} label="Upload" />
                 {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}
             </div>
           );

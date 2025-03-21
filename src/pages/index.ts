@@ -10,4 +10,5 @@ export { default as Home } from './Home';
 export { default as GuestEvalMetrics } from './GuestEvalMetrics';
 export { default as ImportGuestEval} from './ImportGuestEval';
 export { default as ImportCourseEval } from './ImportCourseEval';
-export { default as GuestEvalEdit} from './GuestEvalEdit';
+export { default as GuestEvalEdit } from './GuestEvalEdit';
+export { default as CourseEvalEdit } from './CourseEvalEdit';
