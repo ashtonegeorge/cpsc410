@@ -18,8 +18,9 @@ export default function GuestEvalMetrics() {
                     <div className="flex flex-col w-full max-w-xs">
                         <div className="mb-6"> {/* Increased margin-bottom to push the button lower */}
                             <TextField 
-                                label="Enter Grade Metric" 
+                                label="Enter Grade Metric"
                                 setValue={setGradeMetric} 
+                                placeholder={''}
                             />
                         </div>
                         
