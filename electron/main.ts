@@ -209,6 +209,21 @@ ipcMain.handle('read-academic-years', async () => {
     return result;
 });
 
+ipcMain.handle('create-academic-year', async (_event, ayearName) => {
+    const result = db.prepare('INSERT INTO "academic-year" (name) VALUES (?)').run(ayearName);
+    return result;
+});
+
+ipcMain.handle('update-academic-year', async (_event, ayearName, ayearId) => {
+    const result = db.prepare('UPDATE "academic-year" SET name = ? WHERE id = ?').run(ayearName, ayearId);
+    return result;
+});
+
+ipcMain.handle('delete-academic-year', async (_event, ayearId) => {
+    const result = db.prepare('DELETE FROM "academic-year" WHERE id = ?').run(ayearId);
+    return result;
+});
+
 ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearId) => {
     interface GradeRow { // interface for the data we are querying from the db
         student_id: string;

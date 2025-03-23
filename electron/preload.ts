@@ -107,6 +107,18 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('read-academic-years');
   },
 
+  createAcademicYear(ayearName: string): Promise<void> {
+    return ipcRenderer.invoke('create-academic-year', ayearName);
+  },
+
+  updateAcademicYear(ayearName: string, ayearId: string): Promise<void> {
+    return ipcRenderer.invoke('update-academic-year', ayearName, ayearId);
+  },
+
+  deleteAcademicYear(ayearId: string): Promise<void> {
+    return ipcRenderer.invoke('delete-academic-year', ayearId);
+  },
+
   generateGradeReport(studentId: string, courseId: string, academicYearId: string): Promise<void> {
     return ipcRenderer.invoke('generate-grade-report', studentId, courseId, academicYearId);
   },
