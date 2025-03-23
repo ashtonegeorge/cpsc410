@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import Button from "../components/Button";
 import React from "react";
 import ExcelJS from 'exceljs';
@@ -227,11 +227,11 @@ export default function GradeMetrics() {
                                 <div className="font-bold">Grade Count</div>
                                 <div className="font-bold">Percentage</div>
                                 {Object.entries(gradeCounts).map(([letterGrade, studentIds]) => (
-                                    <React.Fragment key={letterGrade}>
+                                    <Fragment key={letterGrade}>
                                         <div>{letterGrade}</div>
                                         <div>{studentIds.length}</div>
                                         <div>{((studentIds.length / grades.length) * 100).toFixed(2)}%</div>
-                                    </React.Fragment>
+                                    </Fragment>
                                 ))}
                             </div>
                         </>
