@@ -61,30 +61,30 @@ export default function Courses() {
             <div className='grid grid-cols-2 gap-4'>
                 <div className='flex flex-col justify-center w-full items-center'>
                     <h2>Create Course</h2>
-                    <TextField label="Course Code" setValue={setCreateCode}/>
-                    <TextField label="Course Name" setValue={setCreateName}/>
+                    <TextField label="Course Code" setValue={setCreateCode} placeholder={''}/>
+                    <TextField label="Course Name" setValue={setCreateName} placeholder={''}/>
                     <div className='w-1/2'>
                         <Button icon={null} label="Create Course" action={() => createCourse(createCode, createName)}/>
                     </div>
                 </div>
-                <div className='flex flex-col justify-center w-full items-center'>
+                <div className='flex flex-col justify-start w-full items-center'>
                     <h2>Read Course</h2>
-                    <TextField label="Course Code" setValue={setRead}/>
+                    <TextField label="Course Code" setValue={setRead} placeholder={''}/>
                     <div className='w-1/2'>
                         <Button icon={null} label="Read Course" action={() => readCourse(read)}/>
                     </div>
                 </div>
-                <div className='flex flex-col justify-center w-full items-center'>
+                <div className='flex flex-col justify-start w-full items-center'>
                     <h2>Update Course</h2>
-                    <TextField label="Course Code" setValue={setUpdateId}/>
-                    <TextField label="New Course Name" setValue={setUpdateName} />
+                    <TextField label="Course Code" setValue={setUpdateId} placeholder={''}/>
+                    <TextField label="New Course Name" setValue={setUpdateName} placeholder={''} />
                     <div className='w-1/2'>
                         <Button icon={null} label="Update Course" action={() => updateCourse(updateId, updateName)}/>
                     </div>
                 </div>
-                <div className='flex flex-col justify-center w-full items-center'>
+                <div className='flex flex-col justify-start w-full items-center'>
                     <h2>Delete Course</h2>
-                    <TextField label="Course Code" setValue={setDelete}/>
+                    <TextField label="Course Code" setValue={setDelete} placeholder={''}/>
                     <div className='w-1/2'>
                         <Button icon={null} label="Delete Course" action={() => deleteCourse(del)}/>
                     </div>
@@ -92,7 +92,7 @@ export default function Courses() {
             </div>
             <div className='p-8'>
                 <h2 className='text-lg font-bold p-2'>Courses</h2>
-                <div className='text-md text-left xl:w-1/4 w-1/2 mx-auto'>
+                <div className='text-md text-left w-1/2 mx-auto'>
                     {courses.map((course: [string, string], index: number) => { // here we map over the tuple array and render each course
                         return (
                         <div key={course[0] + index}>
