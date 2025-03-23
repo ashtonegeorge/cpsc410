@@ -115,19 +115,6 @@ ipcMain.handle('read-courses', async () => {
 });
 
 /**
- * ipcMain.handle('read-course'...)
- * This event handler is used in the preload.ts file to call the sqlite db.
- * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
- * This allows us to call window.ipcRenderer.readCourse() in the Courses.tsx file.
- * @param courseId
- * @returns a single course sqlite object
- */
-ipcMain.handle('read-course', async (_event, courseId) => {
-    const result = db.prepare('SELECT * FROM course WHERE id = ?').all(courseId);
-    return result;
-});
-
-/**
  * ipcMain.handle('update-course'...)
  * This event handler is used in the preload.ts file to call the sqlite db.
  * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
@@ -153,6 +140,27 @@ ipcMain.handle('delete-course', async (_event, courseId) => {
     const result = db.prepare('DELETE FROM course WHERE id = ?').run(courseId);
     return result;
 });
+
+ipcMain.handle('create-guest-lecturer', async (_event, guestFName, guestLName) => {
+    const result = db.prepare('INSERT INTO "guest-lecturer" (fname, lname) VALUES (?, ?)').run(guestFName, guestLName);
+    return result;
+});
+
+ipcMain.handle('read-guest-lecturers', async () => {
+    const result = db.prepare('SELECT * FROM "guest-lecturer"').all();
+    return result;
+});
+
+ipcMain.handle('update-guest-lecturer', async (_event, guestId, guestFName, guestLName) => {
+    const result = db.prepare('UPDATE "guest-lecturer" SET fname = ? AND SET lname = ? WHERE id = ?').run(guestFName, guestLName, guestId);
+    return result;
+});
+
+ipcMain.handle('delete-guest-lecturer', async (_event, guestId) => {
+    const result = db.prepare('DELETE FROM "guest-lecturer" WHERE id = ?').run(guestId);
+    return result;
+});
+
 
 /**
  * ipcMain.handle('read-grade-file'...)

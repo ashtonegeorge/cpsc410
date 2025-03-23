@@ -41,15 +41,6 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 
   /**
-   * readCourse() is a function that reads a course from the sqlite database.
-   * @param courseId 
-   * @returns a single course sqlite object
-   */
-  readCourse(courseId: string): Promise<{ id: number, name: string }[]> {
-    return ipcRenderer.invoke('read-course', courseId);
-  },
-
-  /**
    * updateCourse() is a function that updates a course in the sqlite database.
    * @param courseId 
    * @param courseName 
@@ -66,6 +57,22 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
    */
   deleteCourse(courseId: string): Promise<void> {
     return ipcRenderer.invoke('delete-course', courseId);
+  },
+
+  createGuestLecturer(guestFName: string, guestLName: string): Promise<void> {
+    return ipcRenderer.invoke('create-guest-lecturer', guestFName, guestLName);
+  },
+
+  readGuestLecturers(): Promise<void> {
+    return ipcRenderer.invoke('read-guest-lecturers');
+  },
+
+  updateGuestLecturer(guestId: string, guestFName: string, guestLName: string): Promise<void> {
+    return ipcRenderer.invoke('update-guest-lecturer', guestId, guestFName, guestLName);
+  },
+  
+  deleteGuestLecturer(guestId: string): Promise<void> {
+    return ipcRenderer.invoke('delete-guest-lecturer', guestId);
   },
 
   /**
