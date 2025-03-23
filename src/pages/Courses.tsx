@@ -6,7 +6,6 @@ export default function Courses() {
     // the following 5 lines are React state variables that allow us to track the values of the input fields
     const [createCode, setCreateCode] = useState('');
     const [createName, setCreateName] = useState('');
-    const [read, setRead] = useState('');
     const [updateId, setUpdateId] = useState('');
     const [updateName, setUpdateName] = useState('');
     const [del, setDelete] = useState('');
@@ -34,15 +33,6 @@ export default function Courses() {
         });
     }
 
-    const readCourse = async (courseId: string) => {
-        const result = await window.ipcRenderer.readCourse(courseId);
-        if(result == null || result.length == 0) {
-            console.log("No results found.");
-        } else {
-            console.log(result[0].name);
-        }
-    }
-
     const updateCourse = async (courseId: string, courseName: string) => {
         const result = await window.ipcRenderer.updateCourse(courseId, courseName);
         console.log(result);
@@ -57,10 +47,10 @@ export default function Courses() {
 
     return (
         <>
-            <h1>Testing</h1>
+            <h1 className="text-2xl">Courses</h1>
             <div className='grid grid-cols-2 gap-4'>
                 <div className='flex flex-col justify-center w-full items-center'>
-                    <h2>Create Course</h2>
+                    <h2 className="text-lg font-semibold mb-2">Create Course</h2>
                     <TextField label="Course Code" setValue={setCreateCode} placeholder={''}/>
                     <TextField label="Course Name" setValue={setCreateName} placeholder={''}/>
                     <div className='w-1/2'>
@@ -68,22 +58,15 @@ export default function Courses() {
                     </div>
                 </div>
                 <div className='flex flex-col justify-start w-full items-center'>
-                    <h2>Read Course</h2>
-                    <TextField label="Course Code" setValue={setRead} placeholder={''}/>
-                    <div className='w-1/2'>
-                        <Button icon={null} label="Read Course" action={() => readCourse(read)}/>
-                    </div>
-                </div>
-                <div className='flex flex-col justify-start w-full items-center'>
-                    <h2>Update Course</h2>
+                    <h2 className="text-lg font-semibold mb-2">Update Course</h2>
                     <TextField label="Course Code" setValue={setUpdateId} placeholder={''}/>
                     <TextField label="New Course Name" setValue={setUpdateName} placeholder={''} />
                     <div className='w-1/2'>
                         <Button icon={null} label="Update Course" action={() => updateCourse(updateId, updateName)}/>
                     </div>
                 </div>
-                <div className='flex flex-col justify-start w-full items-center'>
-                    <h2>Delete Course</h2>
+                <div className='flex flex-col justify-start w-1/2 mx-auto items-center col-span-2'>
+                    <h2 className="text-lg font-semibold mb-2">Delete Course</h2>
                     <TextField label="Course Code" setValue={setDelete} placeholder={''}/>
                     <div className='w-1/2'>
                         <Button icon={null} label="Delete Course" action={() => deleteCourse(del)}/>
@@ -92,7 +75,7 @@ export default function Courses() {
             </div>
             <div className='p-8'>
                 <h2 className='text-lg font-bold p-2'>Courses</h2>
-                <div className='text-md text-left w-1/2 mx-auto'>
+                <div className='text-md text-left w-2/3 mx-auto'>
                     {courses.map((course: [string, string], index: number) => { // here we map over the tuple array and render each course
                         return (
                         <div key={course[0] + index}>

@@ -18,7 +18,7 @@ export default function AcademicYear() {
             const ay = result.map((e) => [e.id, e.name] as [string, string]);
             setAcademicYears(ay);
         });
-    }
+    };
 
     const createAcademicYear = () => {
         const result = window.ipcRenderer.createAcademicYear(newYear);
@@ -40,28 +40,27 @@ export default function AcademicYear() {
 
     return (
             <>
-                <h1>Academic Year</h1>
+                <h1 className='text-2xl'>Academic Year</h1>
                 <div className='grid grid-cols-2 gap-4'>
                     <div className="flex flex-col justify-start w-full items-center">
                         <h2 className="text-lg font-semibold mb-2">Add Academic Year</h2>
                         <TextField label="Academic Year Name" setValue={setNewYear} placeholder={'New name'} />
                         <Button label="Save Year" action={createAcademicYear} icon={null} />
                     </div>
-                    
                     <div className="flex flex-col justify-start w-full items-center">
                         <h2 className="text-lg font-semibold mb-2">Update Academic Year</h2>
                         <TextField label="Academic Year ID" setValue={setUpdateYearId} placeholder={'ID to update'} />
                         <TextField label="Academic Year Name" setValue={setUpdateYearName} placeholder={'New name'} />
                         <Button label="Update Year" action={updateAcademicYear} icon={null} />
                     </div>
-                    <div className="flex flex-col justify-start w-full items-center">
+                    <div className="flex flex-col justify-start w-1/2 items-center col-span-2 mx-auto">
                         <h2 className="text-lg font-semibold mb-2">Delete Academic Year</h2>
                         <TextField label="Academic Year ID" setValue={setDeleteYear} placeholder={'ID to delete'} />
                         <Button label="Delete Year" action={deleteAcademicYear} icon={null} />
                     </div>
                 </div>
-                <div className='pt-12'>
-                    <h2 className='text-2xl font-bold'>Academic Years</h2>
+                <div>
+                    <h2 className='text-2xl font-bold py-6'>Academic Years</h2>
                     <div className='grid grid-cols-2 w-sm mx-auto'>
                         <p className='font-semibold'>ID</p> 
                         <p className='font-semibold'>Name</p>
