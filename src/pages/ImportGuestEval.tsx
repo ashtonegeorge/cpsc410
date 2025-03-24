@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import uploadIcon from '../assets/upload.png';
@@ -50,18 +51,19 @@ export default function ImportGuestEval() {
         const handleUpload = async () => {
             if (filePath) { // if there is a file path, read the file
                 const records = await window.ipcRenderer.readCourseEvalFile(filePath); // read the file and get student id and grade pairs
-                records.forEach((record: [string, string]) => {
-                    window.ipcRenderer.importCourseEval(record[0], 
-                                                    selectedCourse, 
-                                                    selectedSemester, 
-                                                    selectedAcademicYear, 
-                                                    record[1]);
-                });
+                console.log(records);
+                // records.forEach((record: [string, string]) => {
+                //     window.ipcRenderer.importCourseEval(record[0], 
+                //                                     selectedCourse, 
+                //                                     selectedSemester, 
+                //                                     selectedAcademicYear, 
+                //                                     record[1]);
+                // });
     
-                setSuccess(true);
-                setTimeout(() => { // hides success message after ten seconds
-                    setSuccess(false);
-                }, 3000); 
+                // setSuccess(true);
+                // setTimeout(() => { // hides success message after ten seconds
+                //     setSuccess(false);
+                // }, 3000); 
             }
         };
     

@@ -85,6 +85,15 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 
   /**
+   * readCourseEvalFile() is a function that reads a course evaluation file from the file system.
+   * @param filePath 
+   * @returns void
+  */
+  readCourseEvalFile(filePath: string): Promise<[string, string]> {
+    return ipcRenderer.invoke('read-course-eval-file', filePath)
+  },
+
+  /**
    * importGrades() is a function that imports grades into the database.
    * @param studentId
    * @param courseId

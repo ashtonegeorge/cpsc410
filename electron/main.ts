@@ -202,6 +202,96 @@ ipcMain.handle('read-grade-file', async (_event, filePath) => {
     return pairs;
 });
 
+/**
+ * ipcMain.handle('read-course-eval-file'...)
+ * This event handler is used in the preload.ts file to read a canvas grade file.
+ * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
+ * This allows us to call window.ipcRenderer.readSpreadsheetFile() in the ImportGrades.tsx file.
+ * @param filePath
+ * @returns rows
+ */
+ipcMain.handle('read-course-eval-file', async (_event, filePath) => {
+    interface EvalQuestion {
+        questionText: string;
+        likertAnswers: number[];
+        likertAverage: number;
+        openResponses: string[];
+    }
+
+    // create an excel instance, retrieve the file extension, and specify desired columns
+    const workbook = new ExcelJS.Workbook(); 
+    const ext = path.extname(filePath).toLowerCase();
+
+    if (ext === '.xlsx') { // if the file is an xlsx file, read the file
+        await workbook.xlsx.readFile(filePath);
+    } else if (ext === '.csv') { // if the file is a csv file, convert it to a filestream first
+        const fileStream = fs.createReadStream(filePath);
+        await workbook.csv.read(fileStream);
+    } else { // throw if invalid file format
+        throw new Error('Unsupported file format');
+    }
+
+    const sheet: ExcelJS.Worksheet = workbook.getWorksheet(1)!;
+
+    // start and end columns for questions, initialized to 1 by default
+    let start = 1;
+    let end = 1;
+
+    // find the start and end from the first row
+    sheet.getRow(1).eachCell((c, i) => {
+        if(c.value?.toString() === "attempt") { start = i+1; } // the column after the attempt column is the first question
+        else if(c.value?.toString() === "n correct") { // the column before the n correct column is the last question
+            end = i-1; 
+            return;
+        }
+    });
+
+    // for every column between the start and end values, collect every survey response and average them
+    const questions: EvalQuestion[] = [];
+    const questionCols: ExcelJS.Column[] = [];
+    for(let i = start; i<=end; i++) {
+        questionCols.push(sheet.getColumn(i));
+    }
+    questionCols.forEach((col) => {
+        let qText: string;
+        const likertAnswers: number[] = [];
+        const openResponses: string[] = [];
+        if(!(col.values[1]?.toString() === "0")) {
+            qText = col.values[1]!.toString();
+            col.values.map((cell) => {
+                switch(cell?.toString()) {
+                    case "Strongly Agree":
+                        likertAnswers.push(5);
+                        break;
+                    case "Agree":
+                        likertAnswers.push(4);
+                        break;
+                    case "Neutral":
+                        likertAnswers.push(3);
+                        break;
+                    case "Disagree":
+                        likertAnswers.push(2);
+                        break;
+                    case "Strongly Disagree":
+                        likertAnswers.push(1);
+                        break;
+                    default:
+                        if(cell!.toString() !== qText) openResponses.push(cell!.toString());
+                }
+            })
+            const avg = (likertAnswers.reduce((p, v) => p + v, 0)) / likertAnswers.length;
+            const q: EvalQuestion = {
+                questionText: qText,
+                likertAnswers: likertAnswers,
+                likertAverage: avg,
+                openResponses: openResponses
+            }
+            questions.push(q);
+        }  
+    })
+    return questions;
+});
+
 ipcMain.handle('import-grades', async (_event, studentId, courseId, semesterId, academicYearId, isRetake, grade) => {
     const result = db.prepare('INSERT INTO grade (student_id, course_id, semester_id, academic_year_id, retake, final_grade) VALUES (?, ?, ?, ?, ?, ?)').run(studentId, courseId, semesterId, academicYearId, isRetake, grade);
     return result;
