@@ -71,7 +71,7 @@ export default function GuestLecturers() {
                 </div>
                 <div className="flex flex-col justify-start w-1/2 mx-auto items-center col-span-2">
                     <h2 className="text-lg font-semibold mb-2">Delete Guest Lecturer</h2>
-                    <TextField label="Academic Year ID" setValue={setDeleteGuestId} placeholder={'ID to delete'} />
+                    <TextField label="Guest ID" setValue={setDeleteGuestId} placeholder={'ID to delete'} />
                     <Button label="Delete Guest" action={deleteGuestLecturer} icon={null} />
                 </div>
             </div>
