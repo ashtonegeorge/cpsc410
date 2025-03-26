@@ -3,6 +3,13 @@ import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import uploadIcon from '../assets/upload.png';
 
+interface EvalQuestion {
+    questionText: string;
+    likertAnswers: number[];
+    likertAverage: number;
+    openResponses: string[];
+}
+
 export default function ImportGuestEval() { 
     const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
         const [success, setSuccess] = useState(false);
@@ -10,11 +17,13 @@ export default function ImportGuestEval() {
         const [courses, setCourses] = useState<[string, string][]>([]);
         const [semesters, setSemesters] = useState<[string, string][]>([]);
         const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
+        const [guests, setGuests] = useState<[string, string, string][]>([]);
     
         // these three state variables correspond to the dropdowns for course, semester, and academic year
         const [selectedCourse, setSelectedCourse] = useState('');
         const [selectedSemester, setSelectedSemester] = useState('');
         const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
+        const [selectedGuest, setSelectedGuest] = useState('');
     
         useEffect(() => {
             window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
@@ -39,6 +48,13 @@ export default function ImportGuestEval() {
                     setSelectedAcademicYear(academicYearsArray[0][0]);
                 }
             });
+            window.ipcRenderer.readGuestLecturers().then((result: { id: string, fname: string, lname: string }[]) => {
+                const guestsArray = result.map((e) => [e.id, e.fname, e.lname] as [string, string, string]);
+                setGuests(guestsArray);
+                if (guestsArray.length > 0) {
+                    setSelectedGuest(guestsArray[0][0]);
+                }
+            });
         }, [])
     
         const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,20 +66,14 @@ export default function ImportGuestEval() {
     
         const handleUpload = async () => {
             if (filePath) { // if there is a file path, read the file
-                const records = await window.ipcRenderer.readCourseEvalFile(filePath); // read the file and get student id and grade pairs
+                const records = await window.ipcRenderer.readGuestEvalFile(filePath); // read the file and get student id and grade pairs
                 console.log(records);
-                // records.forEach((record: [string, string]) => {
-                //     window.ipcRenderer.importCourseEval(record[0], 
-                //                                     selectedCourse, 
-                //                                     selectedSemester, 
-                //                                     selectedAcademicYear, 
-                //                                     record[1]);
-                // });
-    
-                // setSuccess(true);
-                // setTimeout(() => { // hides success message after ten seconds
-                //     setSuccess(false);
-                // }, 3000); 
+                window.ipcRenderer.importGuestEvaluation(selectedGuest, selectedCourse, selectedSemester, selectedAcademicYear, records);
+
+                setSuccess(true);
+                setTimeout(() => { // hides success message after ten seconds
+                    setSuccess(false);
+                }, 3000); 
             }
         };
     
@@ -71,6 +81,7 @@ export default function ImportGuestEval() {
         const handleSelectedCourseChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedCourse(event.target.value); };
         const handleSelectedSemesterChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedSemester(event.target.value); };
         const handleSelectedAcademicYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedAcademicYear(event.target.value); };
+        const handleSelectedGuestChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedGuest(event.target.value); };
 
     return (
         <div className='pt-12 w-1/2 mx-auto'>
@@ -84,6 +95,16 @@ export default function ImportGuestEval() {
                             onChange={handleFileChange} 
                             className='text-stone-50 font-semibold text-md file:mr-8 cursor-pointer text-xl rounded-xl leading-6 w-full file:w-1/2 file:bg-(--color-francis-red) file:hover:bg-red-700 file:text-stone-50 file:font-semibold file:border-none file:p-4 file:rounded-xl'
                         />
+                    </div>
+                    <div>
+                        <h1 className='font-semibold'>Select Guest Lecturer</h1>
+                        <select onChange={handleSelectedGuestChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
+                            {guests.map(([id, fname, lname]) => (  
+                                <option className='flex p-1 w-full' value={id} key={id}>
+                                    {lname}, {fname}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <h1 className='font-semibold'>Select Course</h1>

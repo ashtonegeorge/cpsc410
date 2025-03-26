@@ -1,6 +1,13 @@
 import { ipcRenderer, contextBridge } from 'electron';
 import ExcelJS from 'exceljs';
 
+interface EvalQuestion {
+  questionText: string;
+  likertAnswers: number[];
+  likertAverage: number;
+  openResponses: string[];
+}
+
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on(...args: Parameters<typeof ipcRenderer.on>) {
@@ -74,6 +81,20 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   deleteGuestLecturer(guestId: string): Promise<void> {
     return ipcRenderer.invoke('delete-guest-lecturer', guestId);
   },
+  
+  /**
+   * importGrades() is a function that imports grades into the database.
+   * @param studentId
+   * @param courseId
+   * @param semesterId
+   * @param academicYearId
+   * @param retake
+   * @param grade
+   * @returns void
+   */ 
+  importGuestEvaluation(guestId: string, courseId: string, semesterId: string, academicYearId: string, evalQuestions: EvalQuestion[]): Promise<void> {
+    return ipcRenderer.invoke('import-guest-evaluation', guestId, courseId, semesterId, academicYearId, evalQuestions); 
+  },
 
   /**
    * readGradeFile() is a function that reads a grade file from the file system.
@@ -83,7 +104,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   readGradeFile(filePath: string): Promise<void> {
     return ipcRenderer.invoke('read-grade-file', filePath)
   },
-
+  
   /**
    * readCourseEvalFile() is a function that reads a course evaluation file from the file system.
    * @param filePath 
@@ -91,6 +112,15 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   */
   readCourseEvalFile(filePath: string): Promise<[string, string]> {
     return ipcRenderer.invoke('read-course-eval-file', filePath)
+  },
+
+  /**
+   * readCourseEvalFile() is a function that reads a course evaluation file from the file system.
+   * @param filePath 
+   * @returns void
+  */
+  readGuestEvalFile(filePath: string): Promise<[string, string]> {
+    return ipcRenderer.invoke('read-guest-eval-file', filePath)
   },
 
   /**

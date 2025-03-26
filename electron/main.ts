@@ -161,6 +161,20 @@ ipcMain.handle('delete-guest-lecturer', async (_event, guestId) => {
     return result;
 });
 
+ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, courseId: string, semesterId: string, academicYearId: string, evalQuestions: {questionText: string; likertAnswers: number[]; likertAverage: number; openResponses: string[];}[]) => {
+    const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
+    const guestEvalId = guestResult.lastInsertRowid;
+
+    evalQuestions.forEach((q) => {
+        const type = q.likertAnswers.length > 0 ? "likert" : "open";
+
+        const questionResult = db.prepare('INSERT INTO question (question_text, type) VALUES (?, ?)').run(q.questionText, type);
+        const questionId = questionResult.lastInsertRowid;
+
+        db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
+            .run(guestEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('; ')); 
+    });
+});
 
 /**
  * ipcMain.handle('read-grade-file'...)
@@ -203,14 +217,14 @@ ipcMain.handle('read-grade-file', async (_event, filePath) => {
 });
 
 /**
- * ipcMain.handle('read-course-eval-file'...)
- * This event handler is used in the preload.ts file to read a canvas grade file.
+ * ipcMain.handle('read-guest-eval-file'...)
+ * This event handler is used in the preload.ts file to read a guest speaker evaluation survey spreadsheet file.
  * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
- * This allows us to call window.ipcRenderer.readSpreadsheetFile() in the ImportGrades.tsx file.
+ * This allows us to call window.ipcRenderer.readSpreadsheetFile() in the ImportGuestEval.tsx file.
  * @param filePath
  * @returns rows
  */
-ipcMain.handle('read-course-eval-file', async (_event, filePath) => {
+ipcMain.handle('read-guest-eval-file', async (_event, filePath) => {
     interface EvalQuestion {
         questionText: string;
         likertAnswers: number[];
