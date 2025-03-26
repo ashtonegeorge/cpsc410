@@ -10,7 +10,7 @@ interface EvalQuestion {
     openResponses: string[];
 }
 
-export default function ImportGuestEval() { 
+export default function ImportGuestEval({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) { 
     const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
         const [success, setSuccess] = useState(false);
         // the following three state variables are arrays of tuples, where the first element is the id and the second is the name
@@ -137,6 +137,7 @@ export default function ImportGuestEval() {
                         </select>
                     </div>
                 <Button icon={uploadIcon} action={handleUpload} label="Upload" />
+                <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
                 {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}
             </div>
           );

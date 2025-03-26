@@ -19,7 +19,7 @@ interface GradeReport {
     buffer: Buffer;
 }
 
-export default function GradeMetrics() {
+export default function GradeMetrics({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     const [filter, setFilter] = useState('sid');
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
@@ -198,6 +198,7 @@ export default function GradeMetrics() {
                 <div className="w-2/3 mx-auto py-6 flex flex-col gap-4">
                     <Button icon={null} label="Generate Report" action={handleGenerateReport} />
                     {workbook && <Button icon={null} label="Save Report to Excel" action={handleSaveGradeReport} />}
+                    <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
                 </div>
                 {success && <p className="w-full text-green-300 font-semibold">Report generated successfully!</p>}
                 {error && <p className="w-full text-red-300 font-semibold">Saving report to Excel failed, ensure a report has been generated and please try again.</p>}
