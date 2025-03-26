@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
 
-export default function Courses() {
+export default function Courses({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     // the following 5 lines are React state variables that allow us to track the values of the input fields
     const [createCode, setCreateCode] = useState('');
     const [createName, setCreateName] = useState('');
@@ -84,6 +84,9 @@ export default function Courses() {
                         )
                     })}
                 </div>
+            </div>
+            <div className="flex justify-evenly gap-12 pb-12">
+                <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
             </div>
         </>
     )

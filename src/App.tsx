@@ -35,20 +35,20 @@ function App() {
         {/* when the left statement is true, perform the right statement, which in our case renders a component */}
         {view === 'home' && <Home setView={setView} />}
         {view === 'about' && <About />}
-        {view === 'courses' && <Courses />}
+        {view === 'courses' && <Courses setView={setView} />}
         {view === 'grades' && <Grades setView={setView} />}
-        {view === 'importGrades' && <ImportGrades />}
-        {view === 'gradeMetrics' && <GradeMetrics />}
+        {view === 'importGrades' && <ImportGrades setView={setView}/>}
+        {view === 'gradeMetrics' && <GradeMetrics setView={setView} />}
         {view === 'guestEval' && <GuestEval setView={setView} />}
-        {view === 'guestLecturers' && <GuestLecturers />}
-        {view === 'guestEvalEdit' && <GuestEvalEdit />}
-        {view === 'importGuestEval' && <ImportGuestEval />}
-        {view === 'guestEvalmetrics' && <GuestEvalMetrics />}
+        {view === 'guestLecturers' && <GuestLecturers setView={setView} />}
+        {view === 'guestEvalEdit' && <GuestEvalEdit setView={setView} />}
+        {view === 'importGuestEval' && <ImportGuestEval setView={setView} />}
+        {view === 'guestEvalmetrics' && <GuestEvalMetrics setView={setView} />}
         {view === 'courseEval' && <CourseEval setView={setView} />}
-        {view === 'importCourseEval' && <ImportCourseEval />}
-        {view === 'importCourseEvalMan' && <ImportCourseEvalMan />}
-        {view === 'academicYear' && <AcademicYear />}
-        {view === 'courseEvalEdit' && <CourseEvalEdit/>}
+        {view === 'importCourseEval' && <ImportCourseEval setView={setView} />}
+        {view === 'importCourseEvalMan' && <ImportCourseEvalMan setView={setView} />}
+        {view === 'academicYear' && <AcademicYear setView={setView} />}
+        {view === 'courseEvalEdit' && <CourseEvalEdit setView={setView} />}
       </div>
     </main>
   )
