@@ -238,6 +238,6 @@ export default function GradeMetrics() {
                     }
                 </div>
             </div>
-            </div>
+        </div>
     );
 }
