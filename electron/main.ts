@@ -5,6 +5,7 @@ import path from 'node:path'
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import { HfInference } from '@huggingface/inference';
 
 dotenv.config();
 
@@ -448,6 +449,52 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
     // store the excel spreadsheet as a buffer to retain spreadsheet values
     const buffer = await workbook.xlsx.writeBuffer(); 
     return { result, sortedCpAndBelow, gradeCounts, buffer }; // return all of the important information for the front-end in an object
+});
+
+ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semesterId, academicYearId) => {
+    // initial query, includes the verbose academic year name and semester name 
+    let query = `SELECT * FROM "guest-evaluation" WHERE 1=1`;    
+
+    // if we are filtering, dynamically append those to our SQL query and add their corresponding parameters to the params array
+    const params = [];
+    if (guestId !== '*') {
+        query += ' AND guest_id = ?';
+        params.push(guestId);
+    }
+    if (courseId !== '*') {
+        query += ' AND course_id = ?';
+        params.push(courseId);
+    }
+    if (academicYearId !== '*') {
+        query += ' AND academic_year_id = ?';
+        params.push(academicYearId);
+    }
+    if (academicYearId !== '*') {
+        query += ' AND semester_id = ?';
+        params.push(semesterId);
+    }
+    
+    // get the id of the guest-evaluation
+    const ge: {id: string, guest_id: string, semester_id: string, academic_year_id: string}[] = db.prepare(query).all(...params);
+    const answers: {id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string}[] = db.prepare('SELECT * FROM answer WHERE guest_evaluation_id = ?').all(ge[0].id);
+    const questionAndAnswer: [string, string][] = []; 
+
+    for (const a of answers) {
+        const q = db.prepare('SELECT * FROM question WHERE id = ?').get(a.question_id);
+
+        if (q.type === "likert") {
+            questionAndAnswer.push([q.question_text, a.answer_text]);
+        } else if (q.type === "open") {
+            const inference = new HfInference(process.env.HF_KEY);
+            const res = await inference.summarization({
+                model: "facebook/bart-large-cnn",
+                inputs: `${a.answer_text}`,
+            });
+            questionAndAnswer.push([q.question_text, res.summary_text]);
+        }
+    }
+
+    return questionAndAnswer;
 });
 
 ipcMain.handle('save-grade-report', async (_event, buffer: Buffer) => {

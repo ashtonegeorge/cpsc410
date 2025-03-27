@@ -169,6 +169,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('generate-grade-report', studentId, courseId, academicYearId);
   },
 
+  generateGuestReport(guestId: string, courseId: string, semesterId: string, academicYearId: string): Promise<void> {
+    return ipcRenderer.invoke('generate-guest-report', guestId, courseId, semesterId, academicYearId);
+  },
+
   async saveGradeReport(buffer: ExcelJS.Buffer): Promise<void> {
     const result = ipcRenderer.invoke('save-grade-report', buffer);
     if (!result) {

@@ -67,7 +67,6 @@ export default function ImportGuestEval({setView}: {setView: React.Dispatch<Reac
         const handleUpload = async () => {
             if (filePath) { // if there is a file path, read the file
                 const records = await window.ipcRenderer.readGuestEvalFile(filePath); // read the file and get student id and grade pairs
-                console.log(records);
                 window.ipcRenderer.importGuestEvaluation(selectedGuest, selectedCourse, selectedSemester, selectedAcademicYear, records);
 
                 setSuccess(true);
@@ -137,7 +136,9 @@ export default function ImportGuestEval({setView}: {setView: React.Dispatch<Reac
                         </select>
                     </div>
                 <Button icon={uploadIcon} action={handleUpload} label="Upload" />
-                <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
+                <div className='mt-2'>
+                    <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
+                </div>
                 {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}
             </div>
           );
