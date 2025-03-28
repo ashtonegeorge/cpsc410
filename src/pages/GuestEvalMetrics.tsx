@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import Button from '../components/Button';
 // import ExcelJS from 'exceljs';
 
-export default function GuestEvalMetrics() {
+export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     const [guests, setGuests] = useState<[string, string, string][]>([]);
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
@@ -121,6 +121,9 @@ export default function GuestEvalMetrics() {
                 </div>
                 {success && <p className="w-full text-green-300 font-semibold">Report generated successfully!</p>}
                 {error && <p className="w-full text-red-300 font-semibold">Saving report to Excel failed, ensure a report has been generated and please try again.</p>}
+                <div className="text-white rounded-xl p-2 text-sm border-none">
+                         <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))} />
+                    </div>
             </div>
 
             <div className="w-full h-full">

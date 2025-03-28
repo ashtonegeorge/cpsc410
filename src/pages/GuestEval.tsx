@@ -14,7 +14,14 @@ export default function GuestEval({setView}: {setView: React.Dispatch<React.SetS
                     <Button icon={null} label="Edit Guest Evaluation Data" action={() => Promise.resolve(setView('guestEvalEdit'))}/>
                 </div>
             </div>
-    
+            <div>
+                <div className="flex justify-center pb-12">
+                    <div className="text-white rounded-xl p-2 text-sm border-none">
+                        <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
+                            </div>
+                        </div>
+                    </div>
+
     
     </div>
     );
