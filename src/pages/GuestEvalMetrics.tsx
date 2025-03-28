@@ -118,12 +118,15 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
                 <div className="w-2/3 mx-auto py-6 flex flex-col gap-4">
                     <Button icon={null} label="Generate Report" action={handleGenerateReport} />
                     {/* {workbook && <Button icon={null} label="Save Report to Excel" action={handleSaveGuestReport} />} */}
+                    <div className="flex justify-center pb-12">
+                            <div className="text-white rounded-xl p-2 text-sm border-none">
+                            <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
+                        </div>
+                    </div>                 
                 </div>
                 {success && <p className="w-full text-green-300 font-semibold">Report generated successfully!</p>}
                 {error && <p className="w-full text-red-300 font-semibold">Saving report to Excel failed, ensure a report has been generated and please try again.</p>}
-                <div className="text-white rounded-xl p-2 text-sm border-none">
-                         <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))} />
-                    </div>
+            
             </div>
 
             <div className="w-full h-full">
