@@ -139,7 +139,7 @@ export default function ImportGuestEval({setView}: {setView: React.Dispatch<Reac
                 <div className='mt-2'>
                     <div className="flex justify-center pb-12">
                                 <div className="text-white rounded-xl p-2 text-sm border-none">
-                                <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
+                                <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
                             </div>
                         </div>
                     </div>

@@ -120,7 +120,7 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
                     {/* {workbook && <Button icon={null} label="Save Report to Excel" action={handleSaveGuestReport} />} */}
                     <div className="flex justify-center pb-12">
                             <div className="text-white rounded-xl p-2 text-sm border-none">
-                            <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
+                            <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
                         </div>
                     </div>                 
                 </div>
