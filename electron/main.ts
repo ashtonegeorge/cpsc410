@@ -5,7 +5,7 @@ import path from 'node:path'
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import { HfInference } from '@huggingface/inference';
+// import { env } from '@huggingface/transformers';
 
 dotenv.config();
 
@@ -13,6 +13,11 @@ const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dbPath = process.env.NODE_ENV === 'development' ? './dev.db' : path.join(process.resourcesPath, "./dev.db") 
 const db = require('better-sqlite3')(dbPath);
+const transformers = require('@huggingface/transformers');
+
+const env = transformers.env;
+env.allowRemoteModels = false;
+env.localModelPath = './models/distilbert/';
 
 // The built directory structure
 //
@@ -473,25 +478,31 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
         query += ' AND semester_id = ?';
         params.push(semesterId);
     }
+
+    const tokenizer = await transformers.AutoTokenizer.from_pretrained(env.localModelPath);
+    const model = await transformers.AutoModelForSequenceClassification.from_pretrained(env.localModelPath);
     
     // get the id of the guest-evaluation
     const ge: {id: string, guest_id: string, semester_id: string, academic_year_id: string}[] = db.prepare(query).all(...params);
     const answers: {id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string}[] = db.prepare('SELECT * FROM answer WHERE guest_evaluation_id = ?').all(ge[0].id);
-    const questionAndAnswer: [string, string][] = []; 
+    const questionAndAnswer: [string, string | number[]][] = []; 
 
-    for (const a of answers) {
-        const q = db.prepare('SELECT * FROM question WHERE id = ?').get(a.question_id);
-
-        if (q.type === "likert") {
-            questionAndAnswer.push([q.question_text, a.answer_text]);
-        } else if (q.type === "open") {
-            const inference = new HfInference(process.env.HF_KEY);
-            const res = await inference.summarization({
-                model: "facebook/bart-large-cnn",
-                inputs: `${a.answer_text}`,
-            });
-            questionAndAnswer.push([q.question_text, res.summary_text]);
+    try {
+        for (const a of answers) {
+            const q = db.prepare('SELECT * FROM question WHERE id = ?').get(a.question_id);
+    
+            if (q.type === "likert") {
+                questionAndAnswer.push([q.question_text, a.answer_text]);
+            } else if (q.type === "open") {
+                const inputs = await tokenizer(a.answer_text, { padding: true, truncation: true });
+                const { logits } = await model(inputs);
+                const rawLogits = logits.ort_tensor.cpuData;
+                const probabilities = softmax(rawLogits);
+                questionAndAnswer.push([q.question_text, probabilities]);
+            }
         }
+    } catch(e) {
+        return e;
     }
 
     return questionAndAnswer;
@@ -518,3 +529,10 @@ ipcMain.handle('save-grade-report', async (_event, buffer: Buffer) => {
         return { success: false, message: error };
     }
 });
+
+function softmax(logits: Float32Array): number[] {
+    const logitsArray = Array.from(logits); // Convert Float32Array to a plain array
+    const expLogits = logitsArray.map((x) => Math.exp(x)); // Exponentiate each logit
+    const sumExpLogits = expLogits.reduce((a, b) => a + b, 0); // Sum of all exponentiated logits
+    return expLogits.map((x) => x / sumExpLogits); // Normalize each value
+}
