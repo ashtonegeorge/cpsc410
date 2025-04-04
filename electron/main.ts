@@ -5,7 +5,7 @@ import path from 'node:path'
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 import dotenv from 'dotenv';
-// import { env } from '@huggingface/transformers';
+import { spawn } from 'child_process';
 
 dotenv.config();
 
@@ -13,11 +13,8 @@ const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dbPath = process.env.NODE_ENV === 'development' ? './dev.db' : path.join(process.resourcesPath, "./dev.db") 
 const db = require('better-sqlite3')(dbPath);
-const transformers = require('@huggingface/transformers');
 
-const env = transformers.env;
-env.allowRemoteModels = false;
-env.localModelPath = './models/distilbert/';
+// const ort = require('onnxruntime-node');
 
 // The built directory structure
 //
@@ -479,9 +476,10 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
         params.push(semesterId);
     }
 
-    const tokenizer = await transformers.AutoTokenizer.from_pretrained(env.localModelPath);
-    const model = await transformers.AutoModelForSequenceClassification.from_pretrained(env.localModelPath);
-    
+    // const tokenizer = await transformers.AutoTokenizer.from_pretrained(env.localModelPath);
+    // const model = await transformers.AutoModelForSequenceClassification.from_pretrained(env.localModelPath);
+    // const session = await ort.InferenceSession.create('./src/models/')
+
     // get the id of the guest-evaluation
     const ge: {id: string, guest_id: string, semester_id: string, academic_year_id: string}[] = db.prepare(query).all(...params);
     const answers: {id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string}[] = db.prepare('SELECT * FROM answer WHERE guest_evaluation_id = ?').all(ge[0].id);
@@ -494,11 +492,12 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
             if (q.type === "likert") {
                 questionAndAnswer.push([q.question_text, a.answer_text]);
             } else if (q.type === "open") {
-                const inputs = await tokenizer(a.answer_text, { padding: true, truncation: true });
-                const { logits } = await model(inputs);
-                const rawLogits = logits.ort_tensor.cpuData;
-                const probabilities = softmax(rawLogits);
-                questionAndAnswer.push([q.question_text, probabilities]);
+                // const inputs = await tokenizer(a.answer_text, { padding: true, truncation: true });
+                // const { logits } = await model(inputs);
+                // const rawLogits = logits.ort_tensor.cpuData;
+                // const probabilities = softmax(rawLogits);
+                // questionAndAnswer.push([q.question_text, probabilities]);
+                runPythonAI(a.answer_text);
             }
         }
     } catch(e) {
@@ -536,3 +535,39 @@ function softmax(logits: Float32Array): number[] {
     const sumExpLogits = expLogits.reduce((a, b) => a + b, 0); // Sum of all exponentiated logits
     return expLogits.map((x) => x / sumExpLogits); // Normalize each value
 }
+
+async function runPythonAI(inputText: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    // Spawn a Python child process
+    const pythonProcess = spawn('python', ['./src/utils/get_embeddings.py', inputText]);
+
+    let data = '';
+    let error = '';
+
+    // Capture the Python script's output
+    pythonProcess.stdout.on('data', (chunk) => {
+      data += chunk;
+    });
+
+    // Capture any error output
+    pythonProcess.stderr.on('data', (chunk) => {
+      error += chunk;
+    });
+
+    // When Python script finishes
+    pythonProcess.on('close', (code) => {
+      if (code === 0) {
+        // Parse the JSON result from the Python script
+        try {
+          const result = JSON.parse(data);
+          resolve(result);
+        } catch (err) {
+          reject('Error parsing JSON output: ' + err);
+        }
+      } else {
+        reject('Python script failed with code ' + code + ': ' + error);
+      }
+    });
+  });
+}
+
