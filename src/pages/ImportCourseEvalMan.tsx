@@ -6,6 +6,7 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [semesters, setSemesters] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
+    const [questions, setQuestions] = useState<[string, string, string][]>([]);
     const [likertGoals, setLikertGoals] = useState<[string, string][]>([]);
 
     // these three state variables correspond to the dropdowns for course, semester, and academic year
@@ -37,6 +38,11 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                 setSelectedAcademicYear(academicYearsArray[0][0]);
             }
         });
+        window.ipcRenderer.readCourseQuestions().then((result: { id: string, question_text: string, type: string }[]) => {
+            const questionsArray = result.map((e) => [e.id, e.question_text, e.type] as [string, string, string]);
+            setQuestions(questionsArray);
+        });
+
     }, [])
 
     // when the user selects a course, we store the course code in a state variable to be used for uploading
