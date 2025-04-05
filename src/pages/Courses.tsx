@@ -13,35 +13,32 @@ export default function Courses({setView}: {setView: React.Dispatch<React.SetSta
     const [courses, setCourses] = useState<[string, string][]>([]); // this state variable is used to store the courses locally
   
     useEffect(() => {
-        window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
+        window.ipcRenderer.readCourses().then((result: any) => {
             // the ipc renderer returns an array of objects, we map the array to a tuple of [string, string]
-            const n = result.map((e) => [e.id, e.name] as [string, string]);
+            const n = result.map((e: { id: string, name: string }) => [e.id, e.name] as [string, string]);
             setCourses(n);
         });
     }, []);
 
     const createCourse = async (courseCode: string, courseName: string) => {
         const result = window.ipcRenderer.createCourse(courseCode, courseName);
-        console.log(result);
         updateCourses();
     }
 
     const updateCourses = async () => {
-        window.ipcRenderer.readCourses().then((result: { id:string, name: string }[]) => {
-            const n = result.map((e) => [e.id, e.name] as [string, string]);
+        window.ipcRenderer.readCourses().then((result: any) => {
+            const n = result.map((e: { id:string, name: string }) => [e.id, e.name] as [string, string]);
             setCourses(n);
         });
     }
 
     const updateCourse = async (courseId: string, courseName: string) => {
         const result = await window.ipcRenderer.updateCourse(courseId, courseName);
-        console.log(result);
         updateCourses();
     }
 
     const deleteCourse = async (courseId: string) => {
         const result = await window.ipcRenderer.deleteCourse(courseId);
-        console.log(result);
         updateCourses();
     }
 
