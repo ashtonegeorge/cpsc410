@@ -26,9 +26,9 @@ export default function ImportGuestEval({setView}: {setView: React.Dispatch<Reac
         const [selectedGuest, setSelectedGuest] = useState('');
     
         useEffect(() => {
-            window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
+            window.ipcRenderer.readCourses().then((result: any) => {
                 // unfortunately we can't directly reference the state variable, so we have to create a new array
-                const coursesArray = result.map((e) => [e.id, e.name] as [string, string]);
+                const coursesArray = result.map((e: { id: string, name: string }) => [e.id, e.name] as [string, string]);
                 setCourses(coursesArray);
                 if (coursesArray.length > 0) { // we set the selected course to the first course in the array by default since that is the first (and automatically selected) course in the dropdown
                     setSelectedCourse(coursesArray[0][0]);
@@ -48,8 +48,8 @@ export default function ImportGuestEval({setView}: {setView: React.Dispatch<Reac
                     setSelectedAcademicYear(academicYearsArray[0][0]);
                 }
             });
-            window.ipcRenderer.readGuestLecturers().then((result: { id: string, fname: string, lname: string }[]) => {
-                const guestsArray = result.map((e) => [e.id, e.fname, e.lname] as [string, string, string]);
+            window.ipcRenderer.readGuestLecturers().then((result: any) => {
+                const guestsArray = result.map((e: { id: string; fname: string; lname: string; }) => [e.id, e.fname, e.lname] as [string, string, string]);
                 setGuests(guestsArray);
                 if (guestsArray.length > 0) {
                     setSelectedGuest(guestsArray[0][0]);

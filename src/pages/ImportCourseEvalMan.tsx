@@ -16,9 +16,9 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
     const [selectedLikertGoals, setSelectedLikertGoals] = useState('');
 
     useEffect(() => {
-        window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
+        window.ipcRenderer.readCourses().then((result: any) => {
             // unfortunately we can't directly reference the state variable, so we have to create a new array
-            const coursesArray = result.map((e) => [e.id, e.name] as [string, string]);
+            const coursesArray = result.map((e: { id: string, name: string }) => [e.id, e.name] as [string, string]);
             setCourses(coursesArray);
             if (coursesArray.length > 0) { // we set the selected course to the first course in the array by default since that is the first (and automatically selected) course in the dropdown
                 setSelectedCourse(coursesArray[0][0]);
@@ -38,10 +38,11 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                 setSelectedAcademicYear(academicYearsArray[0][0]);
             }
         });
-        window.ipcRenderer.readCourseQuestions().then((result: { id: string, question_text: string, type: string }[]) => {
-            const questionsArray = result.map((e) => [e.id, e.question_text, e.type] as [string, string, string]);
-            setQuestions(questionsArray);
-        });
+        // commenting this out because its not implemented yet
+        // window.ipcRenderer.readCourseQuestions().then((result: { id: string, question_text: string, type: string }[]) => {
+        //     const questionsArray = result.map((e) => [e.id, e.question_text, e.type] as [string, string, string]);
+        //     setQuestions(questionsArray);
+        // });
 
     }, [])
 

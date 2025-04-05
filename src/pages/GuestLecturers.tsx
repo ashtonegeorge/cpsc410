@@ -16,8 +16,8 @@ export default function GuestLecturers() {
     }, [])
 
     const updateGuestLecturers = () => {
-        window.ipcRenderer.readGuestLecturers().then((result: {id: string, fname: string, lname: string}[]) => {
-            const g = result.map((e) => [e.id, e.fname, e.lname] as [string, string, string]);
+        window.ipcRenderer.readGuestLecturers().then((result: any) => {
+            const g = result.map((e: {id: string, fname: string, lname: string}) => [e.id, e.fname, e.lname] as [string, string, string]);
             setGuests(g);
         })
     };

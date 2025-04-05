@@ -16,9 +16,9 @@ export default function ImportCourseEval({setView}: {setView: React.Dispatch<Rea
     const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
 
     useEffect(() => {
-        window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
+        window.ipcRenderer.readCourses().then((result: any) => {
             // unfortunately we can't directly reference the state variable, so we have to create a new array
-            const coursesArray = result.map((e) => [e.id, e.name] as [string, string]);
+            const coursesArray = result.map((e: { id: string, name: string }) => [e.id, e.name] as [string, string]);
             setCourses(coursesArray);
             if (coursesArray.length > 0) { // we set the selected course to the first course in the array by default since that is the first (and automatically selected) course in the dropdown
                 setSelectedCourse(coursesArray[0][0]);
@@ -50,13 +50,13 @@ export default function ImportCourseEval({setView}: {setView: React.Dispatch<Rea
     const handleUpload = async () => {
         if (filePath) { // if there is a file path, read the file
             const records = await window.ipcRenderer.readCourseEvalFile(filePath); // read the file and get student id and grade pairs
-            records.forEach((record: [string, string]) => {
-                window.ipcRenderer.importCourseEval(record[0], 
-                                                selectedCourse, 
-                                                selectedSemester, 
-                                                selectedAcademicYear, 
-                                                record[1]);
-            });
+            // records.forEach((record: [string, string]) => {
+            //     window.ipcRenderer.importCourseEval(record[0], 
+            //                                     selectedCourse, 
+            //                                     selectedSemester, 
+            //                                     selectedAcademicYear, 
+            //                                     record[1]);
+            // });
 
             setSuccess(true);
             setTimeout(() => { // hides success message after ten seconds
