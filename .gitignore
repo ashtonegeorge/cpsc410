@@ -7,13 +7,23 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node modules
 node_modules
-dist
-dist-ssr
-*.local
 
+# Python virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__
+src/utils/__pycache__/
+src/utils/__pycache__/*
+
+# Models and databases
+src/models/minilm
+env/
 csv
-release 
+release
 dev.db
 prod.db
 
@@ -28,4 +38,7 @@ prod.db
 *.sln
 *.sw?
 
+# Build output
+dist
+dist-ssr
 dist-electron
