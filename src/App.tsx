@@ -41,15 +41,15 @@ function App() {
         {view === 'importGrades' && <ImportGrades setView={setView}/>}
         {view === 'gradeMetrics' && <GradeMetrics setView={setView} />}
         {view === 'guestEval' && <GuestEval setView={setView} />}
-        {view === 'guestLecturers' && <GuestLecturers setView={setView} />}
+        {view === 'guestLecturers' && <GuestLecturers />}
         {view === 'guestEvalEdit' && <GuestEvalEdit setView={setView} />}
         {view === 'importGuestEval' && <ImportGuestEval setView={setView} />}
         {view === 'guestEvalmetrics' && <GuestEvalMetrics setView={setView} />}
-        {view === 'guestEvalMan' && <GuestEvalMan setView={setView} />}
+        {view === 'guestEvalMan' && <GuestEvalMan />}
         {view === 'courseEval' && <CourseEval setView={setView} />}
         {view === 'importCourseEval' && <ImportCourseEval setView={setView} />}
         {view === 'importCourseEvalMan' && <ImportCourseEvalMan setView={setView} />}
-        {view === 'academicYear' && <AcademicYear setView={setView} />}
+        {view === 'academicYear' && <AcademicYear />}
         {view === 'courseEvalEdit' && <CourseEvalEdit setView={setView} />}
       </div>
     </main>
