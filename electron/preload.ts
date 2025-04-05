@@ -43,7 +43,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
    * readCourses() is a function that reads all courses from the sqlite database.
    * @returns course sqlite objects
    */
-  readCourses(): Promise<{ Name: string }[]> {
+  readCourses(): Promise<{ id: string, name: string }[]> {
     return ipcRenderer.invoke('read-courses');
   },
 
@@ -70,7 +70,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('create-guest-lecturer', guestFName, guestLName);
   },
 
-  readGuestLecturers(): Promise<void> {
+  readGuestLecturers(): Promise<any> {
     return ipcRenderer.invoke('read-guest-lecturers');
   },
 
@@ -173,7 +173,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('delete-academic-year', ayearId);
   },
 
-  generateGradeReport(studentId: string, courseId: string, academicYearId: string): Promise<void> {
+  generateGradeReport(studentId: string, courseId: string, academicYearId: string): Promise<any> {
     return ipcRenderer.invoke('generate-grade-report', studentId, courseId, academicYearId);
   },
 

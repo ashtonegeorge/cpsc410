@@ -11,7 +11,8 @@ dotenv.config();
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const dbPath = process.env.NODE_ENV === 'development' ? './dev.db' : path.join(process.resourcesPath, "./dev.db") 
+const devMode = process.env.NODE_ENV === 'development';
+const dbPath = devMode ? './dev.db' : path.join(process.resourcesPath, "./dev.db") 
 const db = require('better-sqlite3')(dbPath);
 
 // const ort = require('onnxruntime-node');
@@ -175,7 +176,7 @@ ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, course
         const questionId = questionResult.lastInsertRowid;
 
         db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(guestEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('; ')); 
+            .run(guestEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('|'));
     });
 });
 
@@ -483,7 +484,7 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
     // get the id of the guest-evaluation
     const ge: {id: string, guest_id: string, semester_id: string, academic_year_id: string}[] = db.prepare(query).all(...params);
     const answers: {id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string}[] = db.prepare('SELECT * FROM answer WHERE guest_evaluation_id = ?').all(ge[0].id);
-    const questionAndAnswer: [string, string | number[]][] = []; 
+    const questionAndAnswer: [string, string | { count: number, keywords: string[], responses: string[], summary: string, topic: string }[]][] = []; 
 
     try {
         for (const a of answers) {
@@ -492,12 +493,8 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
             if (q.type === "likert") {
                 questionAndAnswer.push([q.question_text, a.answer_text]);
             } else if (q.type === "open") {
-                // const inputs = await tokenizer(a.answer_text, { padding: true, truncation: true });
-                // const { logits } = await model(inputs);
-                // const rawLogits = logits.ort_tensor.cpuData;
-                // const probabilities = softmax(rawLogits);
-                // questionAndAnswer.push([q.question_text, probabilities]);
-                runPythonAI(a.answer_text);
+                const res = await thematic_analysis(a.answer_text) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
+                questionAndAnswer.push([q.question_text, res])
             }
         }
     } catch(e) {
@@ -529,45 +526,44 @@ ipcMain.handle('save-grade-report', async (_event, buffer: Buffer) => {
     }
 });
 
-function softmax(logits: Float32Array): number[] {
-    const logitsArray = Array.from(logits); // Convert Float32Array to a plain array
-    const expLogits = logitsArray.map((x) => Math.exp(x)); // Exponentiate each logit
-    const sumExpLogits = expLogits.reduce((a, b) => a + b, 0); // Sum of all exponentiated logits
-    return expLogits.map((x) => x / sumExpLogits); // Normalize each value
+function thematic_analysis(inputText: string) {
+    return new Promise((resolve, reject) => {
+        const scriptPath = devMode
+            ? './src/utils/analyze_responses.py'
+            : path.join(process.resourcesPath, './src/utils/analyze_responses.py');
+
+        const pythonPath = process.env.NODE_ENV === 'development'
+            ? 'python'
+            : path.join(process.resourcesPath, 'venv', 'Scripts', 'python.exe');
+        const pythonProcess = spawn(pythonPath, [scriptPath]);
+
+        let data = '';
+        let error = '';
+
+        pythonProcess.stdout.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        pythonProcess.stderr.on('data', (chunk) => {
+            error += chunk.toString();
+            console.error('Python STDERR:', chunk.toString());
+        });
+
+        pythonProcess.on('close', (code) => {
+            if (code === 0) {
+                try {
+                    const result: { count: number, keywords: string[], responses: string[], summary: string, topic: string }[] = JSON.parse(data);
+                    resolve(result);
+                } catch (err) {
+                    reject(`Error parsing JSON output: ${(err as Error).message}`);
+                }
+            } else {
+                reject(`Python script failed with code ${code}: ${error}`);
+            }
+        });
+
+        // Send input to stdin
+        pythonProcess.stdin.write(inputText);
+        pythonProcess.stdin.end();
+    });
 }
-
-async function runPythonAI(inputText: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    // Spawn a Python child process
-    const pythonProcess = spawn('python', ['./src/utils/get_embeddings.py', inputText]);
-
-    let data = '';
-    let error = '';
-
-    // Capture the Python script's output
-    pythonProcess.stdout.on('data', (chunk) => {
-      data += chunk;
-    });
-
-    // Capture any error output
-    pythonProcess.stderr.on('data', (chunk) => {
-      error += chunk;
-    });
-
-    // When Python script finishes
-    pythonProcess.on('close', (code) => {
-      if (code === 0) {
-        // Parse the JSON result from the Python script
-        try {
-          const result = JSON.parse(data);
-          resolve(result);
-        } catch (err) {
-          reject('Error parsing JSON output: ' + err);
-        }
-      } else {
-        reject('Python script failed with code ' + code + ': ' + error);
-      }
-    });
-  });
-}
-

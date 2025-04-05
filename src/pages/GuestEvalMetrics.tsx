@@ -1,6 +1,13 @@
 import { Fragment, useEffect, useState } from 'react';
 import Button from '../components/Button';
-// import ExcelJS from 'exceljs';
+
+type TopicSummary = {
+    topic: string;
+    summary: string;
+    keywords: string[];
+    count: number;
+    responses: string[];
+  };
 
 export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     const [guests, setGuests] = useState<[string, string, string][]>([]);
@@ -13,14 +20,15 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
     const [selectedSemester, setSelectedSemester] = useState('*');
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     // const [workbook, setWorkbook] = useState<ExcelJS.Buffer>();
-    const [result, setResult] = useState<[string, string][]>([]);
+    const [result, setResult] = useState<[string, string | TopicSummary[]][]>([]);
 
     useEffect(() => {
-        window.ipcRenderer.readCourses().then((result: { id: string, name: string }[]) => {
+        window.ipcRenderer.readCourses().then((result: any) => {
             // unfortunately we can't directly reference the state variable, so we have to create a new array
-            const coursesArray = result.map((e) => [e.id, e.name] as [string, string]);
+            const coursesArray = result.map((e: { id: string, name: string }) => [e.id, e.name] as [string, string]);
             setCourses(coursesArray);
         });
         window.ipcRenderer.readAcademicYears().then((result: { id: string, name: string }[]) => {
@@ -31,8 +39,8 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
             const semestersArray = result.map((e) => [e.id, e.name] as [string, string]);
             setSemesters(semestersArray);
         });
-        window.ipcRenderer.readGuestLecturers().then((result: { id: string, fname: string, lname: string }[]) => {
-            const guestsArray = result.map((e) => [e.id, e.fname, e.lname] as [string, string, string]);
+        window.ipcRenderer.readGuestLecturers().then((result: any) => {
+            const guestsArray = result.map((e: { id: string, fname: string, lname: string }) => [e.id, e.fname, e.lname] as [string, string, string]);
             setGuests(guestsArray);
         });
     }, [])
@@ -54,27 +62,30 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
     }
 
     async function handleGenerateReport(): Promise<void> {
+        if(loading) return;
+
+        setLoading(true);
         try {
-            const res: [string, string][] = await window.ipcRenderer.generateGuestReport( // get sql data
+            const res: [string, string | TopicSummary[]][] = await window.ipcRenderer.generateGuestReport(
                 selectedGuest,
                 selectedCourse,
                 selectedSemester,
                 selectedAcademicYear
             );
 
-            console.log(res);
-
             if (res) { // set the response data to corresponding state to be used in the UI
+                // const preprocessedResult = preprocessResult(res);
                 setResult(res);
                 setSuccess(true);
             } else {
                 setError(true);
             }
         } catch (error) {
+            setLoading(false);
             setError(true);
             console.log(error);
         }
-
+        setLoading(false);
         setTimeout(() => {
             setSuccess(false);
             setError(false);
@@ -118,37 +129,60 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
                 <div className="w-2/3 mx-auto py-6 flex flex-col gap-4">
                     <Button icon={null} label="Generate Report" action={handleGenerateReport} />
                     {/* {workbook && <Button icon={null} label="Save Report to Excel" action={handleSaveGuestReport} />} */}
-                    <div className="flex justify-center pb-12">
+                    <div className="flex justify-center">
                             <div className="text-white rounded-xl p-2 text-sm border-none">
                             <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
                         </div>
                     </div>                 
                 </div>
                 {success && <p className="w-full text-green-300 font-semibold">Report generated successfully!</p>}
-                {error && <p className="w-full text-red-300 font-semibold">Saving report to Excel failed, ensure a report has been generated and please try again.</p>}
+                {error && <p className="w-full text-red-300 font-semibold">Generating report failed, please ensure the correct criteria is selected and try again.</p>}
             
             </div>
 
             <div className="w-full h-full">
                 <div className="h-1/12 text-2xl">Output</div>
-                <div className="bg-stone-300 w-full min-h-11/12 border-2 border-stone-600 rounded-xl  text-stone-900 p-4 text-left">
-                    {(result.length === 0 || !result) && 
+                <div className="bg-stone-300 w-full min-h-11/12 border-2 border-stone-600 rounded-xl overflow-y-auto max-h-[500px] text-stone-900 p-4 text-left">
+                    {(result.length === 0 || !result) && loading === false &&
                         <div>Run a report to show metrics here.</div>
                     }
-                    { result.length > 0 &&
-                        <div className='grid grid-cols-1'>
-                            {result.map((qa, i) => (
-                                <Fragment key={i}>
-                                    <p className='font-semibold'>
-                                        {qa[0]}
-                                    </p>
-                                    <p>
-                                        {qa[1]}
-                                    </p>
-                                </Fragment>
-                            ))}
+                    {loading && 
+                        <div className='flex space-x-2 justify-center items-center h-min pt-8'>
+                            <div className='h-6 w-6 bg-stone-800 rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+                            <div className='h-6 w-6 bg-stone-800 rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+                            <div className='h-6 w-6 bg-stone-800 rounded-full animate-bounce'></div>
                         </div>
                     }
+                    {result.map((qa, i) => {
+                        return (
+                            <Fragment key={i}>
+                                <p className="font-semibold">
+                                    {qa[0]} {/* Render the question */}
+                                </p>
+                                {typeof qa[1] === "string" ? (
+                                    <p className='pb-6'>{qa[1] as string}</p>
+                                ) : (
+                                    <div className="pb-6">
+                                    {/* Render the object answer */}
+                                    {qa[1] && Array.isArray(qa[1]) && qa[1].map((topic, index) => (
+                                        <div key={index} className="pl-4">
+                                            <p><strong>{topic.topic}</strong></p>
+                                            <p><strong>Summary:</strong> {topic.summary}</p>
+                                            <p><strong>Keywords:</strong> {topic.keywords.join(", ")}</p>
+                                            <p><strong>Count:</strong> {topic.count}</p>
+                                            <p><strong>Responses:</strong></p>
+                                            <ul>
+                                                {topic.responses.map((response, idx) => (
+                                                    <li key={idx}>{response}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
+                                )}
+                            </Fragment>
+                        );
+                    })}
                 </div>
             </div>
         </div>
