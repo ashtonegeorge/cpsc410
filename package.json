@@ -44,8 +44,12 @@
     "productName": "Evalu8",
     "files": [
       "dist/",
+      "dist/**/*",
+      "src/utils/**/*",
+      "src/models/**/*",
       "dist-electron/",
       "node_modules/**/*",
+      "./venv/*/**",
       "public/**/*",
       "node_modules",
       "package.json"
@@ -54,7 +58,11 @@
       "buildResources": "public"
     },
     "extraResources": [
-      "./dev.db"
+      "./venv/",
+      "./venv/*/**",
+      "./dev.db",
+      "src/utils/**/*",
+      "src/models/**/*"
     ]
   }
 }
