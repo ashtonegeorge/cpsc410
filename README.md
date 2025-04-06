@@ -30,9 +30,23 @@ From here, you must run the postinstall script to initialize the database.
 ```bash
 npm run postinstall
 ```
+After running the postinstall, you must create a Python virtual environment using the command below.
+```bash
+virtualenv venv
+```
+Now activate the virtual environment.
+```bash
+venv/Scripts/activate # windows
+
+source venv/bin/activate # macos/linux
+```
+From here we can finally install the pip dependencies from requirements.txt. 
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
-You can start the application by running the following command.
+You can start the application by running the following command. Ensure the Python environment is activated to use all features.
 ```bash
 npm run dev
 ```
