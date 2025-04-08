@@ -10,7 +10,7 @@ interface EvalQuestion {
     openResponses: string[];
 }
 
-export default function GuestEvalMan() {
+export default function ImportGuestEvalMan() {
         const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
         // const [success, setSuccess] = useState(false);
         // the following three state variables are arrays of tuples, where the first element is the id and the second is the name

@@ -10,6 +10,7 @@ export { default as GuestLecturers } from './GuestLecturers';
 export { default as Home } from './Home';
 export { default as GuestEvalMetrics } from './GuestEvalMetrics';
 export { default as ImportGuestEval} from './ImportGuestEval';
+export { default as ImportGuestEvalMan} from './ImportGuestEvalMan';
 export { default as ImportCourseEval } from './ImportCourseEval';
 export { default as ImportCourseEvalMan } from './ImportCourseEvalMan';
 export { default as GuestEvalEdit } from './GuestEvalEdit';
