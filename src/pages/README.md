@@ -22,6 +22,15 @@ This file contains the academic year page. The intention behind this file is tha
 ### CourseEval.tsx
 This file contains the course evaluation homepage. The intention behind this file is that it will serve as intermediate navigation between the homepage and whatever course-related actions the user wants to do.
 
+### ImportCourseEval.tsx
+This file contains the import course evaluation page. Here, users can import course evaluation data from CSV files.
+
+### CourseEvalEdit.tsx
+This file contains the edit course evaluation page.
+
+### CourseEvalMetrics.tsx
+This file contains the course evaluation metrics page. Here, users can perform thematic analysis on student responses.
+
 ### Courses.tsx
 This file contains the courses page. The intention behind this file is that it allows the user to maintain the available course selections for evaluations and grades.
 
@@ -33,6 +42,15 @@ This file contains the module grades page. The intention behind this file is tha
 
 ### GuestEval.tsx
 This file contains the guest evaulation homepage. This intention behind this file is that it will serve as intermediate navigation between the homepage and whatever guest-evaluation-related actions the user wants to do.
+
+### ImportGuestEval.tsx
+This file contains the import guest evaluation page. Here, users can import guest evaluation data from CSV files.
+
+### GuestEvalEdit.tsx
+This file contains the edit guest evaluation page.
+
+### GuestEvalMetrics.tsx
+This file contains the guest evaluation metrics page. Here, users can perform thematic analysis on student responses.
 
 ### Home.tsx
 This file contains the homepage. The intention behind this file is that the user can navigate to different areas of the application from a user-friendly page.
