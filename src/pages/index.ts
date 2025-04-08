@@ -14,6 +14,5 @@ export { default as ImportGuestEval} from './ImportGuestEval';
 export { default as ImportGuestEvalMan} from './ImportGuestEvalMan';
 export { default as ImportCourseEval } from './ImportCourseEval';
 export { default as ImportCourseEvalMan } from './ImportCourseEvalMan';
-export { default as ImportGuestEvalMan } from './ImportGuestEvalMan';
 export { default as GuestEvalEdit } from './GuestEvalEdit';
 export { default as CourseEvalEdit } from './CourseEvalEdit';
