@@ -7,7 +7,7 @@ type TopicSummary = {
     keywords: string[];
     count: number;
     responses: string[];
-  };
+};
 
 export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     const [guests, setGuests] = useState<[string, string, string][]>([]);
@@ -92,6 +92,27 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
         }, 5000);
     }
 
+    async function handleSaveGuestReport(): Promise<void> {
+        try {
+            if (!result) throw new Error("Missing data, please generate a report and try again.");
+            const res = await window.ipcRenderer.saveEvalReport(result);
+            if (!res.success) {
+                setError(true);
+                console.error('Error saving course report:', res.message);
+            } else {
+                setSuccess(true);
+            }
+        } catch (error) {
+            setError(true);
+            console.error('Error saving course report:', error);
+        } finally {
+            setTimeout(() => {
+                setSuccess(false);
+                setError(false);
+            }, 5000);
+        }
+    }
+
     return (
         <div className="flex justify-between gap-8 h-full">
             <div className="w-1/3">
@@ -128,7 +149,7 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
                 </div>
                 <div className="w-2/3 mx-auto py-6 flex flex-col gap-4">
                     <Button icon={null} label="Generate Report" action={handleGenerateReport} />
-                    {/* {workbook && <Button icon={null} label="Save Report to Excel" action={handleSaveGuestReport} />} */}
+                    {result.length > 0 && result && <Button icon={null} label="Save Report to Excel" action={handleSaveGuestReport} />}
                     <div className="flex justify-center">
                             <div className="text-white rounded-xl p-2 text-sm border-none">
                             <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
@@ -186,6 +207,5 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
                 </div>
             </div>
         </div>
-
     );
 }

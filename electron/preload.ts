@@ -114,6 +114,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('read-course-eval-file', filePath)
   },
 
+  importCourseEvaluation(courseId: string, semesterId: string, academicYearId: string, evalQuestions: EvalQuestion[]) {
+    return ipcRenderer.invoke('import-course-evaluation', courseId, semesterId, academicYearId, evalQuestions)
+  },
+
   readCourseQuestions() {
     return ipcRenderer.invoke('read-course-questions')
   },
@@ -179,6 +183,19 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   generateGuestReport(guestId: string, courseId: string, semesterId: string, academicYearId: string): Promise<void> {
     return ipcRenderer.invoke('generate-guest-report', guestId, courseId, semesterId, academicYearId);
+  },
+
+  generateCourseReport(courseId: string, semesterId: string, academicYearId: string): Promise<void> {
+    return ipcRenderer.invoke('generate-course-report', courseId, semesterId, academicYearId);
+  },
+
+  async saveEvalReport(data: [string, string | { topic: string; summary: string; keywords: string[]; count: number; responses: string[]; }][]) {
+    const result = ipcRenderer.invoke('save-eval-report', data);
+    if (!result) {
+        console.error('Error saving evaluation report:', result);
+        throw new Error(result);
+    }
+    return result;
   },
 
   async saveGradeReport(buffer: ExcelJS.Buffer): Promise<void> {
