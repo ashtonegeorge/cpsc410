@@ -1,5 +1,6 @@
 import re
 from textblob import TextBlob
+import unicodedata
 
 # Optional: turn this off to speed up processing
 ENABLE_SPELLING_CORRECTION = False
@@ -16,6 +17,12 @@ ABBREVIATIONS = {
     "pharm": "pharmacology",
     "rx": "prescription"
 }
+
+def removeSpecialChars(text):
+    text = unicodedata.normalize("NFKD", text)
+    # Encode to ASCII and ignore non-ASCII characters
+    text = text.encode("ascii", "ignore").decode("utf-8")
+    return text
 
 def correct_spelling(text):
     return str(TextBlob(text).correct())
@@ -36,6 +43,7 @@ def preprocess_sentences(sentences: list[str]) -> list[str]:
         text = sentence.lower()
         text = expand_abbreviations(text)
         text = remove_redundant_phrases(text)
+        text = removeSpecialChars(text)
         if ENABLE_SPELLING_CORRECTION:
             text = correct_spelling(text)
         cleaned.append(text)
