@@ -50,13 +50,7 @@ export default function ImportCourseEval({setView}: {setView: React.Dispatch<Rea
     const handleUpload = async () => {
         if (filePath) { // if there is a file path, read the file
             const records = await window.ipcRenderer.readCourseEvalFile(filePath); // read the file and get student id and grade pairs
-            // records.forEach((record: [string, string]) => {
-            //     window.ipcRenderer.importCourseEval(record[0], 
-            //                                     selectedCourse, 
-            //                                     selectedSemester, 
-            //                                     selectedAcademicYear, 
-            //                                     record[1]);
-            // });
+            window.ipcRenderer.importCourseEvaluation(selectedCourse, selectedSemester, selectedAcademicYear, records);
 
             setSuccess(true);
             setTimeout(() => { // hides success message after ten seconds
@@ -113,11 +107,15 @@ export default function ImportCourseEval({setView}: {setView: React.Dispatch<Rea
                     ))}
                 </select>
             </div>
-        <Button icon={uploadIcon} action={handleUpload} label="Upload" />
+            <Button icon={uploadIcon} action={handleUpload} label="Upload" />
+            <div className='mt-2'>
+                <div className="flex justify-center pb-12">
+                        <div className="text-white rounded-xl p-2 text-sm border-none">
+                        <Button icon={null} label="Back" action={() => Promise.resolve(setView('courseEval'))}/>
+                    </div>
+                </div>
+            </div>
         {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}
-        <div className="flex justify-evenly gap-12 pb-12">
-            <Button icon={null} label="Back" action={() => Promise.resolve(setView('courseEval'))}/>
-        </div>
     </div>
   );
 }
