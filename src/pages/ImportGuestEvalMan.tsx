@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import uploadIcon from '../assets/upload.png';
+import TextField from '../components/TextField';
 
 
 interface EvalQuestion {
@@ -10,7 +11,7 @@ interface EvalQuestion {
     openResponses: string[];
 }
 
-export default function ImportGuestEvalMan() {
+export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
         const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
         // const [success, setSuccess] = useState(false);
         // the following three state variables are arrays of tuples, where the first element is the id and the second is the name
@@ -18,7 +19,7 @@ export default function ImportGuestEvalMan() {
         const [semesters, setSemesters] = useState<[string, string][]>([]);
         const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
         const [guests, setGuests] = useState<[string, string, string][]>([]);
-        // const [likertGoals, setLikertGoals] = useState<[string, string][]>([]);
+        //const [likertGoals, setLikertGoals] = useState<[string, string][]>([]);
 
         // these three state variables correspond to the dropdowns for course, semester, and academic year
         const [selectedCourse, setSelectedCourse] = useState('');
@@ -26,7 +27,7 @@ export default function ImportGuestEvalMan() {
         const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
         const [selectedGuest, setSelectedGuest] = useState('');
         const [selectedLikertGoals, setSelectedLikertGoals] = useState('');
-        
+        const [selectedOpenGoals, setSelectedOpenGoals] = useState('');
     
         useEffect(() => {
             window.ipcRenderer.readCourses().then((result: any) => {
@@ -85,12 +86,13 @@ export default function ImportGuestEvalMan() {
         const handleSelectedAcademicYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedAcademicYear(event.target.value); };
         const handleSelectedGuestChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedGuest(event.target.value); };
         const handleSelectedLikertGoals = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedLikertGoals(event.target.value); };
+        const handleSelectedOpenGoals = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedOpenGoals(event.target.value); };
 
     return(
 <div> 
 <h2>Import Guest Speaker Evaluations Manually</h2>
 <div>
-    
+<div className="flex justify-evenly gap-12 pb-12"></div>
         <h1 className='font-semibold'>Select Guest Lecturer</h1>
         <select onChange={handleSelectedGuestChange} className='text-black bg-white p-2 rounded-lg my-2 w-100'>
         {guests.map(([id, fname, lname]) => (  
@@ -130,6 +132,7 @@ export default function ImportGuestEvalMan() {
   </select>
  </div>
  <div>
+ <div className="flex justify-evenly gap-12 pb-12"></div>
     <h1 className='font-semibold'>Question 1</h1>
     <select onChange={handleSelectedLikertGoals} className='text-black bg-white p-2 rounded-lg my-2 w-100'>
         <option className='flex p-1 w-full'>Strongly Agree</option>
@@ -188,6 +191,20 @@ export default function ImportGuestEvalMan() {
         <option className='flex p-1 w-full'>Disagree</option>
         <option className='flex p-1 w-full'>Strongly Disagree</option>
     </select>
+    </div>
+    <div className="flex justify-evenly gap-12 pb-12"></div>
+    <div className="flex flex-col justify-start w-full items-center">
+    <h2 className="text-lg font-semibold mb-2">Open Response Questions</h2>
+        <TextField label="Question 7" setValue={setSelectedOpenGoals} placeholder={''}/>
+        <TextField label="Question 8" setValue={setSelectedOpenGoals} placeholder={''}/>
+        <div className='w-1/2'>
+    </div>
+    </div>
+
+    <div className="flex justify-center pb-12">
+        <div className="text-white rounded-xl p-2 text-sm border-none">
+            <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
+        </div>
     </div>
 </div>
     );
