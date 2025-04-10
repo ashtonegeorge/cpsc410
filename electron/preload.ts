@@ -177,6 +177,14 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('delete-academic-year', ayearId);
   },
 
+  readCourseEvals(): Promise<{id: string, courseId: string, semesterName: string, academicYearName: string }[]> {
+    return ipcRenderer.invoke('read-course-evaluations');
+  },
+
+  readGuestEvals() {
+
+  },
+
   generateGradeReport(studentId: string, courseId: string, academicYearId: string): Promise<any> {
     return ipcRenderer.invoke('generate-grade-report', studentId, courseId, academicYearId);
   },

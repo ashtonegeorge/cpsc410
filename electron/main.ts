@@ -443,6 +443,23 @@ ipcMain.handle('delete-academic-year', async (_event, ayearId) => {
     return result;
 });
 
+ipcMain.handle('read-course-evaluations', async () => {
+    const query = `
+        SELECT c.*, s.name as semester_name, ay.name as academic_year_name
+        FROM "course-evaluation" c
+        LEFT JOIN semester s ON c.semester_id = s.id
+        LEFT JOIN "academic-year" ay ON c.academic_year_id = ay.id
+        WHERE 1=1
+    `
+    const result = db.prepare(query).all();
+    return result;
+})
+
+ipcMain.handle('read-guest-evaluations', async () => {
+    const result = db.prepare('SELECT * FROM "guest-evaluation"').all();
+    return result;
+})
+
 ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearId) => {
     interface GradeRow { // interface for the data we are querying from the db
         student_id: string;
