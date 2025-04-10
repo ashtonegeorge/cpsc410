@@ -36,9 +36,9 @@ virtualenv venv
 ```
 Now activate the virtual environment.
 ```bash
-venv/Scripts/activate # windows
-
-source venv/bin/activate # macos/linux
+.\venv\Scripts\activate.ps1 # Windows PowerShell
+.\venv\Scripts\activate.bat # Windows Command Prompt
+source ./venv/Scripts/activate # macOS/Linux
 ```
 From here we can finally install the pip dependencies from requirements.txt. 
 ```bash
