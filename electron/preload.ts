@@ -197,6 +197,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('generate-course-report', courseId, semesterId, academicYearId);
   },
 
+  deleteCourseEvaluation(evalId: string) {
+    return ipcRenderer.invoke('delete-course-evaluation', evalId);
+  },
+
   async saveEvalReport(data: [string, string | { topic: string; summary: string; keywords: string[]; count: number; responses: string[]; }][]) {
     const result = ipcRenderer.invoke('save-eval-report', data);
     if (!result) {

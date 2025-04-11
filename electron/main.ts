@@ -450,6 +450,7 @@ ipcMain.handle('read-course-evaluations', async () => {
         LEFT JOIN semester s ON c.semester_id = s.id
         LEFT JOIN "academic-year" ay ON c.academic_year_id = ay.id
         WHERE 1=1
+        ORDER BY id DESC
     `
     const result = db.prepare(query).all();
     return result;
@@ -618,6 +619,16 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
     }
 
     return questionAndAnswer;
+});
+
+ipcMain.handle('delete-course-evaluation', async (_event, evalId) => {
+    // get all of the corresponding answers
+    const answersToDelete: { id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string }[] = db.prepare('SELECT * FROM answer WHERE course_evaluation_id = ?').all(evalId)
+    db.prepare('DELETE FROM answer WHERE course_evaluation_id = ?').run(evalId); // delete answers before questions due to foreign key constraints
+    answersToDelete.forEach((ans) => { // loop through the answers and delete each question with corresponding question id
+        db.prepare('DELETE FROM question WHERE id = ?').run(ans.question_id); 
+    });
+    db.prepare('DELETE FROM "course-evaluation" WHERE id = ?').run(evalId); // finally delete the evaluation record
 });
 
 ipcMain.handle('generate-course-report', async (_event, courseId, semesterId, academicYearId) => {
