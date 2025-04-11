@@ -4,7 +4,10 @@
   font-weight: 400;
 
   color-scheme: dark;
-  background-color: var(--color-francis-grey);
+
+  
+  background: #000000;
+  background: linear-gradient(180deg,rgba(119, 119, 119, 1) 60%, rgba(156, 22, 22, 1) 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

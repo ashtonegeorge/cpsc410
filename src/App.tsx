@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import sfuLogo from './assets/redflash.png'
 import './App.css'
 // the following imports are dedicated pages
 
-import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval, ImportGrades, GradeMetrics, GuestEvalMetrics, GuestLecturers, ImportGuestEval, GuestEvalEdit, CourseEvalEdit, ImportCourseEval, ImportCourseEvalMan, ImportGuestEvalMan } from './pages';
+import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval, ImportGrades, GradeMetrics, GuestEvalMetrics, GuestLecturers, ImportGuestEval, GuestEvalEdit, CourseEvalEdit, ImportCourseEval, ImportCourseEvalMan, ImportGuestEvalMan, CourseEvalMetrics } from './pages';
 
 function App() {
   const [view, setView] = useState('home'); // state to handle what page is displayed
@@ -40,7 +40,7 @@ function App() {
         {view === 'importGrades' && <ImportGrades setView={setView}/>}
         {view === 'gradeMetrics' && <GradeMetrics setView={setView} />}
         {view === 'guestEval' && <GuestEval setView={setView} />}
-        {view === 'guestLecturers' && <GuestLecturers />}
+        {view === 'guestLecturers' && <GuestLecturers setView={setView} />}
         {view === 'guestEvalEdit' && <GuestEvalEdit setView={setView} />}
         {view === 'importGuestEval' && <ImportGuestEval setView={setView} />}
         {view === 'guestEvalmetrics' && <GuestEvalMetrics setView={setView} />}
@@ -49,7 +49,7 @@ function App() {
         {view === 'importCourseEval' && <ImportCourseEval setView={setView} />}
         {view === 'courseEvalMetrics' && <CourseEvalMetrics setView={setView} />}
         {view === 'importCourseEvalMan' && <ImportCourseEvalMan setView={setView} />}
-        {view === 'academicYear' && <AcademicYear />}
+        {view === 'academicYear' && <AcademicYear setView={setView} />}
         {view === 'courseEvalEdit' && <CourseEvalEdit setView={setView} />}
       </div>
     </main>
