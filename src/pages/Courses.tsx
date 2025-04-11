@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect, Fragment } from 'react'; 
 import TextField from '../components/TextField';
 import Button from '../components/Button';
 
@@ -43,43 +43,51 @@ export default function Courses({setView}: {setView: React.Dispatch<React.SetSta
     }
 
     return (
-        <>
-            <h1 className="text-2xl">Courses</h1>
-            <div className='grid grid-cols-2 gap-4'>
-                <div className='flex flex-col justify-center w-full items-center'>
-                    <h2 className="text-lg font-semibold mb-2">Create Course</h2>
-                    <TextField label="Course Code" setValue={setCreateCode} placeholder={''}/>
-                    <TextField label="Course Name" setValue={setCreateName} placeholder={''}/>
-                    <div className='w-1/2'>
-                        <Button icon={null} label="Create Course" action={() => createCourse(createCode, createName)}/>
-                    </div>
-                </div>
-                <div className='flex flex-col justify-start w-full items-center'>
-                    <h2 className="text-lg font-semibold mb-2">Update Course</h2>
-                    <TextField label="Course Code" setValue={setUpdateId} placeholder={''}/>
-                    <TextField label="New Course Name" setValue={setUpdateName} placeholder={''} />
-                    <div className='w-1/2'>
-                        <Button icon={null} label="Update Course" action={() => updateCourse(updateId, updateName)}/>
-                    </div>
-                </div>
-                <div className='flex flex-col justify-start w-1/2 mx-auto items-center col-span-2'>
-                    <h2 className="text-lg font-semibold mb-2">Delete Course</h2>
-                    <TextField label="Course Code" setValue={setDelete} placeholder={''}/>
-                    <div className='w-1/2'>
-                        <Button icon={null} label="Delete Course" action={() => deleteCourse(del)}/>
-                    </div>
-                </div>
-            </div>
-            <div className='p-8'>
-                <h2 className='text-lg font-bold p-2'>Courses</h2>
-                <div className='text-md text-left w-2/3 mx-auto'>
-                    {courses.map((course: [string, string], index: number) => { // here we map over the tuple array and render each course
-                        return (
-                        <div key={course[0] + index}>
-                            <p>{course[0]} : {course[1]}</p>
+        <div>
+            <div className='flex justify-between'>
+                <div className='w-1/2 flex flex-col gap-8'>
+                    <h1 className="text-2xl">Courses</h1>
+                    <div className='flex flex-col justify-center w-full items-center'>
+                        <h2 className="text-lg font-semibold mb-2">Create Course</h2>
+                        <TextField label="Course Code" setValue={setCreateCode} placeholder={''}/>
+                        <TextField label="Course Name" setValue={setCreateName} placeholder={''}/>
+                        <div className=''>
+                            <Button icon={null} label="Create Course" action={() => createCourse(createCode, createName)}/>
                         </div>
-                        )
-                    })}
+                    </div>
+                    <div className='flex flex-col justify-start w-full items-center'>
+                        <h2 className="text-lg font-semibold mb-2">Update Course</h2>
+                        <TextField label="Course Code" setValue={setUpdateId} placeholder={''}/>
+                        <TextField label="New Course Name" setValue={setUpdateName} placeholder={''} />
+                        <div className=''>
+                            <Button icon={null} label="Update Course" action={() => updateCourse(updateId, updateName)}/>
+                        </div>
+                    </div>
+                    <div className='flex flex-col justify-start mx-auto items-center col-span-2'>
+                        <h2 className="text-lg font-semibold mb-2">Delete Course</h2>
+                        <TextField label="Course Code" setValue={setDelete} placeholder={''}/>
+                        <div className=''>
+                            <Button icon={null} label="Delete Course" action={() => deleteCourse(del)}/>
+                        </div>
+                    </div>
+                </div>
+                <div className='w-full m-12'>
+                    <div className='bg-stone-300 w-full min-h-11/12 border-2 border-stone-600 rounded-xl overflow-y-auto max-h-[500px] text-stone-900 p-4 text-left'>
+                        <div className='text-lg text-left mx-auto grid grid-cols-[0.5fr_2fr] gap-x-2'>
+                            <Fragment>
+                                <p className='font-semibold text-center'>Course Code : </p> 
+                                <p className='font-semibold text-left'> Course Name</p>
+                            </Fragment>
+                            {courses.map((course: [string, string], index: number) => { // here we map over the tuple array and render each course
+                                return (
+                                    <Fragment key={course[0] + index}>
+                                        <p className='text-center'>{course[0]}:</p>
+                                        <p className='text-left'> {course[1]}</p>
+                                    </Fragment>
+                                )
+                            })}
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className="flex justify-evenly gap-12 pb-12">
@@ -87,6 +95,6 @@ export default function Courses({setView}: {setView: React.Dispatch<React.SetSta
                     <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
                 </div>
             </div>
-        </>
+        </div>
     )
 }

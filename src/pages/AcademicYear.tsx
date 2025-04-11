@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
 
-export default function AcademicYear() {
+export default function AcademicYear({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     const [newYear, setNewYear] = useState('');
     const [updateYearName, setUpdateYearName] = useState('');
     const [updateYearId, setUpdateYearId] = useState('');
@@ -39,45 +39,51 @@ export default function AcademicYear() {
     };
 
     return (
-            <>
-                <h1 className='text-2xl'>Academic Year</h1>
-                <div className='grid grid-cols-2 gap-4'>
-                    <div className="flex flex-col justify-start w-full items-center">
-                        <h2 className="text-lg font-semibold mb-2">Add Academic Year</h2>
-                        <TextField label="Academic Year Name" setValue={setNewYear} placeholder={'New name'} />
-                        <Button label="Save Year" action={createAcademicYear} icon={null} />
+            <div>
+                <div className='flex justify-between'>
+                    <div className='w-1/2 flex flex-col gap-8'>
+                        <h1 className='text-2xl'>Academic Year</h1>
+                        <div className="flex flex-col justify-start w-full items-center">
+                            <h2 className="text-lg font-semibold mb-2">Add Academic Year</h2>
+                            <TextField label="Academic Year Name" setValue={setNewYear} placeholder={'New name'} />
+                            <Button label="Save Year" action={createAcademicYear} icon={null} />
+                        </div>
+                        <div className="flex flex-col justify-start w-full items-center">
+                            <h2 className="text-lg font-semibold mb-2">Update Academic Year</h2>
+                            <TextField label="Academic Year ID" setValue={setUpdateYearId} placeholder={'ID to update'} />
+                            <TextField label="Academic Year Name" setValue={setUpdateYearName} placeholder={'New name'} />
+                            <Button label="Update Year" action={updateAcademicYear} icon={null} />
+                        </div>
+                        <div className="flex flex-col justify-start w-1/2 items-center col-span-2 mx-auto">
+                            <h2 className="text-lg font-semibold mb-2">Delete Academic Year</h2>
+                            <TextField label="Academic Year ID" setValue={setDeleteYear} placeholder={'ID to delete'} />
+                            <Button label="Delete Year" action={deleteAcademicYear} icon={null} />
+                        </div>
                     </div>
-                    <div className="flex flex-col justify-start w-full items-center">
-                        <h2 className="text-lg font-semibold mb-2">Update Academic Year</h2>
-                        <TextField label="Academic Year ID" setValue={setUpdateYearId} placeholder={'ID to update'} />
-                        <TextField label="Academic Year Name" setValue={setUpdateYearName} placeholder={'New name'} />
-                        <Button label="Update Year" action={updateAcademicYear} icon={null} />
-                    </div>
-                    <div className="flex flex-col justify-start w-1/2 items-center col-span-2 mx-auto">
-                        <h2 className="text-lg font-semibold mb-2">Delete Academic Year</h2>
-                        <TextField label="Academic Year ID" setValue={setDeleteYear} placeholder={'ID to delete'} />
-                        <Button label="Delete Year" action={deleteAcademicYear} icon={null} />
-                    </div>
-                </div>
-                <div>
-                    <h2 className='text-2xl font-bold py-6'>Academic Years</h2>
-                    <div className='grid grid-cols-2 w-sm mx-auto'>
-                        <p className='font-semibold'>ID</p> 
-                        <p className='font-semibold'>Name</p>
-                        {academicYears.map((ayear: [string, string], id: number) => {
-                            return (
-                                <Fragment key={ayear[0] + id}>
-                                    <p>
-                                        {ayear[0]}: 
-                                    </p>
-                                    <p>
-                                        {ayear[1]}
-                                    </p>
+                    <div className='w-full m-12'>
+                        <div className='bg-stone-300 w-full min-h-11/12 border-2 border-stone-600 rounded-xl overflow-y-auto max-h-[500px] text-stone-900 p-4 text-left'>
+                            <div className='text-lg text-left mx-auto grid grid-cols-[0.5fr_2fr] gap-x-2'>
+                                <Fragment>
+                                    <p className='font-semibold text-center'>ID : </p> 
+                                    <p className='font-semibold text-left'> Year Name</p>
                                 </Fragment>
-                            )
-                        })}
+                                {academicYears.map((ayear: [string, string], id: number) => {
+                                    return (
+                                        <Fragment key={ayear[0] + id}>
+                                            <p className='text-center'>{ayear[0]}:</p> 
+                                            <p className='text-left'>{ayear[1]}</p>
+                                        </Fragment>
+                                    )
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </>
+                <div className="flex justify-evenly gap-12 pb-12">
+                    <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none">
+                        <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
+                    </div>
+                </div>
+            </div>
     );
 }
