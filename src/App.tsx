@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import sfuLogo from './assets/redflash.png'
 import './App.css'
 // the following imports are dedicated pages

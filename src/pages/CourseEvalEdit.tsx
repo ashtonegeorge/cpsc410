@@ -4,8 +4,25 @@ import Button from '../components/Button';
 export default function CourseEvalEdit({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) { 
     const [courseEvals, setCourseEvals] = useState<[string, string, string, string][]>([]);
     const [markedEvals, setMarkedEvals] = useState<string[]>([]);
+    const [courses, setCourses] = useState<[string, string][]>([]);
+    const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
+    const [semesters, setSemesters] = useState<[string, string][]>([]);
 
     useEffect(() => {
+        window.ipcRenderer.readCourses().then((result: any) => {
+            // unfortunately we can't directly reference the state variable, so we have to create a new array
+            const coursesArray = result.map((e: { id: string, name: string }) => [e.id, e.name] as [string, string]);
+            console.log(coursesArray);
+            setCourses(coursesArray);
+        });
+        window.ipcRenderer.readAcademicYears().then((result: { id: string, name: string }[]) => {
+            const academicYearsArray = result.map((e) => [e.id, e.name] as [string, string]);
+            setAcademicYears(academicYearsArray);
+        });
+        window.ipcRenderer.readSemesters().then((result: { id: string, name: string }[]) => {
+            const semestersArray = result.map((e) => [e.id, e.name] as [string, string]);
+            setSemesters(semestersArray);
+        });
         updateCourseEvals()
     }, [])
 
@@ -34,6 +51,18 @@ export default function CourseEvalEdit({setView}: {setView: React.Dispatch<React
         }
     }
     
+    function handleCourseUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
+        console.log(evalId)
+    }
+
+    function handleSemesterUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
+        console.log(evalId)
+    }
+
+    function handleAcademicYearUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
+        console.log(evalId)
+    }
+
     return (
        <div>
             <h1>Edit Course Evaluation Data</h1>
@@ -45,12 +74,29 @@ export default function CourseEvalEdit({setView}: {setView: React.Dispatch<React
                 <p className='font-semibold'>Academic Year</p>
                 {courseEvals.map((e, i) => (
                     <Fragment key={i}>
-                        {/* <button onClick={() => handleCourseEvaluationDelete(e[0])} className='bg-(--color-francis-red) hover:bg-red-700 transition-colors rounded-lg text-sm w-1/2 place-self-center p-1 cursor-pointer'>Delete</button> */}
                         <input className='p-1 w-5 mx-auto' type='checkbox' onChange={(event) => handleEvalChecked(event, e[0])} />
                         <p className='self-center'>{e[0]}</p>
-                        <p className='self-center'>{e[1]}</p>
-                        <p className='self-center'>{e[2]}</p>
-                        <p className='self-center'>{e[3]}</p>
+                        <select className='self-center' onChange={(event) => handleCourseUpdate(event, e[0])}>
+                            <option>{e[1]}</option>
+                            {courses.length > 0 && courses.map((c) => (
+                                    <option key={c[0]}>{c[0]}</option>
+                                ))
+                            }
+                        </select>
+                        <select className='self-center' onChange={(event) => handleSemesterUpdate(event, e[0])}>
+                            <option>{e[2]}</option>
+                            {semesters.length > 0 && semesters.map((s) => (
+                                    <option key={s[0]}>{s[1]}</option>
+                                ))
+                            }
+                        </select>
+                        <select className='self-center' onChange={(event) => handleAcademicYearUpdate(event, e[0])}>
+                            <option>{e[3]}</option>
+                            {academicYears.length > 0 && academicYears.map((a) => (
+                                    <option key={a[0]}>{a[1]}</option>
+                                ))
+                            }
+                        </select>
                     </Fragment>
                 ))}
 

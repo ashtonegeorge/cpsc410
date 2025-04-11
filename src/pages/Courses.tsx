@@ -33,12 +33,12 @@ export default function Courses({setView}: {setView: React.Dispatch<React.SetSta
     }
 
     const updateCourse = async (courseId: string, courseName: string) => {
-        const result = await window.ipcRenderer.updateCourse(courseId, courseName);
+        await window.ipcRenderer.updateCourse(courseId, courseName);
         updateCourses();
     }
 
     const deleteCourse = async (courseId: string) => {
-        const result = await window.ipcRenderer.deleteCourse(courseId);
+        await window.ipcRenderer.deleteCourse(courseId);
         updateCourses();
     }
 
