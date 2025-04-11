@@ -38,11 +38,11 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                 setSelectedAcademicYear(academicYearsArray[0][0]);
             }
         });
-        // commenting this out because its not implemented yet
-        // window.ipcRenderer.readCourseQuestions().then((result: { id: string, question_text: string, type: string }[]) => {
-        //     const questionsArray = result.map((e) => [e.id, e.question_text, e.type] as [string, string, string]);
-        //     setQuestions(questionsArray);
-        // });
+        
+        window.ipcRenderer.readCourseQuestions().then((result: { id: string, question_text: string, type: string }[]) => {
+            const questionsArray = result.map((e) => [e.id, e.question_text, e.type] as [string, string, string]);
+            setQuestions(questionsArray);
+        });
 
     }, [])
 
@@ -86,14 +86,11 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                 </select>
             </div>
             <div>
-                <h1 className='font-semibold'>The course Program Goals, Course Learning Outcomes, Instructional Objectives, and Syllabus are an effective guide of the material.</h1>
-                <select onChange={handleSelectedLikertGoals} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
-                    <option className='flex p-1 w-full'>Strongly Agree</option>
-                    <option className='flex p-1 w-full'>Agree</option>
-                    <option className='flex p-1 w-full'>Neutral</option>
-                    <option className='flex p-1 w-full'>Disagree</option>
-                    <option className='flex p-1 w-full'>Strongly Disagree</option>
-                </select>
+                {questions.map(([id, question_text, type]) => (  
+                    <h1 className='flex p-1 w-full' key={id}>
+                        {question_text}
+                    </h1>
+                ))}
             </div>
             <div>
                 <h1 className='font-semibold'>Overall, I rate this course as excellent.</h1>
