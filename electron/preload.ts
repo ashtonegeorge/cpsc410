@@ -182,7 +182,15 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 
   readGuestEvals() {
+    return ipcRenderer.invoke('read-guest-evaluations');
+  },
 
+  updateCourseEval(evalId: string, courseId?: string, semesterId?: string, academicYearId?: string) {
+    return ipcRenderer.invoke('update-course-evaluation', evalId, courseId, semesterId, academicYearId)
+  },
+
+  updateGuestEval(evalId: string, guestId?: string, courseId?: string, semesterId?: string, academicYearId?: string) {
+    return ipcRenderer.invoke('update-guest-evaluation', evalId, guestId, courseId, semesterId, academicYearId)
   },
 
   generateGradeReport(studentId: string, courseId: string, academicYearId: string): Promise<any> {
@@ -199,6 +207,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   deleteCourseEvaluation(evalId: string) {
     return ipcRenderer.invoke('delete-course-evaluation', evalId);
+  },
+
+  deleteGuestEvaluation(evalId: string) {
+    return ipcRenderer.invoke('delete-guest-evaluation', evalId)
   },
 
   async saveEvalReport(data: [string, string | { topic: string; summary: string; keywords: string[]; count: number; responses: string[]; }][]) {

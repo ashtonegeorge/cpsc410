@@ -457,9 +457,19 @@ ipcMain.handle('read-course-evaluations', async () => {
 })
 
 ipcMain.handle('read-guest-evaluations', async () => {
-    const result = db.prepare('SELECT * FROM "guest-evaluation"').all();
+    const query = `
+        SELECT ge.*, CONCAT(g.lname, ', ', g.fname) as guest_name, s.name as semester_name, ay.name as academic_year_name
+        FROM "guest-evaluation" ge
+        LEFT JOIN "guest-lecturer" g ON ge.guest_id = g.id
+        LEFT JOIN semester s ON ge.semester_id = s.id
+        LEFT JOIN "academic-year" ay ON ge.academic_year_id = ay.id
+        WHERE 1=1
+        ORDER BY id DESC
+    `
+    const result = db.prepare(query).all();
     return result;
 })
+
 
 ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearId) => {
     interface GradeRow { // interface for the data we are querying from the db
@@ -630,6 +640,38 @@ ipcMain.handle('delete-course-evaluation', async (_event, evalId) => {
     });
     db.prepare('DELETE FROM "course-evaluation" WHERE id = ?').run(evalId); // finally delete the evaluation record
 });
+
+ipcMain.handle('delete-guest-evaluation', async (_event, evalId) => {
+    // get all of the corresponding answers
+    const answersToDelete: { id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string }[] = db.prepare('SELECT * FROM answer WHERE course_evaluation_id = ?').all(evalId)
+    db.prepare('DELETE FROM answer WHERE guest_evaluation_id = ?').run(evalId); // delete answers before questions due to foreign key constraints
+    answersToDelete.forEach((ans) => { // loop through the answers and delete each question with corresponding question id
+        db.prepare('DELETE FROM question WHERE id = ?').run(ans.question_id); 
+    });
+    db.prepare('DELETE FROM "guest-evaluation" WHERE id = ?').run(evalId); // finally delete the evaluation record
+});
+
+ipcMain.handle('update-course-evaluation', async (_event, evalId, courseId?, semesterId?, academicYearId?) => {
+    if(courseId) {
+        await db.prepare('UPDATE "course-evaluation" SET course_id = ? WHERE id = ?').run(courseId, evalId);
+    } else if(semesterId) {
+        await db.prepare('UPDATE "course-evaluation" SET semester_id = ? WHERE id = ?').run(semesterId, evalId);
+    } else if(academicYearId) {
+        await db.prepare('UPDATE "course-evaluation" SET academic_year_id = ? WHERE id = ?').run(academicYearId, evalId);
+    }
+})
+
+ipcMain.handle('update-guest-evaluation', async (_event, evalId, guestId?, courseId?, semesterId?, academicYearId?) => {
+    if(guestId) {
+        await db.prepare('UPDATE "guest-evaluation" SET guest_id = ? WHERE id = ?').run(guestId, evalId);
+    } else if(courseId) {
+        await db.prepare('UPDATE "guest-evaluation" SET course_id = ? WHERE id = ?').run(courseId, evalId);
+    } else if(semesterId) {
+        await db.prepare('UPDATE "guest-evaluation" SET semester_id = ? WHERE id = ?').run(semesterId, evalId);
+    } else if(academicYearId) {
+        await db.prepare('UPDATE "guest-evaluation" SET academic_year_id = ? WHERE id = ?').run(academicYearId, evalId);
+    }
+})
 
 ipcMain.handle('generate-course-report', async (_event, courseId, semesterId, academicYearId) => {
     // initial query, includes the verbose academic year name and semester name 
