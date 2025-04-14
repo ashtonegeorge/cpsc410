@@ -68,9 +68,9 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
                         </div>  
                         <div className="flex flex-col justify-start w-full items-center">
                             <h2 className="text-lg font-semibold mb-2">Update Guest Lecturer</h2>
-                            <TextField label="Guest ID" setValue={setUpdateGuestId} placeholder={'ID to update'} />
                             <TextField label="Guest First Name" setValue={setUpdateGuestFName} placeholder={'New name'} />
                             <TextField label="Guest Last Name" setValue={setUpdateGuestLName} placeholder={'New name'} />
+                            <TextField label="Guest ID" setValue={setUpdateGuestId} placeholder={'ID to update'} />
                             <div>
                                 <Button label="Update Guest" action={updateGuestLecturer} icon={null} />
                             </div>
