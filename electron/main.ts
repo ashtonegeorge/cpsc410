@@ -448,7 +448,7 @@ ipcMain.handle('read-grades', async (_event, studentId?, courseId?, semesterId?,
         params.push(isRetake);
     }
     if(grade != "" && grade != null) {
-        query += ' AND grade = ?';
+        query += ' AND final_grade = ?';
         params.push(grade);
     }
 
@@ -494,6 +494,10 @@ ipcMain.handle('read-course-evaluations', async () => {
     `
     const result = db.prepare(query).all();
     return result;
+})
+
+ipcMain.handle('read-course-questions', async () => {
+    
 })
 
 ipcMain.handle('read-guest-evaluations', async () => {

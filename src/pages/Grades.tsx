@@ -10,6 +10,7 @@ export default function Grades({setView}: {setView: React.Dispatch<React.SetStat
                 <Button icon={uploadIcon} label='Grade Metrics' action={() => Promise.resolve(setView('gradeMetrics'))} />
             </div>
             <div className='flex gap-4 pt-12'>
+                <Button icon={null} label='Input Grades Manually' action={() => Promise.resolve(setView('importGradesMan'))} />
                 <Button icon={uploadIcon} label='Edit Grade Data' action={() => Promise.resolve(setView('gradeEdit'))} />
             </div>
                 <div className="flex justify-center pt-12">

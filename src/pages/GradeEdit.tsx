@@ -1,9 +1,8 @@
 import { ChangeEvent, Fragment, useCallback, useEffect, useState } from 'react';
 import Button from '../components/Button';
-// TODO: narrow down results using some sort of filter
+
 export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) { 
     const [grades, setGrades] = useState<[string, string, string, string, string, string, string][]>([]);
-    const [filteredGrades, setFilteredGrades] = useState<[string, string, string, string, string, string, string][]>([]);
     const [markedGrades, setMarkedGrades] = useState<string[]>([]);
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
@@ -24,46 +23,11 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
     }
 
     const updateGrades = useCallback(async () => {
-        const result = await window.ipcRenderer.readGrades();
+        const result = await window.ipcRenderer.readGrades(studentIdFilter, courseFilter, semesterFilter, academicYearFilter, retakeFilter, gradeFilter);
         const g = result.map((g: { id: string, student_id: string, course_id: string, semester_name: string, academic_year_name: string, retake: string, final_grade: string }) => 
             [g.id, g.student_id, g.course_id, g.semester_name, g.academic_year_name, g.retake, g.final_grade] as [string, string, string, string, string, string, string]
         );
         setGrades(g);
-
-        // Apply filters
-        let filtered = g;
-        if (studentIdFilter != "") {
-            console.log(studentIdFilter);
-            filtered = filtered.filter((i) => i[1] === studentIdFilter);
-            
-        }
-        if (courseFilter != "") {
-            console.log(courseFilter);
-            filtered = filtered.filter((i) => i[2] === courseFilter);
-            
-        }
-        if (semesterFilter != "") {
-            console.log(semesterFilter);
-            filtered = filtered.filter((i) => i[3] === semesterFilter);
-            
-        }
-        if (academicYearFilter != "") {
-            console.log(academicYearFilter);
-            filtered = filtered.filter((i) => i[4] === academicYearFilter);
-            
-        }
-        if (retakeFilter != "") {
-            console.log(retakeFilter);
-            filtered = filtered.filter((i) => i[5] === retakeFilter);
-            
-        }
-        if (gradeFilter != "") {
-            console.log(gradeFilter);
-            filtered = filtered.filter((i) => i[6] === gradeFilter);
-            
-        }
-        console.log(filtered);
-        setFilteredGrades(filtered);
     }, [studentIdFilter, courseFilter, semesterFilter, academicYearFilter, retakeFilter, gradeFilter]);
 
     // Run updateGrades on component mount
@@ -95,10 +59,12 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
     
     function handleStudentIdUpdate(event: React.ChangeEvent<HTMLInputElement>, gradeId: string): void {
         window.ipcRenderer.updateGrade(gradeId, event.target.value, undefined, undefined, undefined, undefined, undefined);
+        updateGrades();
     }
 
     function handleCourseUpdate(event: React.ChangeEvent<HTMLSelectElement>, gradeId: string): void {
         window.ipcRenderer.updateGrade(gradeId, undefined, event.target.value, undefined, undefined, undefined, undefined);
+        updateGrades();
     }
     
     function handleSemesterUpdate(event: React.ChangeEvent<HTMLSelectElement>, gradeId: string): void {
@@ -111,6 +77,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
     
         const id = semesterMapping[event.target.value];
         window.ipcRenderer.updateGrade(gradeId, undefined, undefined, id.toString(), undefined, undefined, undefined);
+        updateGrades();
     }
     
     function handleAcademicYearUpdate(event: React.ChangeEvent<HTMLSelectElement>, gradeId: string): void {
@@ -119,14 +86,17 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
             if(ayear[1] == event.target.value) id = ayear[0];
         })
         window.ipcRenderer.updateGrade(gradeId, undefined, undefined, undefined, id, undefined, undefined);
+        updateGrades();
     }
-
+    
     function handleRetakeUpdate(event: React.ChangeEvent<HTMLSelectElement>, gradeId: string): void {
         window.ipcRenderer.updateGrade(gradeId, undefined, undefined, undefined, undefined, event.target.value, undefined);
+        updateGrades();
     }
-
+    
     function handleFinalGradeUpdate(event: ChangeEvent<HTMLSelectElement>, gradeId: string): void {
         window.ipcRenderer.updateGrade(gradeId, undefined, undefined, undefined, undefined, undefined, event.target.value)
+        updateGrades();
     }
 
     return (
@@ -156,7 +126,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
                     <select className='w-full p-2 border border-stone-700 rounded-sm self-center text-black bg-white' defaultValue={""} onChange={(event) => setSemesterFilter(event.target.value)}>
                         <option value="">All semesters</option>
                         {semesters.length > 0 && semesters.map((s) => (
-                                <option key={s[0]}>{s[1]}</option>
+                                <option key={s[0]} value={s[0]}>{s[1]}</option>
                             ))
                         }
                     </select>
@@ -167,7 +137,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
                     <select className='w-full p-2 border border-stone-700 rounded-sm self-center text-black bg-white' defaultValue={""} onChange={(event) => setAcademicYearFilter(event.target.value)}>
                         <option value="">All academic years</option>
                         {academicYears.length > 0 && academicYears.map((a) => (
-                                <option key={a[0]}>{a[1]}</option>
+                                <option key={a[0]} value={a[0]}>{a[1]}</option>
                             ))
                         }
                     </select>
@@ -202,7 +172,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
                     </select>
                 </div>
             </div>
-            {filteredGrades.length > 0 ? (
+            {grades.length > 0 ? (
                 <div className='grid grid-cols-8 gap-2 h-min grid-flow-row overflow-y-auto max-h-[500px] text-sm mx-auto max-w-5xl bg-stone-600 border border-stone-800 p-2 pb-6 mt-6 rounded-lg '>
                     <p className='font-semibold'>Delete</p>
                     <p className='font-semibold'>ID</p>
@@ -212,31 +182,31 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
                     <p className='font-semibold'>Academic Year</p>
                     <p className='font-semibold'>Retake</p>
                     <p className='font-semibold'>Final Grade</p>
-                    {filteredGrades.map((g, i) => (
+                    {grades.map((g, i) => (
                         <Fragment key={i}>
                             <input className='p-1 w-5 mx-auto' type='checkbox' onChange={(event) => handleEvalChecked(event, g[0])} />
                             <p className='self-center'>{g[0]}</p>
-                            <input type="text" defaultValue={g[1]} className='border border-stone-700 rounded-sm self-center bg-stone-600 px-1' onChange={(event) => handleStudentIdUpdate(event, g[0])}></input>
-                            <select defaultValue={g[2]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleCourseUpdate(event, g[0])}>
+                            <input type="text" value={g[1]} className='border border-stone-700 rounded-sm self-center bg-stone-600 px-1' onChange={(event) => handleStudentIdUpdate(event, g[0])}></input>
+                            <select value={g[2]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleCourseUpdate(event, g[0])}>
                                 {courses.length > 0 && courses.map((c) => (
                                     <option key={c[0]}>{c[0]}</option>
                                 ))}
                             </select>
-                            <select defaultValue={g[3]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleSemesterUpdate(event, g[0])}>
+                            <select value={g[3]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleSemesterUpdate(event, g[0])}>
                                 {semesters.length > 0 && semesters.map((s) => (
                                     <option key={s[0]}>{s[1]}</option>
                                 ))}
                             </select>
-                            <select defaultValue={g[4]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleAcademicYearUpdate(event, g[0])}>
+                            <select value={g[4]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleAcademicYearUpdate(event, g[0])}>
                                 {academicYears.length > 0 && academicYears.map((a) => (
                                     <option key={a[0]}>{a[1]}</option>
                                 ))}
                             </select>
-                            <select defaultValue={g[5]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleRetakeUpdate(event, g[0])}>
+                            <select value={g[5]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleRetakeUpdate(event, g[0])}>
                                 <option value="0">No</option>
                                 <option value="1">Yes</option>
                             </select>
-                            <select defaultValue={g[6]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleFinalGradeUpdate(event, g[0])}>
+                            <select value={g[6]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleFinalGradeUpdate(event, g[0])}>
                                 <option value="A+">A+</option>
                                 <option value="A">A</option>
                                 <option value="A-">A-</option>
@@ -256,7 +226,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
                 </div>
             ) : (
                 <div className='text-center w-full mx-auto max-w-5xl bg-stone-600 border border-stone-800 p-2 mt-6 rounded-lg '>
-                    <h2>No results found, please upload a gradebook file and check back again.</h2>
+                    <h2>No results found, please ensure data with the filter criteria exists in the database and try again.</h2>
                 </div>
             )}
             <div className='p-1'>
