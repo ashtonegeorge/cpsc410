@@ -6,7 +6,7 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [semesters, setSemesters] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
-    const [questions, setQuestions] = useState<[string, string, string][]>([]);
+    const [questions, setQuestions] = useState<[string, string, string, string][]>([]);
     const [likertGoals, setLikertGoals] = useState<[string, string][]>([]);
 
     // these three state variables correspond to the dropdowns for course, semester, and academic year
@@ -39,8 +39,8 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
             }
         });
         
-        window.ipcRenderer.readCourseQuestions().then((result: { id: string, question_text: string, type: string }[]) => {
-            const questionsArray = result.map((e) => [e.id, e.question_text, e.type] as [string, string, string]);
+        window.ipcRenderer.readCourseQuestions().then((result: { id: string, question_text: string, type: string, group: string }[]) => {
+            const questionsArray = result.map((e) => [e.id, e.question_text, e.type, e.group] as [string, string, string, string]);
             setQuestions(questionsArray);
         });
 
@@ -86,13 +86,13 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                 </select>
             </div>
             <div>
-                {questions.map(([id, question_text, type]) => (  
+                {questions.map(([id, question_text]) => (  
                     <h1 className='flex p-1 w-full' key={id}>
                         {question_text}
                     </h1>
                 ))}
             </div>
-            <div>
+            {/* <div>
                 <h1 className='font-semibold'>Overall, I rate this course as excellent.</h1>
 
             </div>
@@ -111,7 +111,7 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
             <div>
                 <h1 className='font-semibold'>The department is always looking for ways to improve the curriculum. What are the reflections regarding the course (for example: course objectives, assessments, labs, etc.)? Please be as specific and provide suggestions, when applicable.</h1>
 
-            </div>
+            </div> */}
         <Button icon={null} label="Back" action={() => Promise.resolve(setView('courseEval'))}/>
     </div>
     );

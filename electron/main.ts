@@ -174,22 +174,7 @@ ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, course
         const questionId = questionResult.lastInsertRowid;
 
         db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(guestEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('|'));
-    });
-});
-
-ipcMain.handle('import-course-evaluation', async (_event, courseId: string, semesterId: string, academicYearId: string, evalQuestions: {questionText: string; likertAnswers: number[]; likertAverage: number; openResponses: string[];}[]) => {
-    const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
-    const courseEvalId = courseResult.lastInsertRowid;
-
-    evalQuestions.forEach((q) => {
-        const type = q.likertAnswers.length > 0 ? "likert" : "open";
-
-        const questionResult = db.prepare('INSERT INTO question (question_text, type) VALUES (?, ?)').run(q.questionText, type);
-        const questionId = questionResult.lastInsertRowid;
-
-        db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(courseEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('|'));
+            .run(guestEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('; ')); 
     });
 });
 
@@ -323,96 +308,6 @@ ipcMain.handle('read-guest-eval-file', async (_event, filePath) => {
     return questions;
 });
 
-/**
- * ipcMain.handle('read-course-eval-file'...)
- * This event handler is used in the preload.ts file to read a course speaker evaluation survey spreadsheet file.
- * The event is exposed to the renderer process, in preload.ts, via the contextBridge API.
- * This allows us to call window.ipcRenderer.readSpreadsheetFile() in the ImportCourseEval.tsx file.
- * @param filePath
- * @returns rows
- */
-ipcMain.handle('read-course-eval-file', async (_event, filePath) => {
-    interface EvalQuestion {
-        questionText: string;
-        likertAnswers: number[];
-        likertAverage: number;
-        openResponses: string[];
-    }
-
-    // create an excel instance, retrieve the file extension, and specify desired columns
-    const workbook = new ExcelJS.Workbook(); 
-    const ext = path.extname(filePath).toLowerCase();
-
-    if (ext === '.xlsx') { // if the file is an xlsx file, read the file
-        await workbook.xlsx.readFile(filePath);
-    } else if (ext === '.csv') { // if the file is a csv file, convert it to a filestream first
-        const fileStream = fs.createReadStream(filePath);
-        await workbook.csv.read(fileStream);
-    } else { // throw if invalid file format
-        throw new Error('Unsupported file format');
-    }
-
-    const sheet: ExcelJS.Worksheet = workbook.getWorksheet(1)!;
-
-    // start and end columns for questions, initialized to 1 by default
-    let start = 1;
-    let end = 1;
-
-    // find the start and end from the first row
-    sheet.getRow(1).eachCell((c, i) => {
-        if(c.value?.toString() === "attempt") { start = i+1; } // the column after the attempt column is the first question
-        else if(c.value?.toString() === "n correct") { // the column before the n correct column is the last question
-            end = i-1; 
-            return;
-        }
-    });
-
-    // for every column between the start and end values, collect every survey response and average them
-    const questions: EvalQuestion[] = [];
-    const questionCols: ExcelJS.Column[] = [];
-    for(let i = start; i<=end; i++) {
-        questionCols.push(sheet.getColumn(i));
-    }
-    questionCols.forEach((col) => {
-        let qText: string;
-        const likertAnswers: number[] = [];
-        const openResponses: string[] = [];
-        if(!(col.values[1]?.toString() === "0") && !(col.values[1]?.toString() === "1")) {
-            qText = col.values[1]!.toString();
-            col.values.map((cell) => {
-                switch(cell?.toString()) {
-                    case "Strongly Agree":
-                        likertAnswers.push(5);
-                        break;
-                    case "Agree":
-                        likertAnswers.push(4);
-                        break;
-                    case "Neutral":
-                        likertAnswers.push(3);
-                        break;
-                    case "Disagree":
-                        likertAnswers.push(2);
-                        break;
-                    case "Strongly Disagree":
-                        likertAnswers.push(1);
-                        break;
-                    default:
-                        if(cell!.toString() !== qText) openResponses.push(cell!.toString());
-                }
-            })
-            const avg = (likertAnswers.reduce((p, v) => p + v, 0)) / likertAnswers.length;
-            const q: EvalQuestion = {
-                questionText: qText,
-                likertAnswers: likertAnswers,
-                likertAverage: avg,
-                openResponses: openResponses
-            }
-            questions.push(q);
-        }  
-    })
-    return questions;
-});
-
 ipcMain.handle('import-grades', async (_event, studentId, courseId, semesterId, academicYearId, isRetake, grade) => {
     const result = db.prepare('INSERT INTO grade (student_id, course_id, semester_id, academic_year_id, retake, final_grade) VALUES (?, ?, ?, ?, ?, ?)').run(studentId, courseId, semesterId, academicYearId, isRetake, grade);
     return result;
@@ -443,33 +338,15 @@ ipcMain.handle('delete-academic-year', async (_event, ayearId) => {
     return result;
 });
 
-ipcMain.handle('read-course-evaluations', async () => {
-    const query = `
-        SELECT c.*, s.name as semester_name, ay.name as academic_year_name
-        FROM "course-evaluation" c
-        LEFT JOIN semester s ON c.semester_id = s.id
-        LEFT JOIN "academic-year" ay ON c.academic_year_id = ay.id
-        WHERE 1=1
-        ORDER BY id DESC
-    `
-    const result = db.prepare(query).all();
+ipcMain.handle('read-course-questions', async (_event) => {
+    const result = db.prepare('SELECT * FROM "question" WHERE group = "course"').all();
     return result;
-})
+});
 
-ipcMain.handle('read-guest-evaluations', async () => {
-    const query = `
-        SELECT ge.*, CONCAT(g.lname, ', ', g.fname) as guest_name, s.name as semester_name, ay.name as academic_year_name
-        FROM "guest-evaluation" ge
-        LEFT JOIN "guest-lecturer" g ON ge.guest_id = g.id
-        LEFT JOIN semester s ON ge.semester_id = s.id
-        LEFT JOIN "academic-year" ay ON ge.academic_year_id = ay.id
-        WHERE 1=1
-        ORDER BY id DESC
-    `
-    const result = db.prepare(query).all();
+ipcMain.handle('read-guest-questions', async (_event) => {
+    const result = db.prepare('SELECT * FROM "question" WHERE group = "guest"').all();
     return result;
-})
-
+});
 
 ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearId) => {
     interface GradeRow { // interface for the data we are querying from the db
@@ -608,10 +485,14 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
         params.push(semesterId);
     }
 
+    // const tokenizer = await transformers.AutoTokenizer.from_pretrained(env.localModelPath);
+    // const model = await transformers.AutoModelForSequenceClassification.from_pretrained(env.localModelPath);
+    // const session = await ort.InferenceSession.create('./src/models/')
+
     // get the id of the guest-evaluation
     const ge: {id: string, guest_id: string, semester_id: string, academic_year_id: string}[] = db.prepare(query).all(...params);
     const answers: {id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string}[] = db.prepare('SELECT * FROM answer WHERE guest_evaluation_id = ?').all(ge[0].id);
-    const questionAndAnswer: [string, string | { count: number, keywords: string[], responses: string[], summary: string, topic: string }[]][] = []; 
+    const questionAndAnswer: [string, string | number[]][] = []; 
 
     try {
         for (const a of answers) {
@@ -620,8 +501,12 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
             if (q.type === "likert") {
                 questionAndAnswer.push([q.question_text, a.answer_text]);
             } else if (q.type === "open") {
-                const res = await thematic_analysis(a.answer_text) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
-                questionAndAnswer.push([q.question_text, res])
+                // const inputs = await tokenizer(a.answer_text, { padding: true, truncation: true });
+                // const { logits } = await model(inputs);
+                // const rawLogits = logits.ort_tensor.cpuData;
+                // const probabilities = softmax(rawLogits);
+                // questionAndAnswer.push([q.question_text, probabilities]);
+                runPythonAI(a.answer_text);
             }
         }
     } catch(e) {
@@ -630,147 +515,6 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
 
     return questionAndAnswer;
 });
-
-ipcMain.handle('delete-course-evaluation', async (_event, evalId) => {
-    // get all of the corresponding answers
-    const answersToDelete: { id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string }[] = db.prepare('SELECT * FROM answer WHERE course_evaluation_id = ?').all(evalId)
-    db.prepare('DELETE FROM answer WHERE course_evaluation_id = ?').run(evalId); // delete answers before questions due to foreign key constraints
-    answersToDelete.forEach((ans) => { // loop through the answers and delete each question with corresponding question id
-        db.prepare('DELETE FROM question WHERE id = ?').run(ans.question_id); 
-    });
-    db.prepare('DELETE FROM "course-evaluation" WHERE id = ?').run(evalId); // finally delete the evaluation record
-});
-
-ipcMain.handle('delete-guest-evaluation', async (_event, evalId) => {
-    // get all of the corresponding answers
-    const answersToDelete: { id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string }[] = db.prepare('SELECT * FROM answer WHERE course_evaluation_id = ?').all(evalId)
-    db.prepare('DELETE FROM answer WHERE guest_evaluation_id = ?').run(evalId); // delete answers before questions due to foreign key constraints
-    answersToDelete.forEach((ans) => { // loop through the answers and delete each question with corresponding question id
-        db.prepare('DELETE FROM question WHERE id = ?').run(ans.question_id); 
-    });
-    db.prepare('DELETE FROM "guest-evaluation" WHERE id = ?').run(evalId); // finally delete the evaluation record
-});
-
-ipcMain.handle('update-course-evaluation', async (_event, evalId, courseId?, semesterId?, academicYearId?) => {
-    if(courseId) {
-        await db.prepare('UPDATE "course-evaluation" SET course_id = ? WHERE id = ?').run(courseId, evalId);
-    } else if(semesterId) {
-        await db.prepare('UPDATE "course-evaluation" SET semester_id = ? WHERE id = ?').run(semesterId, evalId);
-    } else if(academicYearId) {
-        await db.prepare('UPDATE "course-evaluation" SET academic_year_id = ? WHERE id = ?').run(academicYearId, evalId);
-    }
-})
-
-ipcMain.handle('update-guest-evaluation', async (_event, evalId, guestId?, courseId?, semesterId?, academicYearId?) => {
-    if(guestId) {
-        await db.prepare('UPDATE "guest-evaluation" SET guest_id = ? WHERE id = ?').run(guestId, evalId);
-    } else if(courseId) {
-        await db.prepare('UPDATE "guest-evaluation" SET course_id = ? WHERE id = ?').run(courseId, evalId);
-    } else if(semesterId) {
-        await db.prepare('UPDATE "guest-evaluation" SET semester_id = ? WHERE id = ?').run(semesterId, evalId);
-    } else if(academicYearId) {
-        await db.prepare('UPDATE "guest-evaluation" SET academic_year_id = ? WHERE id = ?').run(academicYearId, evalId);
-    }
-})
-
-ipcMain.handle('generate-course-report', async (_event, courseId, semesterId, academicYearId) => {
-    // initial query, includes the verbose academic year name and semester name 
-    let query = `SELECT * FROM "course-evaluation" WHERE 1=1`;    
-
-    // if we are filtering, dynamically append those to our SQL query and add their corresponding parameters to the params array
-    const params = [];
-    if (courseId !== '*') {
-        query += ' AND course_id = ?';
-        params.push(courseId);
-    }
-    if (academicYearId !== '*') {
-        query += ' AND academic_year_id = ?';
-        params.push(academicYearId);
-    }
-    if (academicYearId !== '*') {
-        query += ' AND semester_id = ?';
-        params.push(semesterId);
-    }
-
-    // get the id of the course-evaluation
-    const ce: {id: string, guest_id: string, semester_id: string, academic_year_id: string}[] = db.prepare(query).all(...params);
-    const answers: {id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string}[] = db.prepare('SELECT * FROM answer WHERE course_evaluation_id = ?').all(ce[0].id);
-    const questionAndAnswer: [string, string | { count: number, keywords: string[], responses: string[], summary: string, topic: string }[]][] = []; 
-
-    try {
-        for (const a of answers) {
-            const q = db.prepare('SELECT * FROM question WHERE id = ?').get(a.question_id);
-    
-            if (q.type === "likert") {
-                questionAndAnswer.push([q.question_text, a.answer_text]);
-            } else if (q.type === "open") {
-                const res = await thematic_analysis(a.answer_text) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
-                questionAndAnswer.push([q.question_text, res])
-            }
-        }
-    } catch(e) {
-        return e;
-    }
-
-    return questionAndAnswer;
-});
-
-ipcMain.handle('save-eval-report', async (_event, data: [string, string | { topic: string; summary: string; keywords: string[]; count: number; responses: string[]; }[]][]) => {
-    const { filePath } = await dialog.showSaveDialog(win!, {
-        title: 'Save Evaluation Report',
-        defaultPath: 'eval-report.xlsx',
-        filters: [
-            { name: 'Excel Files', extensions: ['xlsx'] },
-            { name: 'All Files', extensions: ['*'] }
-        ]
-    })
-
-    // if(!filePath) return { success: false, message: 'User cancelled the save dialog' };
-    try {
-        const workbook = new ExcelJS.Workbook();
-        // display likert questions and answers
-        // display open response questions and answers
-        const likertSheet = workbook.addWorksheet('Likert Style');
-        likertSheet.columns = [
-            { header: 'Question', key: 'question' },
-            { header: 'Likert Avg', key: 'likertavg' },
-        ]
-        const openResponseSheet = workbook.addWorksheet('Open Response');
-        openResponseSheet.columns = [
-            { header: 'Question', key: 'question' },
-            { header: 'Topic', key: 'topic' },
-            { header: 'Summary', key: 'summary' },
-            { header: 'Keywords', key: 'keywords' },
-            { header: 'Count', key: 'count' }
-        ]
-
-        for(const qna of data) {
-            if(typeof qna[1] === 'string') {
-                likertSheet.addRow({
-                    question: qna[0],
-                    likertavg: qna[1]
-                })
-            } else {
-                openResponseSheet.addRow({
-                    question: qna[0]
-                })
-                qna[1].forEach((item) => {
-                    openResponseSheet.addRow({
-                        topic: item['topic'], 
-                        summary: item['summary'],
-                        keywords: item['keywords'],
-                        count: item['count']
-                    })
-                })
-            }
-        }
-        await workbook.xlsx.writeFile(filePath);
-        return { success: true }
-    } catch (error) {
-        return { success: false, message: error }
-    }
-
-})
 
 ipcMain.handle('save-grade-report', async (_event, buffer: Buffer) => {
     const { filePath } = await dialog.showSaveDialog(win!, {
@@ -794,44 +538,45 @@ ipcMain.handle('save-grade-report', async (_event, buffer: Buffer) => {
     }
 });
 
-function thematic_analysis(inputText: string) {
-    return new Promise((resolve, reject) => {
-        const scriptPath = devMode
-            ? './src/utils/analyze_responses.py'
-            : path.join(process.resourcesPath, './src/utils/analyze_responses.py');
-
-        const pythonPath = process.env.NODE_ENV === 'development'
-            ? 'python'
-            : path.join(process.resourcesPath, 'venv', 'Scripts', 'python.exe');
-        const pythonProcess = spawn(pythonPath, [scriptPath]);
-
-        let data = '';
-        let error = '';
-
-        pythonProcess.stdout.on('data', (chunk) => {
-            data += chunk;
-        });
-
-        pythonProcess.stderr.on('data', (chunk) => {
-            error += chunk.toString();
-            console.error('Python STDERR:', chunk.toString());
-        });
-
-        pythonProcess.on('close', (code) => {
-            if (code === 0) {
-                try {
-                    const result: { count: number, keywords: string[], responses: string[], summary: string, topic: string }[] = JSON.parse(data);
-                    resolve(result);
-                } catch (err) {
-                    reject(`Error parsing JSON output: ${(err as Error).message}`);
-                }
-            } else {
-                reject(`Python script failed with code ${code}: ${error}`);
-            }
-        });
-
-        // Send input to stdin
-        pythonProcess.stdin.write(inputText);
-        pythonProcess.stdin.end();
-    });
+function softmax(logits: Float32Array): number[] {
+    const logitsArray = Array.from(logits); // Convert Float32Array to a plain array
+    const expLogits = logitsArray.map((x) => Math.exp(x)); // Exponentiate each logit
+    const sumExpLogits = expLogits.reduce((a, b) => a + b, 0); // Sum of all exponentiated logits
+    return expLogits.map((x) => x / sumExpLogits); // Normalize each value
 }
+
+async function runPythonAI(inputText: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    // Spawn a Python child process
+    const pythonProcess = spawn('python', ['./src/utils/get_embeddings.py', inputText]);
+
+    let data = '';
+    let error = '';
+
+    // Capture the Python script's output
+    pythonProcess.stdout.on('data', (chunk) => {
+      data += chunk;
+    });
+
+    // Capture any error output
+    pythonProcess.stderr.on('data', (chunk) => {
+      error += chunk;
+    });
+
+    // When Python script finishes
+    pythonProcess.on('close', (code) => {
+      if (code === 0) {
+        // Parse the JSON result from the Python script
+        try {
+          const result = JSON.parse(data);
+          resolve(result);
+        } catch (err) {
+          reject('Error parsing JSON output: ' + err);
+        }
+      } else {
+        reject('Python script failed with code ' + code + ': ' + error);
+      }
+    });
+  });
+}
+
