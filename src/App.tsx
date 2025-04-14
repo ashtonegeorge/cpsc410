@@ -3,7 +3,7 @@ import sfuLogo from './assets/redflash.png'
 import './App.css'
 // the following imports are dedicated pages
 
-import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval, ImportGrades, GradeMetrics, GuestEvalMetrics, GuestLecturers, ImportGuestEval, GuestEvalEdit, CourseEvalEdit, ImportCourseEval, ImportCourseEvalMan, ImportGuestEvalMan, CourseEvalMetrics } from './pages';
+import { Home, Courses, About, GuestEval, Grades, AcademicYear, CourseEval, ImportGrades, GradeEdit, GradeMetrics, GuestEvalMetrics, GuestLecturers, ImportGuestEval, GuestEvalEdit, CourseEvalEdit, ImportCourseEval, ImportCourseEvalMan, ImportGuestEvalMan, CourseEvalMetrics } from './pages';
 
 function App() {
   const [view, setView] = useState('home'); // state to handle what page is displayed
@@ -38,6 +38,7 @@ function App() {
         {view === 'courses' && <Courses setView={setView} />}
         {view === 'grades' && <Grades setView={setView} />}
         {view === 'importGrades' && <ImportGrades setView={setView}/>}
+        {view === 'gradeEdit' && <GradeEdit setView={setView} />}
         {view === 'gradeMetrics' && <GradeMetrics setView={setView} />}
         {view === 'guestEval' && <GuestEval setView={setView} />}
         {view === 'guestLecturers' && <GuestLecturers setView={setView} />}

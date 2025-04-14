@@ -149,6 +149,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('import-grades', studentId, courseId, semesterId, academicYearId, retake, grade); 
   },
 
+  readGrades(studentId?: string, courseId?: string, semesterId?: string, academicYearId?: string, isRetake?: string, grade?: string) {
+    return ipcRenderer.invoke('read-grades', studentId, courseId, semesterId, academicYearId, isRetake, grade);
+  },
+
   /**
    * readSemesters() is a function that reads all semesters from the sqlite database.
    * @returns semester sqlite objects
@@ -185,6 +189,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('read-guest-evaluations');
   },
 
+  updateGrade(gradeId: string, studentId?: string, courseId?: string, semesterId?: string, academicYearId?: string, isRetake?: string, grade?: string) {
+    return ipcRenderer.invoke('update-grade', gradeId, studentId, courseId, semesterId, academicYearId, isRetake, grade);
+  },
+
   updateCourseEval(evalId: string, courseId?: string, semesterId?: string, academicYearId?: string) {
     return ipcRenderer.invoke('update-course-evaluation', evalId, courseId, semesterId, academicYearId)
   },
@@ -203,6 +211,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   generateCourseReport(courseId: string, semesterId: string, academicYearId: string): Promise<void> {
     return ipcRenderer.invoke('generate-course-report', courseId, semesterId, academicYearId);
+  },
+
+  deleteGrade(gradeId: string) {
+    return ipcRenderer.invoke('delete-grade', gradeId);
   },
 
   deleteCourseEvaluation(evalId: string) {
