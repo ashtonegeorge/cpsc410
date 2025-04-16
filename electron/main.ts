@@ -167,12 +167,21 @@ ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, course
     const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
     const guestEvalId = guestResult.lastInsertRowid;
 
-    evalQuestions.forEach((q) => {
+    evalQuestions.forEach(async (q) => {
         const type = q.likertAnswers.length > 0 ? "likert" : "open";
-
-        const questionResult = db.prepare('INSERT INTO question (question_text, type) VALUES (?, ?)').run(q.questionText, type);
-        const questionId = questionResult.lastInsertRowid;
-
+        const formattedQuestion = q.questionText.replace(new RegExp("^.*?: \s*|\s+$"), "");
+        
+        // check if the question already exists in the db
+        const existingQuestion = await db.prepare('SELECT * FROM question WHERE question_text = ? AND type = ? AND category = ?').all(formattedQuestion, type, "guest");
+        
+        let questionId;
+        if(existingQuestion.length === 0 || existingQuestion === undefined || existingQuestion === null) { // if it doesn't exist, simply insert
+            const questionResult = db.prepare('INSERT INTO question (question_text, type, category) VALUES (?, ?, ?)').run(formattedQuestion, type, "guest");
+            questionId = questionResult.lastInsertRowid;
+        } else { // if it does exist, access the existing question id and attach that to the answer
+            questionId = existingQuestion[0]['id'];
+        }
+        
         db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
             .run(guestEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('|'));
     });
@@ -182,11 +191,20 @@ ipcMain.handle('import-course-evaluation', async (_event, courseId: string, seme
     const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
     const courseEvalId = courseResult.lastInsertRowid;
 
-    evalQuestions.forEach((q) => {
+    evalQuestions.forEach(async (q) => {
         const type = q.likertAnswers.length > 0 ? "likert" : "open";
+        const formattedQuestion = q.questionText.replace(new RegExp("^.*?: \s*|\s+$"), "");
 
-        const questionResult = db.prepare('INSERT INTO question (question_text, type) VALUES (?, ?)').run(q.questionText, type);
-        const questionId = questionResult.lastInsertRowid;
+        // check if the question already exists in the db
+        const existingQuestion = await db.prepare('SELECT * FROM question WHERE question_text = ? AND type = ? AND category = ?').all(formattedQuestion, type, "course");
+        
+        let questionId;
+        if(existingQuestion.length === 0 || existingQuestion === undefined || existingQuestion === null) { // if it doesn't exist, simply insert
+            const questionResult = db.prepare('INSERT INTO question (question_text, type, category) VALUES (?, ?, ?)').run(formattedQuestion, type, "course");
+            questionId = questionResult.lastInsertRowid;
+        } else { // if it does exist, access the existing question id and attach that to the answer
+            questionId = existingQuestion[0]['id'];
+        }
 
         db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
             .run(courseEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('|'));
@@ -725,22 +743,14 @@ ipcMain.handle('delete-grade', async (_event, gradeId) => {
 
 ipcMain.handle('delete-course-evaluation', async (_event, evalId) => {
     // get all of the corresponding answers
-    const answersToDelete: { id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string }[] = db.prepare('SELECT * FROM answer WHERE course_evaluation_id = ?').all(evalId)
-    db.prepare('DELETE FROM answer WHERE course_evaluation_id = ?').run(evalId); // delete answers before questions due to foreign key constraints
-    answersToDelete.forEach((ans) => { // loop through the answers and delete each question with corresponding question id
-        db.prepare('DELETE FROM question WHERE id = ?').run(ans.question_id); 
-    });
-    db.prepare('DELETE FROM "course-evaluation" WHERE id = ?').run(evalId); // finally delete the evaluation record
+    db.prepare('DELETE FROM answer WHERE course_evaluation_id = ?').run(evalId); 
+    db.prepare('DELETE FROM "course-evaluation" WHERE id = ?').run(evalId); 
 });
 
 ipcMain.handle('delete-guest-evaluation', async (_event, evalId) => {
     // get all of the corresponding answers
-    const answersToDelete: { id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string }[] = db.prepare('SELECT * FROM answer WHERE course_evaluation_id = ?').all(evalId)
-    db.prepare('DELETE FROM answer WHERE guest_evaluation_id = ?').run(evalId); // delete answers before questions due to foreign key constraints
-    answersToDelete.forEach((ans) => { // loop through the answers and delete each question with corresponding question id
-        db.prepare('DELETE FROM question WHERE id = ?').run(ans.question_id); 
-    });
-    db.prepare('DELETE FROM "guest-evaluation" WHERE id = ?').run(evalId); // finally delete the evaluation record
+    db.prepare('DELETE FROM answer WHERE guest_evaluation_id = ?').run(evalId); 
+    db.prepare('DELETE FROM "guest-evaluation" WHERE id = ?').run(evalId); 
 });
 
 ipcMain.handle('update-grade', async (_event, gradeId, studentId?, courseId?, semesterId?, academicYearId?, isRetake?, grade?) => {
