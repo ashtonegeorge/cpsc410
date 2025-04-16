@@ -15,7 +15,7 @@ export default function ImportGrades({setView}: {setView: React.Dispatch<React.S
     const [selectedSemester, setSelectedSemester] = useState('');
     const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
 
-    const [isRetake, setIsRetake] = useState(0);
+    const [isRetake, setIsRetake] = useState("0");
 
     useEffect(() => {
         window.ipcRenderer.readCourses().then((result: any) => {
@@ -53,7 +53,7 @@ export default function ImportGrades({setView}: {setView: React.Dispatch<React.S
         if (filePath) { // if there is a file path, read the file
             const records = await window.ipcRenderer.readGradeFile(filePath); // read the file and get student id and grade pairs
             records.forEach((record: [string, string]) => {
-                window.ipcRenderer.importGrades(record[0], 
+                window.ipcRenderer.importGrade(record[0], 
                                                 selectedCourse, 
                                                 selectedSemester, 
                                                 selectedAcademicYear, 
@@ -72,7 +72,7 @@ export default function ImportGrades({setView}: {setView: React.Dispatch<React.S
     const handleSelectedCourseChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedCourse(event.target.value); };
     const handleSelectedSemesterChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedSemester(event.target.value); };
     const handleSelectedAcademicYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedAcademicYear(event.target.value); };
-    const handleIsRetakeChange = (event: React.ChangeEvent<HTMLInputElement>) => { setIsRetake(event.target.checked === true ? 1 : 0); }
+    const handleIsRetakeChange = (event: React.ChangeEvent<HTMLInputElement>) => { setIsRetake(event.target.checked === true ? "1" : "0"); }
 
     return (
         <div className='pt-12 w-1/2 mx-auto'>
@@ -122,7 +122,7 @@ export default function ImportGrades({setView}: {setView: React.Dispatch<React.S
                 <label htmlFor="vehicle1" className='font-semibold'>Retakes?</label><br/>
             </div>
         <Button icon={uploadIcon} action={handleUpload} label="Upload" />
-        <div className="flex justify-evenly gap-12 pb-12">
+        <div className="flex justify-evenly gap-12 pt-6">
             <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
         </div>
         {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}

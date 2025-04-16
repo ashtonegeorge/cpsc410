@@ -13,6 +13,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
     const [academicYearFilter, setAcademicYearFilter] = useState("");
     const [retakeFilter, setRetakeFilter] = useState("");
     const [gradeFilter, setGradeFilter] = useState("");
+    const [deleteSuccess, setDeleteSuccess] = useState(false);
 
     const handleDeleteCourseEvaluation = async () => {
         markedGrades.forEach((g) => {
@@ -20,6 +21,11 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
         })
         updateGrades()
         setMarkedGrades([]);
+        setDeleteSuccess(true);
+        
+        setTimeout(() => {
+            setDeleteSuccess(false);
+        }, 5000);
     }
 
     const updateGrades = useCallback(async () => {
@@ -184,7 +190,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
                     <p className='font-semibold'>Final Grade</p>
                     {grades.map((g, i) => (
                         <Fragment key={i}>
-                            <input className='p-1 w-5 mx-auto' type='checkbox' onChange={(event) => handleEvalChecked(event, g[0])} />
+                            <input className='p-1 w-5 mx-auto' type='checkbox' checked={markedGrades.includes(g[0])} onChange={(event) => handleEvalChecked(event, g[0])} />
                             <p className='self-center'>{g[0]}</p>
                             <input type="text" value={g[1]} className='border border-stone-700 rounded-sm self-center bg-stone-600 px-1' onChange={(event) => handleStudentIdUpdate(event, g[0])}></input>
                             <select value={g[2]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleCourseUpdate(event, g[0])}>
@@ -236,6 +242,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
             <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none mx-auto pt-6">
                 <Button icon={null} label="Delete" action={handleDeleteCourseEvaluation}/>
             </div>
+            {deleteSuccess && <p className="w-full text-green-300 font-semibold">Deleted successfully!</p>}
             <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none mx-auto">
                 <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
             </div>

@@ -81,17 +81,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   deleteGuestLecturer(guestId: string): Promise<void> {
     return ipcRenderer.invoke('delete-guest-lecturer', guestId);
   },
-  
-  /**
-   * importGrades() is a function that imports grades into the database.
-   * @param studentId
-   * @param courseId
-   * @param semesterId
-   * @param academicYearId
-   * @param retake
-   * @param grade
-   * @returns void
-   */ 
+
   importGuestEvaluation(guestId: string, courseId: string, semesterId: string, academicYearId: string, evalQuestions: EvalQuestion[]): Promise<void> {
     return ipcRenderer.invoke('import-guest-evaluation', guestId, courseId, semesterId, academicYearId, evalQuestions); 
   },
@@ -136,7 +126,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 
   /**
-   * importGrades() is a function that imports grades into the database.
+   * importGrade() is a function that imports a grade into the database.
    * @param studentId
    * @param courseId
    * @param semesterId
@@ -145,7 +135,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
    * @param grade
    * @returns void
    */ 
-  importGrades(studentId: string, courseId: string, semesterId: string, academicYearId: string, retake: number, grade: string): Promise<void> {
+  importGrade(studentId: string, courseId: string, semesterId: string, academicYearId: string, retake: number, grade: string): Promise<void> {
     return ipcRenderer.invoke('import-grades', studentId, courseId, semesterId, academicYearId, retake, grade); 
   },
 
