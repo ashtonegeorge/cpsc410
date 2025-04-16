@@ -193,6 +193,43 @@ ipcMain.handle('import-course-evaluation', async (_event, courseId: string, seme
     });
 });
 
+ipcMain.handle('save-guest-evaluation', async (_event, guestId, courseId, semesterId, academicYearId, evalQuestions) => {
+    interface EvalQuestion {
+        questionText: string;
+        likertAnswers: number[];
+        likertAverage: number;
+        openResponses: string[];
+    }
+
+    try {
+        // Use the same logic to process and save `EvalQuestion` data
+        evalQuestions.forEach((question) => {
+            const type = question.likertAnswers.length > 0 ? "likert" : "open";
+
+            // Insert question into the database
+            const questionResult = db.prepare(
+                'INSERT INTO question (question_text, type) VALUES (?, ?)'
+            ).run(question.questionText, type);
+
+            const questionId = questionResult.lastInsertRowid;
+
+            // Insert answer into the database
+            db.prepare(
+                'INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)'
+            ).run(
+                guestId,
+                questionId,
+                type === "likert" ? question.likertAverage : question.openResponses.join('|')
+            );
+        });
+
+        return true; // Return success
+    } catch (error) {
+        console.error('Error saving guest evaluation:', error);
+        return false; // Return failure
+    }
+});
+
 /**
  * ipcMain.handle('read-grade-file'...)
  * This event handler is used in the preload.ts file to read a canvas grade file.
