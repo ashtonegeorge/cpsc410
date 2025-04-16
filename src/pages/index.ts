@@ -18,3 +18,6 @@ export { default as ImportCourseEval } from './ImportCourseEval';
 export { default as ImportCourseEvalMan } from './ImportCourseEvalMan';
 export { default as GuestEvalEdit } from './GuestEvalEdit';
 export { default as CourseEvalEdit } from './CourseEvalEdit';
+export { default as Questions } from './Questions';
+export { default as AddQuestions } from './AddQuestions';
+export { default as EditQuestions } from './EditQuestions';

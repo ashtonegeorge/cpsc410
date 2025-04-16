@@ -16,6 +16,9 @@ export default function Home({setView}: {setView: React.Dispatch<React.SetStateA
                 <Button label="Guest Lecturers" action={() => Promise.resolve(setView('guestLecturers'))} icon={null}/>
                 <Button label="Academic Year" action={() => Promise.resolve(setView('academicYear'))} icon={null}/>
             </div>
+            <div className="flex justify-center pt-12 ">
+                <Button label="Manage Questions" action={() => Promise.resolve(setView('questions'))} icon={null}/>
+            </div>
         </div>
       </div>
     );

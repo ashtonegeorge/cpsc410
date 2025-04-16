@@ -497,7 +497,13 @@ ipcMain.handle('read-course-evaluations', async () => {
 })
 
 ipcMain.handle('read-course-questions', async () => {
-    
+    const result = await db.prepare('SELECT * FROM question WHERE category = ?').run("course");
+    return result;
+})
+
+ipcMain.handle('read-guest-questions', async () => {
+    const result = await db.prepare('SELECT * FROM question WHERE category = ?').run("guest");
+    return result;
 })
 
 ipcMain.handle('read-guest-evaluations', async () => {
