@@ -11,7 +11,6 @@ interface EvalQuestion {
     openResponses: string[];
 }
 
-
 export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
         const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
         // const [success, setSuccess] = useState(false);
@@ -31,7 +30,9 @@ export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<R
         const [selectedLikertGoals, setSelectedLikertGoals] = useState('');
         const [selectedOpenGoals, setSelectedOpenGoals] = useState('');
 
-    
+        const [success, setSuccess] = useState<boolean>(false);
+        const [error, setError] = useState<boolean>(false);
+
         useEffect(() => {
             window.ipcRenderer.readCourses().then((result: any) => {
                 // unfortunately we can't directly reference the state variable, so we have to create a new array
@@ -69,7 +70,50 @@ export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<R
         });
 
     }, [])
-        
+    
+    
+    const handleSubmit = async () => {
+      // Build `EvalQuestion[]` from form inputs
+      const evalQuestions: EvalQuestion[] = [
+          {
+              questionText: "Question 1",
+              likertAnswers: [Number(selectedLikertGoals)], // Convert Likert responses to numbers
+              likertAverage: Number(selectedLikertGoals),  // Use selectedLikertGoals for average
+              openResponses: [selectedOpenGoals],          // Add open responses
+          },
+          // Add additional questions based on your form inputs
+      ];
+  
+      try {
+          // Call the saveGuestEvaluation handler
+          const result = await window.ipcRenderer.saveGuestEvaluation(
+              selectedGuest,          // guestId
+              selectedCourse,         // courseId
+              selectedSemester,       // semesterId
+              selectedAcademicYear,   // academicYearId
+              evalQuestions           // Structured questions
+          );
+  
+          if (result) {
+              setSuccess(true); // Indicate success
+          } else {
+              setError(true);   // Indicate error
+          }
+      } catch (err) {
+          console.error("Error saving evaluation:", err);
+          setError(true);
+      }
+  
+      // Reset success/error messages after a delay
+      setTimeout(() => {
+          setSuccess(false);
+          setError(false);
+      }, 5000);
+  };
+  
+  
+  
+  
     
         // when the user selects a course, we store the course code in a state variable to be used for uploading
         const handleSelectedCourseChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedCourse(event.target.value); };
@@ -218,9 +262,14 @@ export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<R
 
   <div className="w-1/2"></div>
 </div>
+<div className="w-1/3 text-white rounded-xl p-2 text-sm border-none mx-auto pt-6">
+    <Button icon={null} label="Submit" action={() => handleSubmit()} />
+</div>
+{success && <p className="w-full text-green-300 font-semibold">Submitted successfully!</p>}
+{error && <p className="w-full text-red-300 font-semibold">Submission failed, please try again.</p>}
 
       <div className="flex justify-center pb-12">
-        <div className="text-white rounded-xl p-2 text-sm border-none">
+      <div className="w-1/3 text-white rounded-xl p-2 text-sm border-none mx-auto pt-6">
           <Button
             icon={null}
             label="Back"
