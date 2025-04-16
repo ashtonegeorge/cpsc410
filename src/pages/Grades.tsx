@@ -13,11 +13,13 @@ export default function Grades({setView}: {setView: React.Dispatch<React.SetStat
                 <Button icon={null} label='Input Grades Manually' action={() => Promise.resolve(setView('importGradesMan'))} />
                 <Button icon={uploadIcon} label='Edit Grade Data' action={() => Promise.resolve(setView('gradeEdit'))} />
             </div>
-                <div className="flex justify-center pt-12">
-                    <div className="text-white rounded-xl p-2 text-sm border-none">
+            <div>
+                <div className="flex justify-center pb-12">
+                    <div className="w-1/2 text-white rounded-xl p-12 text-sm border-none">
                         <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
                     </div>
                 </div>
+            </div>
         </div>
     );
 }
