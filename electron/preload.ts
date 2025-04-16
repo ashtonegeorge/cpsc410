@@ -86,6 +86,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('import-guest-evaluation', guestId, courseId, semesterId, academicYearId, evalQuestions); 
   },
 
+  saveGuestEvaluation(guestId: string, courseId: string, semesterId: string, academicYearId: string, evalQuestions: EvalQuestion[]):Promise<void> {
+    return ipcRenderer.invoke('save-guest-evaluation', guestId, courseId, semesterId, academicYearId, evalQuestions);
+},
   /**
    * readGradeFile() is a function that reads a grade file from the file system.
    * @param filePath 
