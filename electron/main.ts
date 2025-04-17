@@ -552,12 +552,12 @@ ipcMain.handle('read-course-evaluations', async () => {
 })
 
 ipcMain.handle('read-course-questions', async () => {
-    const result = await db.prepare('SELECT * FROM question WHERE category = ?').run("course");
+    const result = await db.prepare('SELECT * FROM question WHERE category = ?').all("course");
     return result;
 })
 
 ipcMain.handle('read-guest-questions', async () => {
-    const result = await db.prepare('SELECT * FROM question WHERE category = ?').run("guest");
+    const result = await db.prepare('SELECT * FROM question WHERE category = ?').all("guest");
     return result;
 })
 

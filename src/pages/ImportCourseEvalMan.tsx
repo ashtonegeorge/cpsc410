@@ -7,13 +7,11 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
     const [semesters, setSemesters] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
     const [questions, setQuestions] = useState<[string, string, string, string][]>([]);
-    const [likertGoals, setLikertGoals] = useState<[string, string][]>([]);
 
     // these three state variables correspond to the dropdowns for course, semester, and academic year
     const [selectedCourse, setSelectedCourse] = useState('');
     const [selectedSemester, setSelectedSemester] = useState('');
     const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
-    const [selectedLikertGoals, setSelectedLikertGoals] = useState('');
 
     useEffect(() => {
         window.ipcRenderer.readCourses().then((result: any) => {
@@ -50,7 +48,6 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
     const handleSelectedCourseChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedCourse(event.target.value); };
     const handleSelectedSemesterChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedSemester(event.target.value); };
     const handleSelectedAcademicYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedAcademicYear(event.target.value); };
-    const handleSelectedLikertGoals = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedLikertGoals(event.target.value); };
 
     return (
         <div className='pt-12 w-1/2 mx-auto'>
@@ -86,32 +83,24 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                 </select>
             </div>
             <div>
-                {questions.map(([id, question_text]) => (  
-                    <h1 className='flex p-1 w-full' key={id}>
-                        {question_text}
-                    </h1>
+                {questions.map(([id, question_text,type]) => (  
+                    <div>
+                        <h1 className='flex p-1 w-full' key={id}>
+                            {question_text}
+                        </h1>
+                        <textarea
+                            className="w-full p-2 border rounded resize-none bg-white text-black"
+                            placeholder="Type here..."
+                            style={{ height: "auto" }}
+                            onInput={(event) => {
+                            const textarea = event.target as HTMLTextAreaElement; // Cast to HTMLTextAreaElement
+                            textarea.style.height = "auto"; // Reset the height
+                            textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+                            }}
+                        />
+                    </div>
                 ))}
             </div>
-            {/* <div>
-                <h1 className='font-semibold'>Overall, I rate this course as excellent.</h1>
-
-            </div>
-            <div>
-                <h1 className='font-semibold'>The course challenged me to improve upon my understanding of the subject.</h1>
-                
-            </div>
-            <div>
-                <h1 className='font-semibold'>The course included instruction in patient evaluation, diagnoses, and management.</h1>
-
-            </div>
-            <div>
-                <h1 className='font-semibold'>After taking the course, I understand the role of the Physician Assistant in regards to providing care to patients with conditions covered in this course.</h1>
-                
-            </div>
-            <div>
-                <h1 className='font-semibold'>The department is always looking for ways to improve the curriculum. What are the reflections regarding the course (for example: course objectives, assessments, labs, etc.)? Please be as specific and provide suggestions, when applicable.</h1>
-
-            </div> */}
         <Button icon={null} label="Back" action={() => Promise.resolve(setView('courseEval'))}/>
     </div>
     );
