@@ -119,6 +119,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('read-guest-questions')
   },
 
+  readQuestions() {
+    return ipcRenderer.invoke('read-questions')
+  },
+  
   /**
    * readCourseEvalFile() is a function that reads a course evaluation file from the file system.
    * @param filePath 

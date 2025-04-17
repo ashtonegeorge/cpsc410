@@ -561,6 +561,11 @@ ipcMain.handle('read-guest-questions', async () => {
     return result;
 })
 
+ipcMain.handle('read-questions', async () => {
+    const result = await db.prepare ('SELECT * FROM question').all;
+    return result;
+})
+
 ipcMain.handle('read-guest-evaluations', async () => {
     const query = `
         SELECT ge.*, CONCAT(g.lname, ', ', g.fname) as guest_name, s.name as semester_name, ay.name as academic_year_name

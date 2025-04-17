@@ -3,6 +3,7 @@ import Button from "../components/Button";
 import TextField from "../components/TextField";
 
 export default function AddQuestions({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
+    
     return(
         <div>
             <h2>Add Questions</h2>
