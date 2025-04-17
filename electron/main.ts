@@ -562,7 +562,7 @@ ipcMain.handle('read-guest-questions', async () => {
 })
 
 ipcMain.handle('read-questions', async () => {
-    const result = await db.prepare ('SELECT * FROM question').all;
+    const result = await db.prepare('SELECT * FROM question').all();
     return result;
 })
 
@@ -758,6 +758,11 @@ ipcMain.handle('delete-guest-evaluation', async (_event, evalId) => {
     db.prepare('DELETE FROM "guest-evaluation" WHERE id = ?').run(evalId); 
 });
 
+ipcMain.handle('delete-question', async (_event, questionId) => {
+    db.prepare('DELETE FROM answer WHERE id = ?').run(questionId);
+    db.prepare('DELETE FROM question WHERE id = ?').run(questionId);
+});
+
 ipcMain.handle('update-grade', async (_event, gradeId, studentId?, courseId?, semesterId?, academicYearId?, isRetake?, grade?) => {
     if(studentId) {
         await db.prepare('UPDATE grade SET student_id = ? WHERE id = ?').run(studentId, gradeId);
@@ -793,6 +798,14 @@ ipcMain.handle('update-guest-evaluation', async (_event, evalId, guestId?, cours
         await db.prepare('UPDATE "guest-evaluation" SET semester_id = ? WHERE id = ?').run(semesterId, evalId);
     } else if(academicYearId) {
         await db.prepare('UPDATE "guest-evaluation" SET academic_year_id = ? WHERE id = ?').run(academicYearId, evalId);
+    }
+})
+
+ipcMain.handle('update-question', async (_event, questionId, question_text?, type?, category?) => {
+    if(type) {
+        await db.prepare('UPDATE question SET type = ? WHERE id = ?').run(type, questionId);
+    } else if(category) {
+        await db.prepare('UPDATE question SET category = ? WHERE id = ?').run(category, questionId);
     }
 })
 
