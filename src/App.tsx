@@ -32,7 +32,7 @@ function App() {
           <img src={sfuLogo} alt='logo' className='ml-auto h-10 px-8 glow' />
         </div>
       </nav>
-      <div className='p-4 pt-18 h-[100vh]'>
+      <div className='p-4 pt-18 h-[100vh] max-w-7xl mx-auto'>
         {/* the following lines are conditional rendering. each line employs "short-circuit evaluation" meaning */}
         {/* when the left statement is true, perform the right statement, which in our case renders a component */}
         {view === 'home' && <Home setView={setView} />}
