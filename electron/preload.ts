@@ -111,6 +111,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('import-course-evaluation', courseId, semesterId, academicYearId, evalQuestions)
   },
 
+  importCourseEvaluationManual(courseId: string, semesterId: string, academicYearId: string, questions: { id: string, question_text: string, type: string, group: string }[], answers: string[]) {
+    return ipcRenderer.invoke('import-course-evaluation-manual', courseId, semesterId, academicYearId, questions, answers)
+  },
+
   readCourseQuestions() {
     return ipcRenderer.invoke('read-course-questions')
   },

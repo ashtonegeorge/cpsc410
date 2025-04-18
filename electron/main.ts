@@ -211,41 +211,14 @@ ipcMain.handle('import-course-evaluation', async (_event, courseId: string, seme
     });
 });
 
-ipcMain.handle('save-guest-evaluation', async (_event, guestId, courseId, semesterId, academicYearId, evalQuestions) => {
-    interface EvalQuestion {
-        questionText: string;
-        likertAnswers: number[];
-        likertAverage: number;
-        openResponses: string[];
-    }
+ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: string, semesterId: string, academicYearId: string, questions: { id: string, question_text: string, type: string, group: string }[], answers: string[]) => {
+    const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
+    const courseEvalId = courseResult.lastInsertRowid;
 
-    try {
-        // Use the same logic to process and save `EvalQuestion` data
-        evalQuestions.forEach((question) => {
-            const type = question.likertAnswers.length > 0 ? "likert" : "open";
-
-            // Insert question into the database
-            const questionResult = db.prepare(
-                'INSERT INTO question (question_text, type) VALUES (?, ?)'
-            ).run(question.questionText, type);
-
-            const questionId = questionResult.lastInsertRowid;
-
-            // Insert answer into the database
-            db.prepare(
-                'INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)'
-            ).run(
-                guestId,
-                questionId,
-                type === "likert" ? question.likertAverage : question.openResponses.join('|')
-            );
-        });
-
-        return true; // Return success
-    } catch (error) {
-        console.error('Error saving guest evaluation:', error);
-        return false; // Return failure
-    }
+    questions.forEach(async (q, i) => {
+        db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
+            .run(courseEvalId, q.id, q.type === "likert" ? answers[i] : answers[i].replace('//', '|'));
+    });
 });
 
 /**
