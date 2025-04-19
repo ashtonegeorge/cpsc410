@@ -539,6 +539,11 @@ ipcMain.handle('read-questions', async () => {
     return result;
 })
 
+ipcMain.handle('add-question', async (_event, question_text, type, category, manual) => {
+    const result = db.prepare('INSERT INTO question (question_text, type, category, manual) VALUES (?, ?, ?, ?)').run(question_text, type, category, manual);
+    return result;
+})
+
 ipcMain.handle('read-guest-evaluations', async () => {
     const query = `
         SELECT ge.*, CONCAT(g.lname, ', ', g.fname) as guest_name, s.name as semester_name, ay.name as academic_year_name
