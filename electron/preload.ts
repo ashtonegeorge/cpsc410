@@ -115,12 +115,12 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('import-course-evaluation-manual', courseId, semesterId, academicYearId, questions, answers)
   },
 
-  readCourseQuestions() {
-    return ipcRenderer.invoke('read-course-questions')
+  readManualCourseQuestions() {
+    return ipcRenderer.invoke('read-manual-course-questions')
   },
   
-  readGuestQuestions() {
-    return ipcRenderer.invoke('read-guest-questions')
+  readManualGuestQuestions() {
+    return ipcRenderer.invoke('read-manual-guest-questions')
   },
 
   readQuestions() {
@@ -202,8 +202,8 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('update-guest-evaluation', evalId, guestId, courseId, semesterId, academicYearId)
   },
 
-  updateQuestion(questionId: string, question_text?: string, type?: string, category?: string) {
-    return ipcRenderer.invoke('update-question', questionId, question_text, type, category)
+  updateQuestion(questionId: string, question_text?: string, type?: string, category?: string, manual?: string) {
+    return ipcRenderer.invoke('update-question', questionId, question_text, type, category, manual)
   },
 
   generateGradeReport(studentId: string, courseId: string, academicYearId: string): Promise<any> {

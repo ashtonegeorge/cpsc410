@@ -38,7 +38,7 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
             }
         });
         
-        window.ipcRenderer.readCourseQuestions().then((result: { id: string, question_text: string, type: string, group: string }[]) => {
+        window.ipcRenderer.readManualCourseQuestions().then((result: { id: string, question_text: string, type: string, group: string }[]) => {
             const questionsArray = result.map((e) => [e.id, e.question_text, e.type, e.group] as [string, string, string, string]);
             setQuestions(questionsArray);
             const answersArray: string[] = [];
@@ -99,7 +99,7 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                 <div>
                     {questions.map((q, i) => (
                         <div key={q[0]} className='pb-6'>
-                            <h1 className="flex p-1 w-full">{q[1]}</h1>
+                            <h1 className="flex p-1 w-full text-left">{q[1]}</h1>
                             { q[2] === "likert" ? 
                                 <div>
                                     <input 

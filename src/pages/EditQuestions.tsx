@@ -1,82 +1,102 @@
 import { Fragment, useEffect, useState } from "react";
 import Button from "../components/Button";
-import TextField from "../components/TextField";
-import { stringify } from "node:querystring";
 
 export default function EditQuestions({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
-        const [markedEvals, setMarkedQuestions] = useState<string[]>([]);
-        const [questions, setQuestions] = useState<[string, string, string, string][]>([]);
+        const [questionsToDelete, setQuestionsToDelete] = useState<string[]>([]);
+        const [questions, setQuestions] = useState<[string, string, string, string, string][]>([]);
     
         useEffect(() => {
-            window.ipcRenderer.readQuestions().then((result: any) => {
-                // unfortunately we can't directly reference the state variable, so we have to create a new array
-                const questionsArray = result.map((e: {id: string, question_text: string, type: string, category: string }) => [e.id, e.question_text, e.type, e.category] as [string, string, string, string]);
-                setQuestions(questionsArray);
-            });
             updateQuestions()
         }, [])
     
         const handleDeleteQuestion = async () => {
-            markedEvals.forEach((e) => {
+            questionsToDelete.forEach((e) => {
                 window.ipcRenderer.deleteQuestion(e);
             })
             updateQuestions()
-            setMarkedQuestions([]);
+            setQuestionsToDelete([]);
         }
     
         const updateQuestions = async () => {
-            window.ipcRenderer.readQuestions().then(((result: { id: string, question_text: string, type: string, category: string}[]) => {
-                const q = result.map((e) => [e['id'], e['question_text'], e['type'], e['category']] as [string, string, string, string]);
+            window.ipcRenderer.readQuestions().then(((result: { id: string, question_text: string, type: string, category: string, manual: string}[]) => {
+                const q = result.map((e) => [e['id'], e['question_text'], e['type'], e['category'], e['manual']] as [string, string, string, string, string]);
                 setQuestions(q);
             }))
         }
     
-        const handleQuestionChecked = (event: React.ChangeEvent<HTMLInputElement>, evalId: string) => {
+        const handleQuestionDeleteChecked = (event: React.ChangeEvent<HTMLInputElement>, evalId: string) => {
             if(event.target.checked) {
-                setMarkedQuestions([...markedEvals, evalId]);
+                setQuestionsToDelete([...questionsToDelete, evalId]);
             } else {
-                const e = markedEvals.filter(i => i !== evalId)
-                setMarkedQuestions(e);
+                const e = questionsToDelete.filter(i => i !== evalId)
+                setQuestionsToDelete(e);
             } 
         }
         
         function handleTypeUpdate(event: React.ChangeEvent<HTMLSelectElement>, questionId: string): void {
-            window.ipcRenderer.updateQuestion(questionId, null, event.target.value, null);
+            window.ipcRenderer.updateQuestion(questionId, null, event.target.value, null, null); 
+            updateQuestions();
         }
 
         function handleCategoryUpdate(event: React.ChangeEvent<HTMLSelectElement>, questionId: string): void {
-            window.ipcRenderer.updateQuestion(questionId, null, null, event.target.value);
+            window.ipcRenderer.updateQuestion(questionId, null, null, event.target.value, null);
+            updateQuestions();
+        }
+
+        function handleForManualEvaluationUpdate(event: React.ChangeEvent<HTMLInputElement>, questionId: string): void {
+            window.ipcRenderer.updateQuestion(questionId, null, null, null, event.target.checked === true ? "1" : "0");
+            updateQuestions();
+        }
+        
+        function handleQuestionTextUpdate(event: React.ChangeEvent<HTMLTextAreaElement>, questionId: string): void {
+            window.ipcRenderer.updateQuestion(questionId, event.target.value, null, null, null);
+            updateQuestions();
         }
     
         return (
            <div>
                 <h1>Edit Questions</h1>
-                {questions.length > 0 ? <div className='grid grid-cols-4 gap-2 h-min grid-flow-row overflow-y-auto max-h-[500px] mx-auto max-w-5xl bg-stone-600 border border-stone-800 p-2 pb-6 mt-6 rounded-lg '>
+                {questions.length > 0 ? <div className='grid grid-cols-[0.1fr_0.25fr_0.1fr_1fr_0.25fr_0.25fr] items-center gap-2 h-min grid-flow-row overflow-y-auto max-h-[500px] mx-auto max-w-5xl bg-stone-600 border border-stone-800 p-2 pb-6 mt-6 rounded-lg '>
                     <p className='font-semibold'>Delete</p>
+                    <p className='font-semibold'>For Manual Evaluations</p>
+                    <p className='font-semibold'>ID</p>
                     <p className='font-semibold'>Question</p>
                     <p className='font-semibold'>Type</p>
                     <p className='font-semibold'>Category</p>
                     {questions.map((e, i) => (
                         <Fragment key={i}>
-                            <input className='p-1 w-5 mx-auto' type='checkbox' onChange={(event) => handleQuestionChecked(event, e[0])} />
-                            <p className='border border-stone-700 rounded-sm self-center bg-stone-600'>{e[1]}</p>
-                            <select defaultValue={e[2]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleTypeUpdate(event, e[0])}>
-                                {/* <option>{e[1]}</option> */}
-                                <option value="likert">
-                                    Likert
-                                </option>
-                                <option value="open">
-                                    Open
-                                </option>
+                            <input
+                                className="p-1 w-5 mx-auto"
+                                type="checkbox"
+                                onChange={(event) => handleQuestionDeleteChecked(event, e[0])}
+                            />
+                            <input
+                                className="p-1 w-5 mx-auto"
+                                type="checkbox"
+                                checked={e[4] === "1"}
+                                onChange={(event) => handleForManualEvaluationUpdate(event, e[0])}
+                            />
+                            <p>{e[0]}</p>
+                            <textarea
+                                value={e[1]}
+                                onChange={(event) => handleQuestionTextUpdate(event, e[0])}
+                                className="border border-stone-700 rounded-sm self-center bg-stone-600 resize-y px-2 min-h-16"
+                            />
+                            <select
+                                value={e[2]}
+                                className="border border-stone-700 rounded-sm self-center bg-stone-600"
+                                onChange={(event) => handleTypeUpdate(event, e[0])}
+                            >
+                                <option value="likert">Likert</option>
+                                <option value="open">Open</option>
                             </select>
-                            <select defaultValue={e[3]} className='border border-stone-700 rounded-sm self-center bg-stone-600' onChange={(event) => handleCategoryUpdate(event, e[0])}>
-                                {/* <option>{e[2]}</option> */}
-                                <option value="course">
-                                    Course
-                                </option>
-                                <option value="guest">
-                                    Guest
-                                </option>
+                            <select
+                                value={e[3]}
+                                className="border border-stone-700 rounded-sm self-center bg-stone-600"
+                                onChange={(event) => handleCategoryUpdate(event, e[0])}
+                            >
+                                <option value="course">Course</option>
+                                <option value="guest">Guest</option>
                             </select>
                         </Fragment>
                     ))}

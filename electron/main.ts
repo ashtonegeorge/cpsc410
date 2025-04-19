@@ -176,7 +176,7 @@ ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, course
         
         let questionId;
         if(existingQuestion.length === 0 || existingQuestion === undefined || existingQuestion === null) { // if it doesn't exist, simply insert
-            const questionResult = db.prepare('INSERT INTO question (question_text, type, category) VALUES (?, ?, ?)').run(formattedQuestion, type, "guest");
+            const questionResult = db.prepare('INSERT INTO question (question_text, type, category, manual) VALUES (?, ?, ?, ?)').run(formattedQuestion, type, "guest", "0");
             questionId = questionResult.lastInsertRowid;
         } else { // if it does exist, access the existing question id and attach that to the answer
             questionId = existingQuestion[0]['id'];
@@ -200,7 +200,7 @@ ipcMain.handle('import-course-evaluation', async (_event, courseId: string, seme
         
         let questionId;
         if(existingQuestion.length === 0 || existingQuestion === undefined || existingQuestion === null) { // if it doesn't exist, simply insert
-            const questionResult = db.prepare('INSERT INTO question (question_text, type, category) VALUES (?, ?, ?)').run(formattedQuestion, type, "course");
+            const questionResult = db.prepare('INSERT INTO question (question_text, type, category) VALUES (?, ?, ?, ?)').run(formattedQuestion, type, "course", "0");
             questionId = questionResult.lastInsertRowid;
         } else { // if it does exist, access the existing question id and attach that to the answer
             questionId = existingQuestion[0]['id'];
@@ -524,13 +524,13 @@ ipcMain.handle('read-course-evaluations', async () => {
     return result;
 })
 
-ipcMain.handle('read-course-questions', async () => {
-    const result = await db.prepare('SELECT * FROM question WHERE category = ?').all("course");
+ipcMain.handle('read-manual-course-questions', async () => {
+    const result = await db.prepare('SELECT * FROM question WHERE category = ? AND manual = ?').all("course", "1");
     return result;
 })
 
-ipcMain.handle('read-guest-questions', async () => {
-    const result = await db.prepare('SELECT * FROM question WHERE category = ?').all("guest");
+ipcMain.handle('read-manual-guest-questions', async () => {
+    const result = await db.prepare('SELECT * FROM question WHERE category = ? AND manual = ?').all("guest", "1");
     return result;
 })
 
@@ -774,11 +774,15 @@ ipcMain.handle('update-guest-evaluation', async (_event, evalId, guestId?, cours
     }
 })
 
-ipcMain.handle('update-question', async (_event, questionId, question_text?, type?, category?) => {
-    if(type) {
+ipcMain.handle('update-question', async (_event, questionId, question_text?, type?, category?, manual?) => {
+    if(question_text) {
+        await db.prepare('UPDATE question SET question_text = ? WHERE id = ?').run(question_text, questionId);
+    } else if(type) {
         await db.prepare('UPDATE question SET type = ? WHERE id = ?').run(type, questionId);
     } else if(category) {
         await db.prepare('UPDATE question SET category = ? WHERE id = ?').run(category, questionId);
+    } else if(manual) {
+        await db.prepare('UPDATE question SET manual = ? WHERE id = ?').run(manual, questionId);
     }
 })
 

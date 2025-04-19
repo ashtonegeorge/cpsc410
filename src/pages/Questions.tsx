@@ -6,7 +6,7 @@ export default function Questions({setView}: {setView: React.Dispatch<React.SetS
     return(
         <div>
             <h2>Manage Questions</h2>
-                <div className='block pt-24'>
+                <div className='block pt-24 w-2/3 mx-auto'>
                     <div className="flex justify-evenly pb-12">
                         <Button label="Add Questions" action={() => Promise.resolve(setView('addQuestions'))} icon={null}/>
                     </div>
