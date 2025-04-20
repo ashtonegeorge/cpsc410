@@ -74,7 +74,9 @@ export default function AddQuestions({setView}: {setView: React.Dispatch<React.S
                         type="checkbox"
                         onChange={(event) => handleForManual(event)}
                     />
-                    <Button icon={null} label="Submit" action={handleUpload}/>
+                    <div className="pb-6">
+                        <Button icon={null} label="Submit" action={handleUpload}/>
+                    </div>
                     {success && <p className="w-full text-green-300 font-semibold">Question added successfully!</p>}
                     {error && <p className="w-full text-red-300 font-semibold">Adding question failed, please try again.</p>}
                     <Button icon={null} label="Back" action={() => Promise.resolve(setView('questions'))}/>

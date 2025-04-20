@@ -201,7 +201,7 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                     <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
                 </div>
                 {success && <p className="w-full text-green-300 font-semibold">Report generated successfully!</p>}
-                {error && <p className="w-full text-red-300 font-semibold">Saving report to Excel failed, ensure a report has been generated and please try again.</p>}
+                {error && <p className="w-full text-red-300 font-semibold">Generating report failed, please try again.</p>}
             </div>
 
             <div className="w-full h-full">
