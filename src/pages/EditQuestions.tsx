@@ -34,22 +34,22 @@ export default function EditQuestions({setView}: {setView: React.Dispatch<React.
         }
         
         function handleTypeUpdate(event: React.ChangeEvent<HTMLSelectElement>, questionId: string): void {
-            window.ipcRenderer.updateQuestion(questionId, null, event.target.value, null, null); 
+            window.ipcRenderer.updateQuestion(questionId, undefined, event.target.value, undefined, undefined); 
             updateQuestions();
         }
 
         function handleCategoryUpdate(event: React.ChangeEvent<HTMLSelectElement>, questionId: string): void {
-            window.ipcRenderer.updateQuestion(questionId, null, null, event.target.value, null);
+            window.ipcRenderer.updateQuestion(questionId, undefined, undefined, event.target.value, undefined);
             updateQuestions();
         }
 
         function handleForManualEvaluationUpdate(event: React.ChangeEvent<HTMLInputElement>, questionId: string): void {
-            window.ipcRenderer.updateQuestion(questionId, null, null, null, event.target.checked === true ? "1" : "0");
+            window.ipcRenderer.updateQuestion(questionId, undefined, undefined, undefined, event.target.checked === true ? "1" : "0");
             updateQuestions();
         }
         
         function handleQuestionTextUpdate(event: React.ChangeEvent<HTMLTextAreaElement>, questionId: string): void {
-            window.ipcRenderer.updateQuestion(questionId, event.target.value, null, null, null);
+            window.ipcRenderer.updateQuestion(questionId, event.target.value, undefined, undefined, undefined);
             updateQuestions();
         }
     

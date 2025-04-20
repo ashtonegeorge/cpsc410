@@ -50,7 +50,7 @@ export default function CourseEvalEdit({setView}: {setView: React.Dispatch<React
     }
     
     function handleCourseUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
-        window.ipcRenderer.updateCourseEval(evalId, event.target.value, null, null);
+        window.ipcRenderer.updateCourseEval(evalId, event.target.value, undefined, undefined);
     }
     
     function handleSemesterUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
@@ -62,7 +62,7 @@ export default function CourseEvalEdit({setView}: {setView: React.Dispatch<React
         };
     
         const id = semesterMapping[event.target.value];
-        window.ipcRenderer.updateCourseEval(evalId, null, id, null);
+        window.ipcRenderer.updateCourseEval(evalId, undefined, id.toString(), undefined);
     }
     
     function handleAcademicYearUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
@@ -70,7 +70,7 @@ export default function CourseEvalEdit({setView}: {setView: React.Dispatch<React
         academicYears.forEach((ayear) => {
             if(ayear[1] == event.target.value) id = ayear[0];
         })
-        window.ipcRenderer.updateCourseEval(evalId, null, null, id);
+        window.ipcRenderer.updateCourseEval(evalId, undefined, undefined, id);
     }
 
     return (

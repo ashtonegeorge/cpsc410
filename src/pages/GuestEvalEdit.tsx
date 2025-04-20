@@ -62,11 +62,11 @@ export default function GuestEvalEdit({setView}: {setView: React.Dispatch<React.
         guests.forEach((g) => {
             if(lname == g[2] && fname == g[1]) id = g[0];
         })
-        window.ipcRenderer.updateGuestEval(evalId, id, null, null, null);
+        window.ipcRenderer.updateGuestEval(evalId, id, undefined, undefined, undefined);
     }
     
     function handleCourseUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
-        window.ipcRenderer.updateGuestEval(evalId, null, event.target.value, null, null);
+        window.ipcRenderer.updateGuestEval(evalId, undefined, event.target.value, undefined, undefined);
     }
     
     function handleSemesterUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
@@ -78,7 +78,7 @@ export default function GuestEvalEdit({setView}: {setView: React.Dispatch<React.
         };
     
         const id = semesterMapping[event.target.value];
-        window.ipcRenderer.updateGuestEval(evalId, null, null, id, null);
+        window.ipcRenderer.updateGuestEval(evalId, undefined, undefined, id.toString(), undefined);
     }
     
     function handleAcademicYearUpdate(event: React.ChangeEvent<HTMLSelectElement>, evalId: string): void {
@@ -86,7 +86,7 @@ export default function GuestEvalEdit({setView}: {setView: React.Dispatch<React.
         academicYears.forEach((ayear) => {
             if(ayear[1] == event.target.value) id = ayear[0];
         })
-        window.ipcRenderer.updateGuestEval(evalId, null, null, null, id);
+        window.ipcRenderer.updateGuestEval(evalId, undefined, undefined, undefined, id);
     }
 
     return (
