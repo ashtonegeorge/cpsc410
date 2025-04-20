@@ -113,7 +113,6 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                                             const newAnswers = [...answers]; // Create a copy of the answers array
                                             newAnswers[i] = event.target.value; // Update the specific answer
                                             setAnswers(newAnswers); // Update the state
-                                            console.log(answers)
                                         }}
                                     />
                                     <p className='font-semibold text-sm'>For likert style questions, enter the average score on a 1-5 scale, where 1 is strongly disagree and 5 is strongly agree.</p>
@@ -129,7 +128,6 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                                             const newAnswers = [...answers]; // Create a copy of the answers array
                                             newAnswers[i] = event.target.value; // Update the specific answer
                                             setAnswers(newAnswers); // Update the state
-                                            console.log(answers)
                                         }}
                                         onInput={(event) => {
                                             const textarea = event.target as HTMLTextAreaElement; // Cast to HTMLTextAreaElement

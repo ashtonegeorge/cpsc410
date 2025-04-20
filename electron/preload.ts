@@ -114,13 +114,17 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   importCourseEvaluationManual(courseId: string, semesterId: string, academicYearId: string, questions: { id: string, question_text: string, type: string, group: string }[], answers: string[]) {
     return ipcRenderer.invoke('import-course-evaluation-manual', courseId, semesterId, academicYearId, questions, answers)
   },
-
+  
   readManualCourseQuestions() {
     return ipcRenderer.invoke('read-manual-course-questions')
   },
   
   readManualGuestQuestions() {
     return ipcRenderer.invoke('read-manual-guest-questions')
+  },
+
+  importGuestEvaluationManual(courseId: string, guestId: string, semesterId: string, academicYearId: string, questions: { id: string, question_text: string, type: string, group: string }[], answers: string[]) {
+    return ipcRenderer.invoke('import-guest-evaluation-manual', courseId, guestId, semesterId, academicYearId, questions, answers)
   },
 
   readQuestions() {

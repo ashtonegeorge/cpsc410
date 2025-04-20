@@ -40,7 +40,7 @@ function createWindow() {
       width: 1200,
       height: 900,
       autoHideMenuBar: true,
-      icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+      icon: path.join(process.env.VITE_PUBLIC, 'redflash.png'),
       webPreferences: {
           preload: path.join(__dirname, 'preload.mjs'),
       },
@@ -218,6 +218,16 @@ ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: strin
     questions.forEach(async (q, i) => {
         db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
             .run(courseEvalId, q.id, q.type === "likert" ? answers[i] : answers[i].replace('//', '|'));
+    });
+});
+
+ipcMain.handle('import-guest-evaluation-manual', async (_event, courseId: string, guestId: string, semesterId: string, academicYearId: string, questions: { id: string, question_text: string, type: string, group: string }[], answers: string[]) => {
+    const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
+    const guestEvalId = guestResult.lastInsertRowid;
+
+    questions.forEach(async (q, i) => {
+        db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
+            .run(guestEvalId, q.id, q.type === "likert" ? answers[i] : answers[i].replace('//', '|'));
     });
 });
 
