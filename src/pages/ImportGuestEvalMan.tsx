@@ -70,7 +70,7 @@ export default function importGuestEvalMan({setView}: {setView: React.Dispatch<R
 
     return (
         <div className='w-2/3 pb-12 mx-auto'>
-            <h2 className='font-semibold text-lg'>Import Guest Speaker Evaluations Manually</h2>
+            <h2 className="text-3xl font-bold">Import Guest Speaker Evaluations Manually</h2>
             <div className='flex justify-evenly align-middle gap-4 pt-12'>
                 <div>
                     <h1 className='font-semibold'>Course</h1>

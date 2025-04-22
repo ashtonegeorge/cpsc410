@@ -5,7 +5,7 @@ import TextField from "../components/TextField";
 export default function Questions({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     return(
         <div>
-            <h2>Manage Questions</h2>
+            <h2 className="text-3xl font-bold">Manage Questions</h2>
                 <div className='block pt-24 w-2/3 mx-auto'>
                     <div className="flex justify-evenly pb-12">
                         <Button label="Add Questions" action={() => Promise.resolve(setView('addQuestions'))} icon={null}/>

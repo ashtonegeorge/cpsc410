@@ -1,7 +1,7 @@
 export default function About() {
     return (
         <div>
-            <h2>About</h2>
+            <h2 className="text-3xl font-bold">About</h2>
             <p>This application was developed by a team of students in Dr. Slonka's CPSC 410 class. The team members are:</p>
             <ul>
                 <li>Marcus Amerine</li>

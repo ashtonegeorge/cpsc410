@@ -3,7 +3,7 @@ import Button from "../components/Button";
 export default function Home({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     return (
       <div>
-        <h2>Home</h2>
+        <h2 className="text-3xl font-bold">Home</h2>
         <p>Welcome to Evalu8, the solution for your grade and survey reporting needs.</p>
         <div className='block pt-24'>
             <div className="flex justify-evenly gap-12 pb-12">

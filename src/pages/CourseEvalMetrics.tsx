@@ -103,7 +103,7 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
     return (
         <div className="flex justify-between gap-8 h-full">
             <div className="w-1/3">
-                <h2 className="h-1/12 text-2xl">Course Evaluation Metrics</h2>
+                <h2 className="text-3xl font-bold">Course Evaluation Metrics</h2>
                 <div className="w-full flex flex-col text-left">
                     <h3>Select Course</h3>
                     <select defaultValue={"*"} className="text-black bg-white p-2 rounded-lg my-2" onChange={handleSelectedCourseChange}>

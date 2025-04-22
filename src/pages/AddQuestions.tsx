@@ -42,8 +42,8 @@ export default function AddQuestions({setView}: {setView: React.Dispatch<React.S
     }
 
     return(
-        <div>
-            <h2>Add Questions</h2>
+        <div className='w-2/3 pb-12 mx-auto'>
+            <h2 className="text-3xl font-bold">Add Questions</h2>
             <div className="flex justify-evenly gap-12 pb-12">
                 <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none">
                     <h1 className="font-semibold">Select Question Type</h1>
@@ -75,7 +75,7 @@ export default function AddQuestions({setView}: {setView: React.Dispatch<React.S
                         onChange={(event) => handleForManual(event)}
                     />
                     <div className="pb-6">
-                        <Button icon={null} label="Submit" action={handleUpload}/>
+                        <Button icon={null} label="Add" action={handleUpload}/>
                     </div>
                     {success && <p className="w-full text-green-300 font-semibold">Question added successfully!</p>}
                     {error && <p className="w-full text-red-300 font-semibold">Adding question failed, please try again.</p>}

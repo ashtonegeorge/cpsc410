@@ -76,7 +76,7 @@ export default function ImportGuestEval({setView}: {setView: React.Dispatch<Reac
     const handleSelectedGuestChange = (event: React.ChangeEvent<HTMLSelectElement>) => { setSelectedGuest(event.target.value); };
 
     return (
-        <div className='pt-12 w-1/2 mx-auto'>
+        <div className="text-3xl font-bold">
                     <h2 className='font-semibold'>Import Guest Evaluation File</h2>
                     <p>Upload a CSV file to import guest evaluations.</p>
                     <div className='w-full flex justify-center my-4 cursor-pointer'>

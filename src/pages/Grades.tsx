@@ -4,7 +4,7 @@ import uploadIcon from '../assets/upload.png';
 export default function Grades({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     return (
     <div>
-        <h2>Module Grades</h2>
+        <h2 className="text-3xl font-bold">Module Grades</h2>
         <div className='block pt-24'>
             <div className="flex justify-evenly gap-12 pb-12">
                 <Button icon={uploadIcon} label='Import Grade File' action={() => Promise.resolve(setView('importGrades'))} />

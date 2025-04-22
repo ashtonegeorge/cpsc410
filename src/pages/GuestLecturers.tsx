@@ -56,7 +56,7 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
         <div className="">
             <div className='flex justify-between'>
                 <div className="w-1/2 flex flex-col gap-8">
-                    <h1 className="text-2xl">Guest Lecturers</h1>
+                    <h1 className="text-3xl font-bold">Guest Lecturers</h1>
                     <div className="flex gap-4">
                         <div className="flex flex-col justify-start w-full items-center">
                             <h2 className="text-lg font-semibold mb-2">Create Guest Lecturer</h2>

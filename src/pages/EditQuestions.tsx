@@ -55,7 +55,7 @@ export default function EditQuestions({setView}: {setView: React.Dispatch<React.
     
         return (
            <div>
-                <h1>Edit Questions</h1>
+                <h1 className="text-3xl font-bold">Edit Questions</h1>
                 {questions.length > 0 ? <div className='grid grid-cols-[0.1fr_0.25fr_0.1fr_1fr_0.25fr_0.25fr] items-center gap-2 h-min grid-flow-row overflow-y-auto max-h-[500px] mx-auto max-w-5xl bg-stone-600 border border-stone-800 p-2 pb-6 mt-6 rounded-lg '>
                     <p className='font-semibold'>Delete</p>
                     <p className='font-semibold'>For Manual Evaluations</p>

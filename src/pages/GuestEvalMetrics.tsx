@@ -116,7 +116,7 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
     return (
         <div className="flex justify-between gap-8 h-full">
             <div className="w-1/3">
-                <h2 className="h-1/12 text-2xl">Guest Evaluation Metrics</h2>
+                <h2 className="text-3xl font-bold">Guest Evaluation Metrics</h2>
                 <div className="w-full flex flex-col text-left">
                     <h3>Select Guest</h3>
                     <select defaultValue={"*"} className="text-black bg-white p-2 rounded-lg my-2" onChange={handleSelectedGuestChange}>

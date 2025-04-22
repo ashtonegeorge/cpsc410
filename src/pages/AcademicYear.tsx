@@ -42,7 +42,7 @@ export default function AcademicYear({setView}: {setView: React.Dispatch<React.S
             <div>
                 <div className='flex justify-between pb-6'>
                     <div className='w-3/5 flex flex-col gap-8'>
-                        <h1 className='text-2xl'>Academic Year</h1>
+                        <h1 className="text-3xl font-bold">Academic Year</h1>
                         <div className='flex gap-4'>
                             <div className="flex flex-col justify-start w-full items-center">
                                 <h2 className="text-lg font-semibold mb-2">Add Academic Year</h2>

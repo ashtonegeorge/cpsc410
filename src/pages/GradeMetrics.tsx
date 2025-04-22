@@ -124,7 +124,7 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
     return (
         <div className="flex justify-between gap-8 h-full">
             <div className="w-1/3">
-                <h2 className="h-1/12 text-2xl">Grade Metrics</h2>
+                <h2 className="text-3xl font-bold">Grade Metrics</h2>
                 <div className="flex">
                     <h3 className="w-full place-self-center text-left">Filter results by: </h3>
                     <select className="text-black bg-white p-2 rounded-lg my-2 w-full" defaultValue={"sid"} onChange={(e) => setFilter(e.target.value)}>

@@ -3,7 +3,7 @@ import Button from '../components/Button';
 export default function CourseEval({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     return (
             <div>
-                <h2>Course Evaluation</h2>
+                <h2 className="text-3xl font-bold">Course Evaluation</h2>
                 <div className='block pt-24'>
                     <div className="flex justify-evenly gap-12 pb-12">
                         <Button icon={null} label='Import Course Evaluation File' action={() => Promise.resolve(setView('importCourseEval'))} />

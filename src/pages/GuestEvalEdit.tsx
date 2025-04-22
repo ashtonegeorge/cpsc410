@@ -91,7 +91,7 @@ export default function GuestEvalEdit({setView}: {setView: React.Dispatch<React.
 
     return (
        <div>
-            <h1>Edit Course Evaluation Data</h1>
+            <h1 className="text-3xl font-bold">Edit Guest Evaluation Data</h1>
             {guestEvals.length > 0 ? <div className='grid grid-cols-6 gap-2 h-min grid-flow-row overflow-y-auto max-h-[500px] mx-auto max-w-5xl bg-stone-600 border border-stone-800 p-2 pb-6 mt-6 rounded-lg '>
                 <p className='font-semibold'>Delete</p>
                 <p className='font-semibold'>ID</p>

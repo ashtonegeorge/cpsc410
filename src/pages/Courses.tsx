@@ -46,7 +46,7 @@ export default function Courses({setView}: {setView: React.Dispatch<React.SetSta
         <div>
             <div className='flex justify-between'>
                 <div className='w-1/2 flex flex-col gap-8'>
-                    <h1 className="text-2xl">Courses</h1>
+                    <h1 className="text-3xl font-bold">Courses</h1>
                     <div className='flex flex-col justify-center w-full items-center'>
                         <h2 className="text-lg font-semibold mb-2">Create Course</h2>
                         <TextField label="Course Code" setValue={setCreateCode} placeholder={''}/>

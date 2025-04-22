@@ -107,7 +107,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
 
     return (
        <div>
-            <h1 className='text-lg font-semibold'>Edit Grade Data</h1>
+            <h1 className="text-3xl font-bold">Edit Grade Data</h1>
             <h2 className='mt-6'>Filter results:</h2>
             <div className='grid grid-cols-6 gap-2 h-min grid-flow-row overflow-y-auto max-h-[500px] text-sm mx-auto max-w-5xl border border-stone-800 p-2 pb-6 mt-2 rounded-lg '>
                 {/* student */}

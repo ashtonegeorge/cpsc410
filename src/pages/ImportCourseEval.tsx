@@ -66,7 +66,7 @@ export default function ImportCourseEval({setView}: {setView: React.Dispatch<Rea
 
     return (
         <div className='pt-12 w-1/2 mx-auto'>
-            <h2 className='font-semibold'>Import Course Evaluation File</h2>
+            <h2 className="text-3xl font-bold">Import Course Evaluation File</h2>
             <p>Upload a CSV file to import course evaluations.</p>
             <div className='w-full flex justify-center my-4 cursor-pointer'>
                 <input 
