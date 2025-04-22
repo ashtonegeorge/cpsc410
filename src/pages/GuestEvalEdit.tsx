@@ -145,8 +145,10 @@ export default function GuestEvalEdit({setView}: {setView: React.Dispatch<React.
             <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none mx-auto pt-6">
                 <Button icon={null} label="Delete" action={handleDeleteGuestEvaluation}/>
             </div>
-            <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none mx-auto">
+            <div className="flex justify-center pb-12">
+            <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none">
                 <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
+            </div>
             </div>
        </div>
     );

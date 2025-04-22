@@ -109,13 +109,13 @@ export default function ImportCourseEval({setView}: {setView: React.Dispatch<Rea
             </div>
             <Button icon={uploadIcon} action={handleUpload} label="Upload" />
             <div className='mt-2'>
-                <div className="flex justify-center pb-12">
-                        <div className="text-white rounded-xl p-2 text-sm border-none">
-                        <Button icon={null} label="Back" action={() => Promise.resolve(setView('courseEval'))}/>
-                    </div>
-                </div>
             </div>
         {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}
+        <div className="flex justify-center pb-12">
+            <div className="w-3/2 text-white rounded-xl p-2 text-sm border-none">
+            <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
+        </div>
+        </div>
     </div>
   );
 }
