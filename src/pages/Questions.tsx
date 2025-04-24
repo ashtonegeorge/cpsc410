@@ -1,6 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
 import Button from "../components/Button";
-import TextField from "../components/TextField";
+import pencilIcon from "/edit.svg";
 
 export default function Questions({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     return(
@@ -11,7 +10,7 @@ export default function Questions({setView}: {setView: React.Dispatch<React.SetS
                         <Button label="Add Questions" action={() => Promise.resolve(setView('addQuestions'))} icon={null}/>
                     </div>
                     <div className="flex justify-center pb-12">
-                        <Button label="Edit Questions" action={() => Promise.resolve(setView('editQuestions'))} icon="/edit.svg"/>
+                        <Button label="Edit Questions" action={() => Promise.resolve(setView('editQuestions'))} icon={pencilIcon}/>
                     </div>
                 </div>   
                 <div className="flex justify-evenly gap-12 pb-12">

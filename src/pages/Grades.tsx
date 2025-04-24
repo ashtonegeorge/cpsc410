@@ -1,5 +1,6 @@
 import Button from '../components/Button';
 import uploadIcon from '../assets/upload.png';
+import pencilIcon from "/edit.svg";
 
 export default function Grades({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     return (
@@ -12,7 +13,7 @@ export default function Grades({setView}: {setView: React.Dispatch<React.SetStat
             </div>
             <div className="flex justify-evenly gap-12 pb-12">
                 <Button icon={null} label='Input Grades Manually' action={() => Promise.resolve(setView('importGradesMan'))} />
-                <Button icon="/edit.svg" label='Edit Grade Data' action={() => Promise.resolve(setView('gradeEdit'))} />
+                <Button icon={pencilIcon} label='Edit Grade Data' action={() => Promise.resolve(setView('gradeEdit'))} />
             </div>
         </div>
         <div>
