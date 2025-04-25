@@ -211,23 +211,23 @@ ipcMain.handle('import-course-evaluation', async (_event, courseId: string, seme
     });
 });
 
-ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: string, semesterId: string, academicYearId: string, questions: { id: string, question_text: string, type: string, group: string }[], answers: string[]) => {
+ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: string, semesterId: string, academicYearId: string, questions: [string, string, string, string, string][], answers: string[]) => {
     const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
     const courseEvalId = courseResult.lastInsertRowid;
-
-    questions.forEach(async (q, i) => {
+    
+    questions.forEach(async (q: [string, string, string, string, string], i: number) => {
         db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(courseEvalId, q.id, q.type === "likert" ? answers[i] : answers[i].replace('//', '|'));
+            .run(courseEvalId, q[0], q[2] === "likert" ? answers[i] : answers[i].split("//").join("|"));
     });
 });
 
-ipcMain.handle('import-guest-evaluation-manual', async (_event, courseId: string, guestId: string, semesterId: string, academicYearId: string, questions: { id: string, question_text: string, type: string, group: string }[], answers: string[]) => {
+ipcMain.handle('import-guest-evaluation-manual', async (_event, courseId: string, guestId: string, semesterId: string, academicYearId: string, questions: [string, string, string, string, string][], answers: string[]) => {
     const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
     const guestEvalId = guestResult.lastInsertRowid;
 
-    questions.forEach(async (q, i) => {
+    questions.forEach(async (q: [string, string, string, string, string], i: number) => {
         db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(guestEvalId, q.id, q.type === "likert" ? answers[i] : answers[i].replace('//', '|'));
+            .run(guestEvalId, q[0], q[2] === "likert" ? answers[i] : answers[i].split("//").join("|"));
     });
 });
 
