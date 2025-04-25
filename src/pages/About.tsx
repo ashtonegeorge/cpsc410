@@ -5,6 +5,7 @@ import caseyPhoto from "../assets/casey.jpg"
 import auremPhoto from "../assets/aurem.jpg"
 import prestonPhoto from "../assets/preston.jpg"
 import tommyPhoto from "../assets/tommy.jpg"
+import evalu8Photo from "../assets/Evalu8.png"
 
 export default function About() {
     return (
@@ -43,6 +44,15 @@ export default function About() {
                     </div>
                 </div>
             </ul>
+            <ul>
+            <div className='pt-12 w-1/2 mx-auto'></div>
+            <li><img className="mx-auto" src={evalu8Photo} height="200" width="200"/></li>
+            </ul>
+            <div className='pt-12 w-1/2 mx-auto'>
+            <h2 className="text-3xl font-bold">User Manual</h2>
+            <p>Click below to access our User Manual if you have any questions.</p>
+
+            </div>
         </div>
     );
 }
