@@ -25,7 +25,7 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
     const [studentId, setStudentId] = useState('');
     const [selectedCourse, setSelectedCourse] = useState('');
-    const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
+    const [selectedAcademicYears, setSelectedAcademicYears] = useState<string[]>([]);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
 
@@ -47,7 +47,7 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
     }, [])
 
     useEffect(() => { // reset values when filter changes
-        setSelectedAcademicYear("*");
+        setSelectedAcademicYears([]);
         setSelectedCourse("*");
         setStudentId("");
     }, [filter])
@@ -56,8 +56,12 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
         setSelectedCourse(event.target.value);
     }
 
-    function handleSelectedAcademicYearChange(event: React.ChangeEvent<HTMLSelectElement>): void {
-        setSelectedAcademicYear(event.target.value);
+    function handleSelectedAcademicYearChange(event: React.ChangeEvent<HTMLInputElement>, id: string): void {
+        setSelectedAcademicYears((prev) =>
+            event.target.checked
+                ? [...prev, id]
+                : prev.filter((a) => a !== id)
+        );
     }
 
     function handleStudentIdChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -77,7 +81,7 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
             const res: GradeReport = await window.ipcRenderer.generateGradeReport( // get sql data
                 studentId === "" ? "*" : studentId,
                 selectedCourse,
-                selectedAcademicYear
+                selectedAcademicYears.length > 0 ? selectedAcademicYears : ["*"]
             );
 
             if (res) { // set the response data to corresponding state to be used in the UI
@@ -143,15 +147,35 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                                 <option value="*">All courses</option>
                                 {courses.map((course) => <option key={course[0]} value={course[0]}>{course[0]}: {course[1]}</option>)}
                             </select>
-                            <h3>Select Academic Year</h3>
-                            <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
-                                <option value="*">All courses</option>
-                                {academicYears.map(([id, name]) => (  
-                                    <option className='flex p-1 w-full' value={id} key={id}>
-                                        {name}
-                                    </option>
-                                ))}
-                            </select>
+                            <h3>Select Academic Year(s)</h3>
+                            <label className="relative bg-white text-black p-2 pr-0 rounded-lg">
+                                <input type="checkbox" className="hidden peer" />
+                                <div className="flex items-center justify-between">
+                                    <p>{"Select all that apply"}</p>
+                                    <svg height="20" viewBox="0 0 48 48" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M14.83 16.42l9.17 9.17 9.17-9.17 2.83 2.83-12 12-12-12z"/><path d="M0-.75h48v48h-48z" fill="none"/></svg>
+                                </div>
+                                <div className="absolute left-0 text-black rounded-b-lg border border-gray-200 w-full opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto">
+                                    <ol className="bg-white rounded-b-md">
+                                    {academicYears.map(([id, name]) => {
+                                        return (
+                                            <li key={id} className="">
+                                                <label className="flex px-2 whitespace-nowrap cursor-pointer transition-colors hover:bg-blue-100 [&:has(input:checked)]:bg-blue-200">
+                                                <input
+                                                    type="checkbox"
+                                                    name={name}
+                                                    value={id}
+                                                    className="cursor-pointer"
+                                                    onChange={(event) => handleSelectedAcademicYearChange(event, id)}
+                                                />
+                                                <span className="ml-1">{name}</span>
+                                                </label>
+                                            </li>
+                                        );
+                                    })}
+
+                                    </ol>
+                                </div>
+                            </label>
                         </div>
                     </>
                 }
@@ -163,30 +187,70 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                                 <option value="*">All courses</option>
                                 {courses.map((course) => <option key={course[0]} value={course[0]}>{course[0]}: {course[1]}</option>)}
                             </select>
-                            <h3>Select Academic Year</h3>
-                            <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
-                                <option value="*">All academic years</option>
-                                {academicYears.map(([id, name]) => (  
-                                    <option className='flex p-1 w-full' value={id} key={id}>
-                                        {name}
-                                    </option>
-                                ))}
-                            </select>
+                            <h3>Select Academic Year(s)</h3>
+                            <label className="relative bg-white text-black p-2 pr-0 rounded-lg">
+                                <input type="checkbox" className="hidden peer" />
+                                <div className="flex items-center justify-between">
+                                    <p>{"Select all that apply"}</p>
+                                    <svg height="20" viewBox="0 0 48 48" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M14.83 16.42l9.17 9.17 9.17-9.17 2.83 2.83-12 12-12-12z"/><path d="M0-.75h48v48h-48z" fill="none"/></svg>
+                                </div>
+                                <div className="absolute left-0 text-black border border-gray-200 w-full opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto">
+                                    <ol className="bg-white ">
+                                    {academicYears.map(([id, name]) => {
+                                        return (
+                                            <li key={id} className="">
+                                                <label className="flex px-2 whitespace-nowrap cursor-pointer transition-colors hover:bg-blue-100 [&:has(input:checked)]:bg-blue-200">
+                                                <input
+                                                    type="checkbox"
+                                                    name={name}
+                                                    value={id}
+                                                    className="cursor-pointer"
+                                                    onChange={(event) => handleSelectedAcademicYearChange(event, id)}
+                                                />
+                                                <span className="ml-1">{name}</span>
+                                                </label>
+                                            </li>
+                                        );
+                                    })}
+
+                                    </ol>
+                                </div>
+                            </label>
                         </div>
                     </>
                 }
                 {filter === 'ayear' && 
                     <>
                         <div className="w-full flex flex-col text-left">
-                            <h3>Select Academic Year</h3>
-                            <select defaultValue={"*"} onChange={handleSelectedAcademicYearChange} className='text-black bg-white p-2 rounded-lg my-2 w-full'>
-                                <option value="*">All academic years</option>
-                                {academicYears.map(([id, name]) => (  
-                                    <option className='flex p-1 w-full' value={id} key={id}>
-                                        {name}
-                                    </option>
-                                ))}
-                            </select>
+                        <h3>Select Academic Year(s)</h3>
+                            <label className="relative bg-white text-black p-2 pr-0 rounded-lg">
+                                <input type="checkbox" className="hidden peer" />
+                                <div className="flex items-center justify-between">
+                                    <p>{"Select all that apply"}</p>
+                                    <svg height="20" viewBox="0 0 48 48" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M14.83 16.42l9.17 9.17 9.17-9.17 2.83 2.83-12 12-12-12z"/><path d="M0-.75h48v48h-48z" fill="none"/></svg>
+                                </div>
+                                <div className="absolute left-0 text-black rounded-b-lg border border-gray-200 w-full opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto">
+                                    <ol className="bg-white rounded-b-md">
+                                    {academicYears.map(([id, name]) => {
+                                        return (
+                                            <li key={id} className="">
+                                                <label className="flex px-2 whitespace-nowrap cursor-pointer transition-colors hover:bg-blue-100 [&:has(input:checked)]:bg-blue-200">
+                                                <input
+                                                    type="checkbox"
+                                                    name={name}
+                                                    value={id}
+                                                    className="cursor-pointer"
+                                                    onChange={(event) => handleSelectedAcademicYearChange(event, id)}
+                                                />
+                                                <span className="ml-1">{name}</span>
+                                                </label>
+                                            </li>
+                                        );
+                                    })}
+
+                                    </ol>
+                                </div>
+                            </label>
                             <h3>Select Course</h3>
                             <select value={selectedCourse} className="text-black bg-white p-2 rounded-lg my-2" onChange={handleSelectedCourseChange}>
                                 <option value="*">All courses</option>
