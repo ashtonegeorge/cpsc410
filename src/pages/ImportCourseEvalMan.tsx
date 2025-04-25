@@ -6,7 +6,7 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [semesters, setSemesters] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
-    const [questions, setQuestions] = useState<[string, string, string, string][]>([]);
+    const [questions, setQuestions] = useState<[string, string, string, string, string][]>([]);
     const [answers, setAnswers] = useState<string[]>([]);
 
     // these three state variables correspond to the dropdowns for course, semester, and academic year
