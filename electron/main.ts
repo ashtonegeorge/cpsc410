@@ -569,7 +569,7 @@ ipcMain.handle('read-guest-evaluations', async () => {
 })
 
 
-ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearId) => {
+ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, academicYearIds) => {
     interface GradeRow { // interface for the data we are querying from the db
         student_id: string;
         course_id: string;
@@ -598,9 +598,9 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
         query += ' AND course_id = ?';
         params.push(courseId);
     }
-    if (academicYearId !== '*') {
-        query += ' AND academic_year_id = ?';
-        params.push(academicYearId);
+    if (academicYearIds.length > 0 && academicYearIds[0] !== '*') {``
+        query += ` AND academic_year_id IN (${academicYearIds.map(() => '?').join(', ')})`;
+        params.push(...academicYearIds);
     }
 
     const result: GradeRow[] = db.prepare(query).all(...params); // utilize our dynamically generated query and the passed-in params
