@@ -133,11 +133,11 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
                     <Button icon={null} label="Generate Report" action={handleGenerateReport} />
                     {result.length > 0 && result && <Button icon={null} label="Save Report to Excel" action={handleSaveCourseReport} />}
                     <div className="flex justify-center">
-                    <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none">
-                    <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
+                        <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none">
+                            <Button icon={null} label="Back" action={() => Promise.resolve(setView('courseEval'))}/>
+                        </div>
+                    </div>                 
                 </div>
-                </div>                 
-                 </div>
                 {success && <p className="w-full text-green-300 font-semibold">Report generated successfully!</p>}
                 {error && <p className="w-full text-red-300 font-semibold">Generating report failed, please ensure the correct criteria is selected and try again.</p>}
             
