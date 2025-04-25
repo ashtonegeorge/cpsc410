@@ -205,6 +205,7 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
                                             </ul>
                                         </div>
                                     ))}
+                                    {qa[1].length === 0 && <p>Themes could not be processed, please adjust inputs and try again. </p>}
                                 </div>
                                 )}
                             </Fragment>
