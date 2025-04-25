@@ -683,7 +683,7 @@ ipcMain.handle('generate-grade-report', async (_event, studentId, courseId, acad
     return { result, sortedCpAndBelow, gradeCounts, buffer }; // return all of the important information for the front-end in an object
 });
 
-ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semesterId, academicYearId) => {
+ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semesterId, academicYearIds) => {
     // initial query, includes the verbose academic year name and semester name 
     let query = `SELECT * FROM "guest-evaluation" WHERE 1=1`;    
 
@@ -697,29 +697,52 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
         query += ' AND course_id = ?';
         params.push(courseId);
     }
-    if (academicYearId !== '*') {
-        query += ' AND academic_year_id = ?';
-        params.push(academicYearId);
+    if (academicYearIds.length > 0 && academicYearIds[0] !== '*') {``
+        query += ` AND academic_year_id IN (${academicYearIds.map(() => '?').join(', ')})`;
+        params.push(...academicYearIds);
     }
-    if (academicYearId !== '*') {
+    if (semesterId !== '*') {
         query += ' AND semester_id = ?';
         params.push(semesterId);
     }
 
     // get the id of the guest-evaluation
     const ge: {id: string, guest_id: string, semester_id: string, academic_year_id: string}[] = db.prepare(query).all(...params);
-    const answers: {id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string}[] = db.prepare('SELECT * FROM answer WHERE guest_evaluation_id = ?').all(ge[0].id);
+    const groupedAnswers: { [question_id: string]: { id: string; answer_text: string }[] } = {};
+    // Iterate over each guest evaluation
+    for (const e of ge) {
+        // Query answers for the current guest evaluation
+        const answers: { id: string, guest_evaluation_id: string, course_evaluation_id: string, question_id: string, answer_text: string }[] =
+            db.prepare('SELECT * FROM answer WHERE guest_evaluation_id = ?').all(e.id);
+
+        // Group answers by question_id
+        answers.forEach((answer) => {
+            const { question_id } = answer;
+            if (!groupedAnswers[question_id]) {
+                groupedAnswers[question_id] = [];
+            }
+            groupedAnswers[question_id].push({ id: answer.id, answer_text: answer.answer_text });
+        });
+    }
+
     const questionAndAnswer: [string, string | { count: number, keywords: string[], responses: string[], summary: string, topic: string }[]][] = []; 
 
     try {
-        for (const a of answers) {
-            const q = db.prepare('SELECT * FROM question WHERE id = ?').get(a.question_id);
+        for (const [question_id, answers] of Object.entries(groupedAnswers)) {
+            const q = db.prepare('SELECT * FROM question WHERE id = ?').get(question_id);
     
             if (q.type === "likert") {
-                questionAndAnswer.push([q.question_text, a.answer_text]);
+                let avgTotal: number = 0
+                answers.forEach(res => {
+                    avgTotal += Number.parseFloat(res.answer_text)
+                });
+                const aggregateAverage = avgTotal / answers.length
+
+                questionAndAnswer.push([q.question_text, aggregateAverage.toString()]);
             } else if (q.type === "open") {
-                const res = await thematic_analysis(a.answer_text) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
-                questionAndAnswer.push([q.question_text, res])
+                const answerTexts = answers.map((answer) => answer.answer_text);
+                const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
+                questionAndAnswer.push([q.question_text, res]);
             }
         }
     } catch(e) {
