@@ -38,8 +38,8 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
             }
         });
         
-        window.ipcRenderer.readManualCourseQuestions().then((result: { id: string, question_text: string, type: string, group: string }[]) => {
-            const questionsArray = result.map((e) => [e.id, e.question_text, e.type, e.group] as [string, string, string, string]);
+        window.ipcRenderer.readManualCourseQuestions().then((result: { id: string, question_text: string, type: string, category: string, manual: string }[]) => {
+            const questionsArray = result.map((e) => [e.id, e.question_text, e.type, e.category, e.manual] as [string, string, string, string, string]);
             setQuestions(questionsArray);
             const answersArray: string[] = [];
             questionsArray.forEach((q) => answersArray.push(q[2] === "likert" ? '1' : ''))

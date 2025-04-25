@@ -7,7 +7,7 @@ export default function importGuestEvalMan({setView}: {setView: React.Dispatch<R
     const [guests, setGuests] = useState<[string, string, string][]>([]);
     const [semesters, setSemesters] = useState<[string, string][]>([]);
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
-    const [questions, setQuestions] = useState<[string, string, string, string][]>([]);
+    const [questions, setQuestions] = useState<[string, string, string, string, string][]>([]);
     const [answers, setAnswers] = useState<string[]>([]);
 
     // these three state variables correspond to the dropdowns for course, semester, and academic year
@@ -45,8 +45,8 @@ export default function importGuestEvalMan({setView}: {setView: React.Dispatch<R
             }
         });
         
-        window.ipcRenderer.readManualGuestQuestions().then((result: { id: string, question_text: string, type: string, group: string }[]) => {
-            const questionsArray = result.map((e) => [e.id, e.question_text, e.type, e.group] as [string, string, string, string]);
+        window.ipcRenderer.readManualGuestQuestions().then((result: { id: string, question_text: string, type: string, category: string, manual: string }[]) => {
+            const questionsArray = result.map((e) => [e.id, e.question_text, e.type, e.category, e.manual] as [string, string, string, string, string]);
             setQuestions(questionsArray);
             const answersArray: string[] = [];
             questionsArray.forEach((q) => answersArray.push(q[2] === "likert" ? '1' : ''))
