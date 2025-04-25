@@ -222,8 +222,8 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke('generate-guest-report', guestId, courseId, semesterId, academicYearId);
   },
 
-  generateCourseReport(courseId: string, semesterId: string, academicYearId: string): Promise<void> {
-    return ipcRenderer.invoke('generate-course-report', courseId, semesterId, academicYearId);
+  generateCourseReport(courseId: string, semesterId: string, academicYearIds: string[]): Promise<void> {
+    return ipcRenderer.invoke('generate-course-report', courseId, semesterId, academicYearIds);
   },
 
   deleteGrade(gradeId: string) {
