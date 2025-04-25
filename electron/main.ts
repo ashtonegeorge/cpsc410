@@ -154,7 +154,7 @@ ipcMain.handle('read-guest-lecturers', async () => {
 });
 
 ipcMain.handle('update-guest-lecturer', async (_event, guestId, guestFName, guestLName) => {
-    const result = db.prepare('UPDATE "guest-lecturer" SET fname = ? AND SET lname = ? WHERE id = ?').run(guestFName, guestLName, guestId);
+    const result = db.prepare('UPDATE "guest-lecturer" SET fname = ?, lname = ? WHERE id = ?').run(guestFName, guestLName, guestId);
     return result;
 });
 
