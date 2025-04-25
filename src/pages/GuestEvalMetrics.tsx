@@ -223,6 +223,7 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
                                             </ul>
                                         </div>
                                     ))}
+                                    {qa[1].length === 0 && <p>Themes could not be processed, please adjust inputs and try again. </p>}
                                 </div>
                                 )}
                             </Fragment>

@@ -201,7 +201,7 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
                                             <ul>
                                                 {topic.responses.map((response, idx) => (
                                                     <li key={idx}>{response}</li>
-                                                ))}
+                                                ))} 
                                             </ul>
                                         </div>
                                     ))}
