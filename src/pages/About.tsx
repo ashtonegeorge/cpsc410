@@ -76,7 +76,7 @@ export default function About() {
         });
     }}
 />
-
+<div className='pt-12 w-1/2 mx-auto'></div>
 
 </div>
         </div>
