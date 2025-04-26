@@ -8,6 +8,7 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
     const [questions, setQuestions] = useState<[string, string, string, string, string][]>([]);
     const [answers, setAnswers] = useState<string[]>([]);
+    const [success, setSuccess] = useState<boolean>();
 
     // these three state variables correspond to the dropdowns for course, semester, and academic year
     const [selectedCourse, setSelectedCourse] = useState('');
@@ -55,6 +56,10 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
     const handleUpload = async () => {
         try {
             await window.ipcRenderer.importCourseEvaluationManual(selectedCourse, selectedSemester, selectedAcademicYear, questions, answers)
+            setSuccess(true);
+            setTimeout(() => {
+                setSuccess(false);
+            }, 5000);
         } catch {
             console.log('fail');
         }
@@ -142,9 +147,10 @@ export default function importCourseEvalMan({setView}: {setView: React.Dispatch<
                     ))}
                 </div>
             </div>
-            <div className='py-6'>
+            <div className='pt-6 pb-4'>
                 <Button icon={null} label="Submit" action={handleUpload}/>
             </div>
+            {success && <p className="w-full pb-4 text-green-300 font-semibold">Evaluation added successfully!</p>}
             <Button icon={null} label="Back" action={() => Promise.resolve(setView('courseEval'))}/>
         </div>
     );
