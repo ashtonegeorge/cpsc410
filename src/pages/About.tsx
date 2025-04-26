@@ -52,7 +52,15 @@ export default function About() {
             <div className='pt-12 w-1/2 mx-auto'></div>
             <li><img className="mx-auto" src={evalu8Photo} height="200" width="200"/></li>
             </ul>
+
             <div className='pt-12 w-1/2 mx-auto'>
+    <h2 className="text-3xl font-bold">Our Vision</h2>
+    </div>
+    <h2 className="text-xl">Our goals is to simplify academic evaluations for the Saint Francis PA department by providing tools to review course feedback, 
+        lecturer evaluations, and grades. Integrated with Canvas for seamless access to data, users can generate grade reports, 
+        track course history, and gain actionable insights—all within a secure desktop application.</h2>
+            
+        <div className='pt-12 w-1/2 mx-auto'>
             <h2 className="text-3xl font-bold">User Manual</h2>
             <p>Click below to access our User Manual if you have any questions.</p>
         
@@ -70,9 +78,7 @@ export default function About() {
 />
 
 
-            
-        
-    </div>
+</div>
         </div>
     );
 }
