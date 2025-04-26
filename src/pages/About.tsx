@@ -6,6 +6,10 @@ import auremPhoto from "../assets/aurem.jpg"
 import prestonPhoto from "../assets/preston.jpg"
 import tommyPhoto from "../assets/tommy.jpg"
 import evalu8Photo from "../assets/Evalu8.png"
+import Button from '../components/Button';
+import DocViewer from "react-doc-viewer";
+
+const userManual = "/UserManual.docx";
 
 export default function About() {
     return (
@@ -51,8 +55,24 @@ export default function About() {
             <div className='pt-12 w-1/2 mx-auto'>
             <h2 className="text-3xl font-bold">User Manual</h2>
             <p>Click below to access our User Manual if you have any questions.</p>
+        
+            <Button
+    icon={null}
+    label="Download User Manual"
+    action={() => {
+        return new Promise<void>((resolve) => { const link = document.createElement("a"); 
+            link.href = userManual; 
+            link.download = "UserManual.docx";
+            link.click();
+            resolve(); 
+        });
+    }}
+/>
 
-            </div>
+
+            
+        
+    </div>
         </div>
     );
 }
