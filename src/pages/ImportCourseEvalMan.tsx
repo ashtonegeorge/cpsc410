@@ -44,7 +44,7 @@ export default function ImportCourseEvalMan({setView}: {setView: React.Dispatch<
             const questionsArray = result.map((e) => [e.id, e.question_text, e.type, e.category, e.manual] as [string, string, string, string, string]);
             setQuestions(questionsArray);
             const answersArray: string[] = [];
-            questionsArray.forEach((q) => answersArray.push(q[2] === "likert" ? '1' : ''))
+            questionsArray.forEach((q) => answersArray.push(q[2] === "likert" ? '5' : ''))
             setAnswers(answersArray);
         });
     }, [])
@@ -57,6 +57,9 @@ export default function ImportCourseEvalMan({setView}: {setView: React.Dispatch<
     const handleUpload = async () => {
         try {
             await window.ipcRenderer.importCourseEvaluationManual(selectedCourse, selectedSemester, selectedAcademicYear, questions, answers)
+            const answersArray: string[] = [];
+            questions.forEach((q) => answersArray.push(q[2] === "likert" ? '5' : ''))
+            setAnswers(answersArray);
             setSuccess(true);
             setTimeout(() => {
                 setSuccess(false);
@@ -108,20 +111,21 @@ export default function ImportCourseEvalMan({setView}: {setView: React.Dispatch<
                             <h1 className="flex p-1 w-full text-left">{q[1]}</h1>
                             { q[2] === "likert" ? 
                                 <div>
-                                    <input 
-                                        className='w-full outline-0 border border-black text-black bg-white p-2 rounded-lg' 
-                                        type='number' 
+                                    <select 
+                                        className='text-black bg-white p-2 rounded-lg my-2 w-full'
                                         value={answers[i]}
-                                        placeholder={"1"}
-                                        min={1}
-                                        max={5}
                                         onChange={(event) => {
                                             const newAnswers = [...answers]; // Create a copy of the answers array
                                             newAnswers[i] = event.target.value; // Update the specific answer
                                             setAnswers(newAnswers); // Update the state
                                         }}
-                                    />
-                                    <p className='font-semibold text-sm'>For likert style questions, enter the average score on a 1-5 scale, where 1 is strongly disagree and 5 is strongly agree.</p>
+                                    >
+                                        <option value='5'>Highly Agree</option>
+                                        <option value='4'>Agree</option>
+                                        <option value='3'>Neutral</option>
+                                        <option value='2'>Disagree</option>
+                                        <option value='1'>Highly Disagree</option>
+                                    </select>
                                 </div> 
                             : 
                                 <div>
@@ -136,12 +140,12 @@ export default function ImportCourseEvalMan({setView}: {setView: React.Dispatch<
                                             setAnswers(newAnswers); // Update the state
                                         }}
                                         onInput={(event) => {
-                                            const textarea = event.target as HTMLTextAreaElement; // Cast to HTMLTextAreaElement
-                                            textarea.style.height = "auto"; // Reset the height
-                                            textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+                                            const textarea = event.target as HTMLTextAreaElement;
+                                            textarea.style.height = "auto"; 
+                                            textarea.style.height = `${textarea.scrollHeight}px`; 
                                         }}
                                     />
-                                    <p className='font-semibold text-sm'>For open response questions, separate each individual response with two slashes <strong>//</strong>. This helps to analyze the responses effectively.</p>
+                                    <p className='font-semibold text-sm'>If no response was given, please enter N/A.</p>
                                 </div>
                             }
                         </div>
