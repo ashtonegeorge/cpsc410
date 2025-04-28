@@ -7,11 +7,19 @@ import prestonPhoto from "../assets/preston.jpg"
 import tommyPhoto from "../assets/tommy.jpg"
 import evalu8Photo from "../assets/Evalu8.png"
 import Button from '../components/Button';
-import DocViewer from "react-doc-viewer";
-
-const userManual = "/UserManual.docx";
 
 export default function About() {
+
+    const handleDownload = async () => {
+        try {
+            const savePath = await window.ipcRenderer.invoke('download-user-manual');
+            alert(`User Manual saved to: ${savePath}`);
+        } catch (error) {
+            console.error('Error downloading User Manual:', error);
+            alert('Failed to download the User Manual.');
+        }
+    };
+
     return (
         <div>
             <h2 className="text-3xl font-bold">About</h2>
@@ -64,18 +72,23 @@ export default function About() {
             <h2 className="text-3xl font-bold">User Manual</h2>
             <p>Click below to access our User Manual if you have any questions.</p>
         
-            <Button
+            {/* <Button
     icon={null}
     label="Download User Manual"
     action={() => {
         return new Promise<void>((resolve) => { const link = document.createElement("a"); 
             link.href = userManual; 
-            link.download = "UserManual.docx";
+            link.download = "Evalu8UserManual.docx";
             link.click();
             resolve(); 
         });
     }}
-/>
+/> */}
+            <Button
+                icon={null}
+                label="Download User Manual"
+                action={handleDownload}
+            />
 <div className='pt-12 w-1/2 mx-auto'></div>
 
 </div>

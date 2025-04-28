@@ -19,7 +19,6 @@
     "exceljs": "^4.4.0",
     "onnxruntime-node": "^1.21.0",
     "react": "^18.2.0",
-    "react-doc-viewer": "^0.1.14",
     "react-dom": "^18.2.0",
     "tailwindcss": "^4.0.6"
   },
@@ -48,6 +47,7 @@
       "dist/**/*",
       "src/utils/**/*",
       "src/models/**/*",
+      "src/assets/Evalu8UserManual.docx",
       "dist-electron/",
       "node_modules/**/*",
       "./venv/*/**",
@@ -62,8 +62,10 @@
       "./venv/",
       "./venv/*/**",
       "./dev.db",
+      "src/assets/Evalu8UserManual.docx",
       "src/utils/**/*",
-      "src/models/**/*"
+      "src/models/**/*",
+      "assets/**/*"
     ]
   }
 }

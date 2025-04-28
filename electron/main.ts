@@ -1009,3 +1009,24 @@ function thematic_analysis(inputText: string) {
         pythonProcess.stdin.end();
     });
 }
+
+ipcMain.handle('download-user-manual', async () => {
+    const userManualPath =
+        process.env.NODE_ENV === "development"
+            ? "src/assets/Evalu8UserManual.docx" : path.join(
+            process.resourcesPath, 'src/assets/Evalu8UserManual.docx'
+    );
+
+    const savePath = dialog.showSaveDialogSync({
+        title: 'Save User Manual',
+        defaultPath: 'Evalu8UserManual.docx',
+        filters: [{ name: 'Word Document', extensions: ['docx'] }],
+    });
+
+    if (savePath) {
+        fs.copyFileSync(userManualPath, savePath);
+        return savePath;
+    } else {
+        throw new Error('Save operation was canceled.');
+    }
+});

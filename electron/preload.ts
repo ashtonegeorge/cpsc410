@@ -258,5 +258,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
         throw new Error(result);
     }
     return result;
+  },
+
+  async downloadUsermanual(): Promise<string> {
+    return await ipcRenderer.invoke('download-user-manual');
   }
 })
