@@ -242,7 +242,7 @@ export default function GradeEdit({setView}: {setView: React.Dispatch<React.SetS
             <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none mx-auto pt-6">
                 <Button icon={null} label="Delete" action={handleDeleteCourseEvaluation}/>
             </div>
-            {deleteSuccess && <p className="w-full text-green-300 font-semibold">Deleted successfully!</p>}
+            {deleteSuccess && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">Deleted successfully!</p></div>}
             <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none mx-auto">
                 <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
             </div>

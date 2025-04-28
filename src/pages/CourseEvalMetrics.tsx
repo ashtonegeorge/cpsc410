@@ -162,8 +162,8 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
                         </div>
                     </div>                 
                 </div>
-                {success && <p className="w-full text-green-300 font-semibold">Report generated successfully!</p>}
-                {error && <p className="w-full text-red-300 font-semibold">Generating report failed, please ensure the correct criteria is selected and try again.</p>}
+                {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">Report generated successfully!</p></div>}
+                {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Generating report failed, please ensure the correct criteria is selected and try again.</p></div>}
             
             </div>
 

@@ -133,14 +133,14 @@ export default function ImportGuestEval({setView}: {setView: React.Dispatch<Reac
                 <Button icon={uploadIcon} action={handleUpload} label="Upload" />
                 <div className='mt-2'>
                 </div>
-                {success && <p className='text-white-500 font-semibold text-xl'>File uploaded successfully!</p>}
+                {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">File uploaded successfully!</p></div>}
                 <div className="flex justify-center pb-12">
                     <div className="w-3/2 text-white rounded-xl p-2 text-sm border-none">
                             <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
                         </div>
                     </div>
+                </div>
             </div>
-            </div>
-            </div>
-          );
+        </div>
+    );
 }
