@@ -182,8 +182,15 @@ ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, course
             questionId = existingQuestion[0]['id'];
         }
         
-        db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(guestEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('|'));
+        if(type === "likert") {
+            q.likertAnswers.forEach((a) => {
+                db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)').run(guestEvalId, questionId, a.toString());
+            });
+        } else {
+            q.openResponses.forEach((o) => {
+                db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)').run(guestEvalId, questionId, o);
+            });
+        }
     });
 });
 
@@ -206,28 +213,50 @@ ipcMain.handle('import-course-evaluation', async (_event, courseId: string, seme
             questionId = existingQuestion[0]['id'];
         }
 
-        db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(courseEvalId, questionId, type === "likert" ? q.likertAverage : q.openResponses.join('|'));
+        if(type === "likert") {
+            q.likertAnswers.forEach((a) => {
+                db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)').run(courseEvalId, questionId, a.toString());
+            });
+        } else {
+            q.openResponses.forEach((o) => {
+                db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)').run(courseEvalId, questionId, o);
+            })
+        }
     });
 });
 
 ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: string, semesterId: string, academicYearId: string, questions: [string, string, string, string, string][], answers: string[]) => {
-    const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
-    const courseEvalId = courseResult.lastInsertRowid;
+    // determine whether the evaluation exists already, if not create a new one
+    const existingEval = db.prepare('SELECT * FROM "course-evaluation" WHERE course_id = ? AND semester_id = ? AND academic_year_id = ?').all(courseId, semesterId, academicYearId);
+    let courseEvalId = "0";
+    if(existingEval.length > 0) { // if the evaluation exists, set the eval id to that
+        courseEvalId = existingEval[0].id;
+    } else { // otherwise, create a new guest evaluation and use the new id
+        const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
+        courseEvalId = courseResult.lastInsertRowid;
+    }
     
-    questions.forEach(async (q: [string, string, string, string, string], i: number) => {
-        db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(courseEvalId, q[0], q[2] === "likert" ? answers[i] : answers[i].split("//").join("|"));
+    answers.forEach(async (a: string, i: number) => { // insert each answer into the db
+        db.prepare('INSERT INTO ANSWER (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
+            .run(courseEvalId, questions[i][0], a);
     });
 });
 
 ipcMain.handle('import-guest-evaluation-manual', async (_event, courseId: string, guestId: string, semesterId: string, academicYearId: string, questions: [string, string, string, string, string][], answers: string[]) => {
-    const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
-    const guestEvalId = guestResult.lastInsertRowid;
+    // determine whether the evaluation exists already, if not create a new one
+    const existingEval = db.prepare('SELECT * FROM "guest-evaluation" WHERE course_id = ? AND guest_id = ? AND semester_id = ? AND academic_year_id = ?').all(courseId, guestId, semesterId, academicYearId);
+    console.log("existing eval?? " + existingEval[0].id)
+    let guestEvalId = "0";
+    if(existingEval.length > 0) { // if the evaluation exists, set the eval id to that
+        guestEvalId = existingEval[0].id;
+    } else { // otherwise, create a new guest evaluation and use the new id
+        const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
+        guestEvalId = guestResult.lastInsertRowid;
+    }
 
-    questions.forEach(async (q: [string, string, string, string, string], i: number) => {
-        db.prepare('INSERT INTO answer (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(guestEvalId, q[0], q[2] === "likert" ? answers[i] : answers[i].split("//").join("|"));
+    answers.forEach(async (a: string, i: number) => { // insert each answer into the db
+        db.prepare('INSERT INTO ANSWER (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
+            .run(guestEvalId, questions[i][0], a);
     });
 });
 
