@@ -193,7 +193,7 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
                                     {/* Render the object answer */}
                                     {qa[1] && Array.isArray(qa[1]) && qa[1].map((topic, index) => (
                                         <div key={index} className="pl-4">
-                                            <p><strong>{topic.topic}</strong></p>
+                                            <p className='font-bold pt-4'><strong>{topic.topic}</strong></p>
                                             <p><strong>Summary:</strong> {topic.summary}</p>
                                             <p><strong>Keywords:</strong> {topic.keywords.join(", ")}</p>
                                             <p><strong>Count:</strong> {topic.count}</p>
