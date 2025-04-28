@@ -56,8 +56,10 @@ function App() {
         {view === 'academicYear' && <AcademicYear setView={setView} />}
         {view === 'courseEvalEdit' && <CourseEvalEdit setView={setView} />}
         {view === 'questions' && <Questions setView={setView}/>}
-        {view === 'addQuestions' && <AddQuestions setView={setView}/>}
-        {view === 'editQuestions' && <EditQuestions setView={setView}/>}
+        {view === 'addGuestQuestions' && <AddQuestions setView={setView} evalType='guest'/>}
+        {view === 'addCourseQuestions' && <AddQuestions setView={setView} evalType='course'/>}
+        {view === 'editGuestQuestions' && <EditQuestions setView={setView} evalType='guest'/>}
+        {view === 'editCourseQuestions' && <EditQuestions setView={setView}  evalType='course'/>}
       </div>
     </main>
   )

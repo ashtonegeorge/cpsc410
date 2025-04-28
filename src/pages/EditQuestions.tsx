@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import Button from "../components/Button";
 
-export default function EditQuestions({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
+export default function EditQuestions({setView, evalType}: {setView: React.Dispatch<React.SetStateAction<string>>, evalType: string}) {
         const [questionsToDelete, setQuestionsToDelete] = useState<string[]>([]);
         const [questions, setQuestions] = useState<[string, string, string, string, string][]>([]);
     
@@ -115,7 +115,7 @@ export default function EditQuestions({setView}: {setView: React.Dispatch<React.
                 </div>
             <div className="flex justify-evenly gap-12 pb-12">
                 <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none">
-                    <Button icon={null} label="Back" action={() => Promise.resolve(setView('questions'))}/>
+                    <Button icon={null} label="Back" action={() => Promise.resolve(setView(evalType === "course" ? "importCourseEvalMan" : "importGuestEvalMan"))}/>
                 </div>
             </div>
         </div>

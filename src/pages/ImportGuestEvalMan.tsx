@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
+import pencilIcon from "/edit.svg";
 
-export default function importGuestEvalMan({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) { 
+export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) { 
     // the following three state variables are arrays of tuples, where the first element is the id and the second is the name
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [guests, setGuests] = useState<[string, string, string][]>([]);
@@ -170,7 +171,11 @@ export default function importGuestEvalMan({setView}: {setView: React.Dispatch<R
             <div className='pt-6 pb-4'>
                 <Button icon={null} label="Submit" action={handleUpload}/>
             </div>
-            {success && <p className="w-full pb-4 text-green-300 font-semibold">Evaluation added successfully!</p>}
+            {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">Evaluation added successfully!</p></div>}
+            <div className="flex gap-4 pb-6">
+                <Button label="Add Questions" action={() => Promise.resolve(setView('addGuestQuestions'))} icon={null}/>
+                <Button label="Edit Questions" action={() => Promise.resolve(setView('editGuestQuestions'))} icon={pencilIcon}/>
+            </div>
             <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
         </div>
     );
