@@ -15,6 +15,9 @@ export default function GuestEval({setView}: {setView: React.Dispatch<React.SetS
                 <Button icon={null} label="Import Evaluations Manually" action={() => Promise.resolve(setView('importGuestEvalMan'))}/>
                 <Button icon={pencilIcon} label="Edit Guest Evaluation Data" action={() => Promise.resolve(setView('guestEvalEdit'))}/>
             </div>
+            <div className="flex justify-evenly gap-12 pb-12 w-1/3 mx-auto">
+                <Button icon={null} label="Manage Guest Lecturers" action={() => Promise.resolve(setView('guestLecturers'))}/>
+            </div>
         </div>
         <div>
             <div className="flex justify-center pb-12">
