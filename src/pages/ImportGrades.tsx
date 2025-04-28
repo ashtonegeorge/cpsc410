@@ -125,7 +125,7 @@ export default function ImportGrades({setView}: {setView: React.Dispatch<React.S
         <div className="flex justify-evenly gap-12 pt-6">
             <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
         </div>
-        {success && <p className='text-green-500 font-semibold text-xl'>File uploaded successfully!</p>}
+        {success && <p className='text-white-500 font-semibold text-xl'>File uploaded successfully!</p>}
     </div>
   );
 }
