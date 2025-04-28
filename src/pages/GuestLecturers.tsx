@@ -105,7 +105,7 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
             </div>
             <div className="flex justify-evenly gap-12 pt-4">
                 <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none">
-                    <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
+                    <Button icon={null} label="Back" action={() => Promise.resolve(setView('guestEval'))}/>
                 </div>
             </div>
         </div>
