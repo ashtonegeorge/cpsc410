@@ -15,6 +15,9 @@ export default function CourseEval({setView}: {setView: React.Dispatch<React.Set
                         <Button icon={null} label="Import Evaluations Manually" action={() => Promise.resolve(setView('importCourseEvalMan'))}/>
                         <Button icon={pencilIcon} label="Edit Course Evaluation Data" action={() => Promise.resolve(setView('courseEvalEdit'))}/>
                     </div>
+                    <div className="flex justify-evenly w-1/3 mx-auto gap-12 pb-12">
+                        <Button label="Manage Courses" action={() => Promise.resolve(setView('courses'))} icon={null}/>
+                    </div>
                     <div className="flex justify-evenly gap-12 pb-12">
                         <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none">
                             <Button icon={null} label="Back" action={() => Promise.resolve(setView('home'))}/>
