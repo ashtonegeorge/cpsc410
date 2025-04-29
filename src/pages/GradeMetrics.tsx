@@ -269,7 +269,7 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                     </div>
                 </div>
                 {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">Report generated successfully!</p></div>}
-                {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Generating report failed, please try again.</p></div>}
+                {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Generating report failed, please check filters and try again.</p></div>}
             </div>
 
             <div className="w-full h-full">

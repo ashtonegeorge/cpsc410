@@ -121,7 +121,7 @@ export default function ImportGradesMan({setView}: {setView: React.Dispatch<Reac
                 <Button icon={null} label="Submit" action={() => handleGradeSubmit()}/>
             </div>
             {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">Imported successfully!</p></div>}
-            {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Import failed, please try again.</p></div>}
+            {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Import failed, please ensure values are correct and try again.</p></div>}
             <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none mx-auto">
                 <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
             </div>

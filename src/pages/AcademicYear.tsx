@@ -8,6 +8,9 @@ export default function AcademicYear({setView}: {setView: React.Dispatch<React.S
     const [updateYearId, setUpdateYearId] = useState('');
     const [deleteYear, setDeleteYear] = useState('');
     const [academicYears, setAcademicYears] = useState<[string, string][]>([]);
+    const [createError, setCreateError] = useState<boolean>();
+    const [modifyError, setModifyError] = useState<boolean>();
+    const [deleteError, setDeleteError] = useState<boolean>();
 
     useEffect(() => {
         updateAcademicYears();
@@ -20,19 +23,40 @@ export default function AcademicYear({setView}: {setView: React.Dispatch<React.S
         });
     };
 
-    const createAcademicYear = () => {
+    const createAcademicYear = async () => {
+        if(newYear === '') {
+            setCreateError(true);
+            setTimeout(() => {
+                setCreateError(false);
+            }, 5000);
+            return;
+        }
         const result = window.ipcRenderer.createAcademicYear(newYear);
         updateAcademicYears();
         return result;
     };
     
-    const updateAcademicYear = () => {
+    const updateAcademicYear = async () => {
+        if(updateYearName === '' || updateYearId === '') {
+            setModifyError(true);
+            setTimeout(() => {
+                setModifyError(false);
+            }, 5000);
+            return;
+        }
         const result = window.ipcRenderer.updateAcademicYear(updateYearName, updateYearId);
         updateAcademicYears();
         return result;
     };
     
-    const deleteAcademicYear = () => {
+    const deleteAcademicYear = async () => {
+        if(deleteYear === '') {
+            setDeleteError(true);
+            setTimeout(() => {
+                setDeleteError(false);
+            }, 5000);
+            return;
+        }
         const result = window.ipcRenderer.deleteAcademicYear(deleteYear);
         updateAcademicYears();
         return result;
@@ -48,11 +72,13 @@ export default function AcademicYear({setView}: {setView: React.Dispatch<React.S
                                 <h2 className="text-lg font-semibold mb-2">Add Academic Year</h2>
                                 <TextField label="Academic Year Name" setValue={setNewYear} placeholder={'New name'} />
                                 <Button label="Save Year" action={createAcademicYear} icon={null} />
+                                {createError && <div className='w-full flex justify-center pt-2'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Error, ensure you fill in the Academic Year Name.</p></div>}
                             </div>
                             <div className="flex flex-col justify-start w-1/2 items-center col-span-2 mx-auto">
                                 <h2 className="text-lg font-semibold mb-2">Delete Academic Year</h2>
                                 <TextField label="Academic Year ID" setValue={setDeleteYear} placeholder={'ID to delete'} />
                                 <Button label="Delete Year" action={deleteAcademicYear} icon={null} />
+                                {deleteError && <div className='w-full flex justify-center pt-2'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Error, ensure you fill in the Academic Year ID.</p></div>}
                             </div>
                         </div>
                         <div className="flex flex-col justify-start w-full items-center">
@@ -60,6 +86,7 @@ export default function AcademicYear({setView}: {setView: React.Dispatch<React.S
                             <TextField label="Academic Year ID" setValue={setUpdateYearId} placeholder={'ID to update'} />
                             <TextField label="Academic Year Name" setValue={setUpdateYearName} placeholder={'New name'} />
                             <Button label="Update Year" action={updateAcademicYear} icon={null} />
+                            {modifyError && <div className='w-full flex justify-center pt-2'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Error, ensure you fill in the Academic Year ID and Name.</p></div>}
                         </div>
                     </div>
                     <div className='w-2/5 m-12'>

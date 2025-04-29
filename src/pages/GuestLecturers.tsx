@@ -10,6 +10,9 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
     const [updateGuestFName, setUpdateGuestFName] = useState('');
     const [updateGuestLName, setUpdateGuestLName] = useState('');
     const [deleteGuestId, setDeleteGuestId] = useState('');
+    const [createError, setCreateError] = useState<boolean>();
+    const [modifyError, setModifyError] = useState<boolean>();
+    const [deleteError, setDeleteError] = useState<boolean>();
 
     useEffect(() => {
         updateGuestLecturers();
@@ -31,21 +34,41 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
         setDeleteGuestId('');
     };
 
-    const createGuestLecturer = () => {
+    const createGuestLecturer = async () => {
+        if(createGuestFName === '' || createGuestLName === '') {
+            setCreateError(true);
+            setTimeout(() => {
+                setCreateError(false);
+            }, 5000);
+            return;        }
         const result = window.ipcRenderer.createGuestLecturer(createGuestFName, createGuestLName)
         updateGuestLecturers();
         clearForm();
         return result;
     };
 
-    const updateGuestLecturer = () => {
+    const updateGuestLecturer = async () => {
+        if(updateGuestFName === '' || updateGuestLName === '') {
+            setModifyError(true);
+            setTimeout(() => {
+                setModifyError(false);
+            }, 5000);
+            return;
+        }
         const result = window.ipcRenderer.updateGuestLecturer(updateGuestId, updateGuestFName, updateGuestLName);
         updateGuestLecturers();
         clearForm();
         return result;
     };
 
-    const deleteGuestLecturer = () => {
+    const deleteGuestLecturer = async () => {
+        if(deleteGuestId === '') {
+            setDeleteError(true);
+            setTimeout(() => {
+                setDeleteError(false);
+            }, 5000);
+            return;
+        }
         const result = window.ipcRenderer.deleteGuestLecturer(deleteGuestId);
         updateGuestLecturers();
         clearForm();
@@ -65,6 +88,7 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
                             <div>
                                 <Button label="Save Guest" action={createGuestLecturer} icon={null} />
                             </div>
+                            {createError && <div className='w-full flex justify-center pt-2'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Error, ensure you fill in the lecturer's first and last name.</p></div>}
                         </div>  
                         <div className="flex flex-col justify-start w-full items-center">
                             <h2 className="text-lg font-semibold mb-2">Update Guest Lecturer</h2>
@@ -74,6 +98,7 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
                             <div>
                                 <Button label="Update Guest" action={updateGuestLecturer} icon={null} />
                             </div>
+                            {modifyError && <div className='w-full flex justify-center pt-2'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Error, ensure you fill in the ID, first name, and last name.</p></div>}
                         </div>
                     </div>
                         <div className="flex flex-col justify-start items-center">
@@ -82,6 +107,7 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
                             <div>
                                 <Button label="Delete Guest" action={deleteGuestLecturer} icon={null} />
                             </div>
+                            {deleteError && <div className='w-full flex justify-center pt-2'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Error, ensure you fill in the Guest ID.</p></div>}
                         </div>
                 </div>
                 <div className='w-1/2 m-12'>
