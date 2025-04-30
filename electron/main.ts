@@ -1003,10 +1003,15 @@ function thematic_analysis(inputText: string) {
             ? './src/utils/analyze_responses.py'
             : path.join(process.resourcesPath, './src/utils/analyze_responses.py');
 
-        const pythonPath = process.env.NODE_ENV === 'development'
-            ? 'python'
-            : path.join(process.resourcesPath, 'venv', 'Scripts', 'python.exe');
-        const pythonProcess = spawn(pythonPath, [scriptPath]);
+            const pythonPath = process.env.NODE_ENV === 'development'
+            ? 'python' // Use system Python in development
+            : path.join(
+                  process.resourcesPath,
+                  'venv',
+                  process.platform === 'win32' ? 'Scripts' : 'bin',
+                  process.platform === 'win32' ? 'python.exe' : 'python'
+              );
+            const pythonProcess = spawn(pythonPath, [scriptPath]);
 
         let data = '';
         let error = '';
