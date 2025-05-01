@@ -284,10 +284,8 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                         <p className="font-bold">Students with C+ or below:</p>
                         {gradeCounts["C+"].length > 0 &&
                             <>
-                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
-                                    <div className="font-bold">C+</div>
-                                    <div></div>
-                                    <div></div>
+                                <h3 className="font-bold">C+</h3>
+                                <div className="grid grid-cols-6 gap-x-4 grid-flow-row">
                                     {gradeCounts["C+"].map((studentIds) => (
                                         <Fragment key={studentIds}>
                                             <div>{studentIds}</div>
@@ -298,10 +296,8 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                         }
                         {gradeCounts["C"].length > 0 &&
                             <>
-                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
-                                    <div className="font-bold">C</div>
-                                    <div></div>
-                                    <div></div>
+                                <h3 className="font-bold">C</h3>
+                                <div className="grid grid-cols-6 gap-x-4 grid-flow-row">
                                     {gradeCounts["C"].map((studentIds) => (
                                         <Fragment key={studentIds}>
                                             <div>{studentIds}</div>
@@ -312,10 +308,8 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                         }
                         {gradeCounts["C-"].length > 0 &&
                             <>
-                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
-                                    <div className="font-bold">C-</div>
-                                    <div></div>
-                                    <div></div>
+                                <h3 className="font-bold">C-</h3>
+                                <div className="grid grid-cols-6 gap-x-4 grid-flow-row">
                                     {gradeCounts["C-"].map((studentIds) => (
                                         <Fragment key={studentIds}>
                                             <div>{studentIds}</div>
@@ -326,10 +320,8 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                         }    
                         {gradeCounts["D+"].length > 0 &&
                             <>
-                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
-                                    <div className="font-bold">D+</div>
-                                    <div></div>
-                                    <div></div>
+                                <h3 className="font-bold">D+</h3>
+                                <div className="grid grid-cols-6 gap-x-4 grid-flow-row">
                                     {gradeCounts["D+"].map((studentIds) => (
                                         <Fragment key={studentIds}>
                                             <div>{studentIds}</div>
@@ -340,10 +332,8 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                         }
                         {gradeCounts["D"].length > 0 &&
                             <>
-                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
-                                    <div className="font-bold">D</div>
-                                    <div></div>
-                                    <div></div>
+                                <h3 className="font-bold">D</h3>
+                                <div className="grid grid-cols-6 gap-x-4 grid-flow-row">
                                     {gradeCounts["D"].map((studentIds) => (
                                         <Fragment key={studentIds}>
                                             <div>{studentIds}</div>
@@ -354,10 +344,8 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                         }
                         {gradeCounts["D-"].length > 0 &&
                             <>
-                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
-                                    <div className="font-bold">D-</div>
-                                    <div></div>
-                                    <div></div>
+                                <h3 className="font-bold">D-</h3>
+                                <div className="grid grid-cols-6 gap-x-4 grid-flow-row">
                                     {gradeCounts["D-"].map((studentIds) => (
                                         <Fragment key={studentIds}>
                                             <div>{studentIds}</div>
@@ -368,10 +356,8 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                         }
                         {gradeCounts["F"].length > 0 &&
                             <>
-                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
-                                    <div className="font-bold">F</div>
-                                    <div></div>
-                                    <div></div>
+                                <h3 className="font-bold">F</h3>
+                                <div className="grid grid-cols-6 gap-x-4 grid-flow-row">
                                     {gradeCounts["F"].map((studentIds) => (
                                         <Fragment key={studentIds}>
                                             <div>{studentIds}</div>
