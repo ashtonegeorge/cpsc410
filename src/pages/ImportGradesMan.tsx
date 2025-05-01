@@ -7,11 +7,11 @@ export default function ImportGradesMan({setView}: {setView: React.Dispatch<Reac
     const [semesters, setSemesters] = useState<[string, string][]>([]);
 
     const [studentId, setStudentId] = useState<string>('');
-    const [course, setCourse] = useState<string>('');
-    const [semester, setSemester] = useState<string>('');
-    const [academicYear, setAcademicYear] = useState<string>('');
-    const [retake, setRetake] = useState<string>('');
-    const [grade, setGrade] = useState<string>('');
+    const [course, setCourse] = useState<string>('PA400');
+    const [semester, setSemester] = useState<string>('1');
+    const [academicYear, setAcademicYear] = useState<string>('1');
+    const [retake, setRetake] = useState<string>('0');
+    const [grade, setGrade] = useState<string>('A+');
 
     const [success, setSuccess] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);

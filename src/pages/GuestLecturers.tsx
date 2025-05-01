@@ -25,15 +25,6 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
         })
     };
 
-    const clearForm = () => {
-        setCreateGuestFName('');
-        setCreateGuestLName('');
-        setUpdateGuestId('');
-        setUpdateGuestFName('');
-        setUpdateGuestLName('');
-        setDeleteGuestId('');
-    };
-
     const createGuestLecturer = async () => {
         if(createGuestFName === '' || createGuestLName === '') {
             setCreateError(true);
@@ -43,7 +34,6 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
             return;        }
         const result = window.ipcRenderer.createGuestLecturer(createGuestFName, createGuestLName)
         updateGuestLecturers();
-        clearForm();
         return result;
     };
 
@@ -57,7 +47,6 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
         }
         const result = window.ipcRenderer.updateGuestLecturer(updateGuestId, updateGuestFName, updateGuestLName);
         updateGuestLecturers();
-        clearForm();
         return result;
     };
 
@@ -71,7 +60,6 @@ export default function GuestLecturers({setView}: {setView: React.Dispatch<React
         }
         const result = window.ipcRenderer.deleteGuestLecturer(deleteGuestId);
         updateGuestLecturers();
-        clearForm();
         return result;
     };
 

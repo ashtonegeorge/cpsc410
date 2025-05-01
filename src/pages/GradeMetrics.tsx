@@ -278,15 +278,108 @@ export default function GradeMetrics({setView}: {setView: React.Dispatch<React.S
                     {cpAndBelow.length === 0 && !gradeCounts && 
                         <div>Run a report to show metrics here.</div>
                     }
-                    {cpAndBelow.length > 0 && 
+                    {gradeCounts && 
                         <>
-                            <p className="font-bold">Number of students with C+ or below: {cpAndBelow.length}</p>
-                            <p className="font-bold">Students with C+ or below:</p>
-                            <div className="grid grid-cols-6 gap-x-4 grid-flow-row">
-                                {Array.from(cpAndBelow).map((id: number) => (
-                                    <p key={id}>{id.toString()}</p>
-                                ))}
-                            </div>
+                        <p className="font-bold">Number of students with C+ or below: {cpAndBelow.length}</p>
+                        <p className="font-bold">Students with C+ or below:</p>
+                        {gradeCounts["C+"].length > 0 &&
+                            <>
+                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
+                                    <div className="font-bold">C+</div>
+                                    <div></div>
+                                    <div></div>
+                                    {gradeCounts["C+"].map((studentIds) => (
+                                        <Fragment key={studentIds}>
+                                            <div>{studentIds}</div>
+                                        </Fragment>
+                                    ))}
+                                </div>
+                            </>
+                        }
+                        {gradeCounts["C"].length > 0 &&
+                            <>
+                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
+                                    <div className="font-bold">C</div>
+                                    <div></div>
+                                    <div></div>
+                                    {gradeCounts["C"].map((studentIds) => (
+                                        <Fragment key={studentIds}>
+                                            <div>{studentIds}</div>
+                                        </Fragment>
+                                    ))}
+                                </div>
+                            </>
+                        }
+                        {gradeCounts["C-"].length > 0 &&
+                            <>
+                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
+                                    <div className="font-bold">C-</div>
+                                    <div></div>
+                                    <div></div>
+                                    {gradeCounts["C-"].map((studentIds) => (
+                                        <Fragment key={studentIds}>
+                                            <div>{studentIds}</div>
+                                        </Fragment>
+                                    ))}
+                                </div>
+                            </>
+                        }    
+                        {gradeCounts["D+"].length > 0 &&
+                            <>
+                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
+                                    <div className="font-bold">D+</div>
+                                    <div></div>
+                                    <div></div>
+                                    {gradeCounts["D+"].map((studentIds) => (
+                                        <Fragment key={studentIds}>
+                                            <div>{studentIds}</div>
+                                        </Fragment>
+                                    ))}
+                                </div>
+                            </>
+                        }
+                        {gradeCounts["D"].length > 0 &&
+                            <>
+                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
+                                    <div className="font-bold">D</div>
+                                    <div></div>
+                                    <div></div>
+                                    {gradeCounts["D"].map((studentIds) => (
+                                        <Fragment key={studentIds}>
+                                            <div>{studentIds}</div>
+                                        </Fragment>
+                                    ))}
+                                </div>
+                            </>
+                        }
+                        {gradeCounts["D-"].length > 0 &&
+                            <>
+                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
+                                    <div className="font-bold">D-</div>
+                                    <div></div>
+                                    <div></div>
+                                    {gradeCounts["D-"].map((studentIds) => (
+                                        <Fragment key={studentIds}>
+                                            <div>{studentIds}</div>
+                                        </Fragment>
+                                    ))}
+                                </div>
+                            </>
+                        }
+                        {gradeCounts["F"].length > 0 &&
+                            <>
+                                <div className="grid grid-cols-3 gap-x-4 grid-flow-row">
+                                    <div className="font-bold">F</div>
+                                    <div></div>
+                                    <div></div>
+                                    {gradeCounts["F"].map((studentIds) => (
+                                        <Fragment key={studentIds}>
+                                            <div>{studentIds}</div>
+                                        </Fragment>
+                                    ))}
+                                </div>
+                            </>
+                        }
                         </>
                     }
                     {gradeCounts &&
