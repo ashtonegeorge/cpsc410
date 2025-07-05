@@ -164,22 +164,59 @@ ipcMain.handle('delete-guest-lecturer', async (_event, guestId) => {
 });
 
 ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, courseId: string, semesterId: string, academicYearId: string, evalQuestions: {questionText: string; likertAnswers: number[]; likertAverage: number; openResponses: string[];}[]) => {
+    const existingGuestEvaluation = db.prepare('SELECT * FROM "guest-evaluation" WHERE guest_id = ? AND course_id = ? AND semester_id = ? AND academic_year_id = ?').all(guestId, courseId, semesterId, academicYearId);
+
+    if(existingGuestEvaluation !== null && existingGuestEvaluation !== undefined && existingGuestEvaluation.length > 0) {
+        return { success: false, message:"Already imported guest evaluation with selected fields. If necessary, please delete it and try again." };
+    }
+
     const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
     const guestEvalId = guestResult.lastInsertRowid;
+    const existingQuestions = await db.prepare('SELECT * FROM question WHERE category = ?').all('guest');
 
     evalQuestions.forEach(async (q) => {
         const type = q.likertAnswers.length > 0 ? "likert" : "open";
         const formattedQuestion = q.questionText.replace(new RegExp("^.*?: \s*|\s+$"), "");
-        
-        // check if the question already exists in the db
-        const existingQuestion = await db.prepare('SELECT * FROM question WHERE question_text = ? AND type = ? AND category = ?').all(formattedQuestion, type, "guest");
-        
-        let questionId;
-        if(existingQuestion.length === 0 || existingQuestion === undefined || existingQuestion === null) { // if it doesn't exist, simply insert
-            const questionResult = db.prepare('INSERT INTO question (question_text, type, category, manual) VALUES (?, ?, ?, ?)').run(formattedQuestion, type, "guest", "0");
+        const freq_map = getStemmedFreqMap(q.questionText);
+
+        let questionId = null;
+        if(existingQuestions !== undefined && existingQuestions !== null && existingQuestions.length !== 0) { // if there are questions in the db
+            let targetQuestion: [number, number] | undefined;
+            for(const existingQuestion of existingQuestions) {
+                let existingFreqMap: Map<string, number>;
+                let hasFreqMap = existingQuestion.freq_map !== null && existingQuestion.freq_map !== undefined && existingQuestion.freq_map !== ''; // if the map in the db isn't set
+                if( hasFreqMap ) { // if the map exists convert it
+                    const rawMap = JSON.parse(existingQuestion.freq_map);
+                    existingFreqMap = new Map(Object.entries(rawMap));
+                    if (existingFreqMap.size === 0) { // if the map we generated still doesn't have any entries then we should generate a new one
+                        hasFreqMap = false;
+                    }
+                }
+
+                if( hasFreqMap === false ) { // create a new frequency map and set it in the db
+                    existingFreqMap = getStemmedFreqMap(existingQuestion.question_text);
+                    await db.prepare('UPDATE "question" SET freq_map = ? WHERE id = ?').run(JSON.stringify(Object.fromEntries(existingFreqMap)), existingQuestion.id);
+                }
+
+                // if for some reason we still can't get it we just skip this question candidate
+                if(existingFreqMap! === null || freq_map === null || existingFreqMap!.keys() === null || freq_map.keys() === null) continue;
+                
+                
+                const similarity = cosineSimilarity(freq_map, existingFreqMap!); // 0.0 >= similarity >= 1.0
+                if(targetQuestion === undefined || targetQuestion[1] < similarity) {
+                    targetQuestion = [existingQuestion.id, similarity]; 
+                }
+            }
+
+            if(targetQuestion !== undefined && targetQuestion[1] > 0.8 && targetQuestion[0] !== null) { // if we found a match, use that question
+                questionId = targetQuestion[0];
+            } else if(questionId === null || questionId === undefined) { // only will be true if a match is not found
+                const questionResult = await db.prepare('INSERT INTO question (question_text, type, category, manual, freq_map) VALUES (?, ?, ?, ?, ?)').run(formattedQuestion, type, "guest", "0", JSON.stringify(Object.fromEntries(freq_map)));
+                questionId = questionResult.lastInsertRowid;
+            }
+        } else { // if there are no questions in the db
+            const questionResult = await db.prepare('INSERT INTO question (question_text, type, category, manual) VALUES (?, ?, ?, ?)').run(formattedQuestion, type, "guest", "0");
             questionId = questionResult.lastInsertRowid;
-        } else { // if it does exist, access the existing question id and attach that to the answer
-            questionId = existingQuestion[0]['id'];
         }
         
         if(type === "likert") {
@@ -196,22 +233,59 @@ ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, course
 });
 
 ipcMain.handle('import-course-evaluation', async (_event, courseId: string, semesterId: string, academicYearId: string, evalQuestions: {questionText: string; likertAnswers: number[]; likertAverage: number; openResponses: string[];}[]) => {
+    const existingCourseEvaluation = db.prepare('SELECT * FROM "course-evaluation" WHERE course_id = ? AND semester_id = ? AND academic_year_id = ?').all(courseId, semesterId, academicYearId);
+
+    if(existingCourseEvaluation !== null && existingCourseEvaluation !== undefined && existingCourseEvaluation.length > 0) {
+        return { success: false, message:"Already imported course evaluation with selected fields. If necessary, please delete it and try again." };
+    }
+
     const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
     const courseEvalId = courseResult.lastInsertRowid;
+    const existingQuestions = await db.prepare('SELECT * FROM question WHERE category = ?').all('course');
 
     evalQuestions.forEach(async (q) => {
         const type = q.likertAnswers.length > 0 ? "likert" : "open";
         const formattedQuestion = q.questionText.replace(new RegExp("^.*?: \s*|\s+$"), "");
+        const freq_map = getStemmedFreqMap(q.questionText);
 
-        // check if the question already exists in the db
-        const existingQuestion = await db.prepare('SELECT * FROM question WHERE question_text = ? AND type = ? AND category = ?').all(formattedQuestion, type, "course");
-        
-        let questionId;
-        if(existingQuestion.length === 0 || existingQuestion === undefined || existingQuestion === null) { // if it doesn't exist, simply insert
-            const questionResult = db.prepare('INSERT INTO question (question_text, type, category) VALUES (?, ?, ?, ?)').run(formattedQuestion, type, "course", "0");
+        let questionId = null;
+        if(existingQuestions !== undefined && existingQuestions !== null && existingQuestions.length !== 0) { // if there are questions in the db
+            let targetQuestion: [number, number] | undefined;
+            for(const existingQuestion of existingQuestions) {
+                let existingFreqMap: Map<string, number>;
+                let hasFreqMap = existingQuestion.freq_map !== null && existingQuestion.freq_map !== undefined && existingQuestion.freq_map !== ''; // if the map in the db isn't set
+                if( hasFreqMap ) { // if the map exists convert it
+                    const rawMap = JSON.parse(existingQuestion.freq_map);
+                    existingFreqMap = new Map(Object.entries(rawMap));
+                    if (existingFreqMap.size === 0) { // if the map we generated still doesn't have any entries then we should generate a new one
+                        hasFreqMap = false;
+                    }
+                }
+
+                if( hasFreqMap === false ) { // create a new frequency map and set it in the db
+                    existingFreqMap = getStemmedFreqMap(existingQuestion.question_text);
+                    await db.prepare('UPDATE "question" SET freq_map = ? WHERE id = ?').run(JSON.stringify(Object.fromEntries(existingFreqMap)), existingQuestion.id);
+                }
+
+                // if for some reason we still can't get it we just skip this question candidate
+                if(existingFreqMap! === null || freq_map === null || existingFreqMap!.keys() === null || freq_map.keys() === null) continue;
+
+                const similarity = cosineSimilarity(freq_map, existingFreqMap!); // 0.0 >= similarity >= 1.0
+                if(targetQuestion === undefined || targetQuestion[1] < similarity) {
+                    targetQuestion = [existingQuestion.id, similarity]; 
+                }
+            }
+
+            if(targetQuestion !== undefined && targetQuestion[1] > 0.8 && targetQuestion[0] !== null) { // if we found a match, use that question
+                questionId = targetQuestion[0];
+            } else if(questionId === null || questionId === undefined) { // only will be true if a match is not found
+                const questionResult = await db.prepare('INSERT INTO question (question_text, type, category, manual, freq_map) VALUES (?, ?, ?, ?, ?)').run(formattedQuestion, type, "course", "0", JSON.stringify(Object.fromEntries(freq_map)));
+                questionId = questionResult.lastInsertRowid;
+            }
+
+        } else { // if there are no questions in the db
+            const questionResult = await db.prepare('INSERT INTO question (question_text, type, category, manual) VALUES (?, ?, ?, ?)').run(formattedQuestion, type, "course", "0");
             questionId = questionResult.lastInsertRowid;
-        } else { // if it does exist, access the existing question id and attach that to the answer
-            questionId = existingQuestion[0]['id'];
         }
 
         if(type === "likert") {
@@ -221,7 +295,7 @@ ipcMain.handle('import-course-evaluation', async (_event, courseId: string, seme
         } else {
             q.openResponses.forEach((o) => {
                 db.prepare('INSERT INTO answer (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)').run(courseEvalId, questionId, o);
-            })
+            });
         }
     });
     return { success: true, message: "" };
@@ -231,9 +305,9 @@ ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: strin
     // determine whether the evaluation exists already, if not create a new one
     const existingEval = db.prepare('SELECT * FROM "course-evaluation" WHERE course_id = ? AND semester_id = ? AND academic_year_id = ?').all(courseId, semesterId, academicYearId);
     let courseEvalId = "0";
-    if(existingEval.length > 0) { // if the evaluation exists, set the eval id to that
-        courseEvalId = existingEval[0].id;
-    } else { // otherwise, create a new guest evaluation and use the new id
+    if(existingEval.length > 0) {
+        return { success: false, message:"Already imported course evaluation with selected fields. If necessary, please delete it and try again." };
+    } else { // otherwise, create a new course evaluation and use the new id
         const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
         courseEvalId = courseResult.lastInsertRowid;
     }
