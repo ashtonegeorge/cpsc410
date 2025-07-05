@@ -5,6 +5,7 @@ import uploadIcon from '../assets/upload.png';
 export default function ImportGrades({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
     const [success, setSuccess] = useState(false);
+    const [duplicates, setDuplicates] = useState(0);
     // the following three state variables are arrays of tuples, where the first element is the id and the second is the name
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [semesters, setSemesters] = useState<[string, string][]>([]);
@@ -52,19 +53,23 @@ export default function ImportGrades({setView}: {setView: React.Dispatch<React.S
     const handleUpload = async () => {
         if (filePath) { // if there is a file path, read the file
             const records = await window.ipcRenderer.readGradeFile(filePath); // read the file and get student id and grade pairs
-            records.forEach((record: [string, string]) => {
-                window.ipcRenderer.importGrade(record[0], 
+            let dupes = 0;
+            for(const record of records) {
+                const response = await window.ipcRenderer.importGrade(record[0], 
                                                 selectedCourse, 
                                                 selectedSemester, 
                                                 selectedAcademicYear, 
                                                 isRetake, 
                                                 record[1]);
-            });
+                if(response.success === false) dupes++;
+            }
 
             setSuccess(true);
-            setTimeout(() => { // hides success message after ten seconds
+            if(dupes > 0) setDuplicates(dupes);
+            setTimeout(() => {
+                setDuplicates(0); 
                 setSuccess(false);
-            }, 3000); 
+            }, 8000); 
         }
     };
 
@@ -125,7 +130,8 @@ export default function ImportGrades({setView}: {setView: React.Dispatch<React.S
         <div className="flex justify-evenly gap-12 pt-6">
             <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
         </div>
-        {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">File uploaded successfully!</p></div>}
+        {success && <div className='w-full flex justify-center'><p className="p-4 my-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">File uploaded successfully!</p></div>}
+        {duplicates > 0 && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 grayscale-50 text-white font-semibold">Note: {duplicates} imported grades already existed in the database and were skipped.</p></div>}
     </div>
   );
 }

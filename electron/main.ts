@@ -192,6 +192,7 @@ ipcMain.handle('import-guest-evaluation', async (_event, guestId: string, course
             });
         }
     });
+    return { success: true, message: "" };
 });
 
 ipcMain.handle('import-course-evaluation', async (_event, courseId: string, semesterId: string, academicYearId: string, evalQuestions: {questionText: string; likertAnswers: number[]; likertAverage: number; openResponses: string[];}[]) => {
@@ -223,6 +224,7 @@ ipcMain.handle('import-course-evaluation', async (_event, courseId: string, seme
             })
         }
     });
+    return { success: true, message: "" };
 });
 
 ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: string, semesterId: string, academicYearId: string, questions: [string, string, string, string, string][], answers: string[]) => {
@@ -240,24 +242,27 @@ ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: strin
         db.prepare('INSERT INTO ANSWER (course_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
             .run(courseEvalId, questions[i][0], a);
     });
+    
+    return { success: true, message:"" };
 });
 
 ipcMain.handle('import-guest-evaluation-manual', async (_event, courseId: string, guestId: string, semesterId: string, academicYearId: string, questions: [string, string, string, string, string][], answers: string[]) => {
     // determine whether the evaluation exists already, if not create a new one
     const existingEval = db.prepare('SELECT * FROM "guest-evaluation" WHERE course_id = ? AND guest_id = ? AND semester_id = ? AND academic_year_id = ?').all(courseId, guestId, semesterId, academicYearId);
-    console.log("existing eval?? " + existingEval[0].id)
     let guestEvalId = "0";
-    if(existingEval.length > 0) { // if the evaluation exists, set the eval id to that
-        guestEvalId = existingEval[0].id;
+    if(existingEval.length > 0) {
+        return { success: false, message:"Already imported guest evaluation with selected fields. If necessary, please delete it and try again." };
     } else { // otherwise, create a new guest evaluation and use the new id
         const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
         guestEvalId = guestResult.lastInsertRowid;
     }
-
+    
     answers.forEach(async (a: string, i: number) => { // insert each answer into the db
         db.prepare('INSERT INTO ANSWER (guest_evaluation_id, question_id, answer_text) VALUES (?, ?, ?)')
-            .run(guestEvalId, questions[i][0], a);
+        .run(guestEvalId, questions[i][0], a);
     });
+
+    return { success: true, message:"" };
 });
 
 /**

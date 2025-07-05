@@ -11,6 +11,7 @@ export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<R
     const [questions, setQuestions] = useState<[string, string, string, string, string][]>([]);
     const [answers, setAnswers] = useState<string[]>([]);
     const [success, setSuccess] = useState<boolean>();
+    const [error, setError] = useState<string>('');
 
     // these three state variables correspond to the dropdowns for course, semester, and academic year
     const [selectedCourse, setSelectedCourse] = useState('');
@@ -64,17 +65,23 @@ export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<R
 
     const handleUpload = async () => {
         try {
-            await window.ipcRenderer.importGuestEvaluationManual(selectedCourse, selectedGuest, selectedSemester, selectedAcademicYear, questions, answers)
-            const answersArray: string[] = [];
-            questions.forEach((q) => answersArray.push(q[2] === "likert" ? '5' : ''))
-            setAnswers(answersArray);
-            setSuccess(true);
-            setTimeout(() => {
-                setSuccess(false);
-            }, 5000);
+            const response = await window.ipcRenderer.importGuestEvaluationManual(selectedCourse, selectedGuest, selectedSemester, selectedAcademicYear, questions, answers)
+            if(response.success) {
+                const answersArray: string[] = [];
+                questions.forEach((q) => answersArray.push(q[2] === "likert" ? '5' : ''))
+                setAnswers(answersArray);
+                setSuccess(true);
+            } else {
+                setError(response.message);
+            }
         } catch {
-            console.log('fail');
+            console.log('Upload failed');
+            setError('An error occurred, please try again.');
         }
+        setTimeout(() => {
+            setSuccess(false);
+            setError('');
+        }, 8000)
     }
 
     return (
@@ -176,6 +183,7 @@ export default function ImportGuestEvalMan({setView}: {setView: React.Dispatch<R
                 <Button icon={null} label="Submit" action={handleUpload}/>
             </div>
             {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">Evaluation added successfully!</p></div>}
+            {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">{error}</p></div>}
             <div className="flex gap-4 pb-6">
                 <Button label="Add Questions" action={() => Promise.resolve(setView('addGuestQuestions'))} icon={null}/>
                 <Button label="Edit Questions" action={() => Promise.resolve(setView('editGuestQuestions'))} icon={pencilIcon}/>

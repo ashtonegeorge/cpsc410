@@ -14,7 +14,7 @@ export default function ImportGradesMan({setView}: {setView: React.Dispatch<Reac
     const [grade, setGrade] = useState<string>('A+');
 
     const [success, setSuccess] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
 
     useEffect(() => {
         window.ipcRenderer.readCourses().then((result: any) => {
@@ -35,18 +35,18 @@ export default function ImportGradesMan({setView}: {setView: React.Dispatch<Reac
     const handleGradeSubmit = async () => {
         try {
             const res = await window.ipcRenderer.importGrade(studentId, course, semester, academicYear, retake, grade)
-            if (res !== null) { // set the response data to corresponding state to be used in the UI
+            if (res.success) { // set the response data to corresponding state to be used in the UI
                 setSuccess(true);
             } else {
-                setError(true);
+                setError(res.message);
             }            
         } catch (error) {
-            setError(true);
+            setError('An error has occurred, please try again.');
             console.log(error);
         }
         setTimeout(() => {
             setSuccess(false);
-            setError(false);
+            setError('');
         }, 5000);
     }
 
@@ -121,7 +121,7 @@ export default function ImportGradesMan({setView}: {setView: React.Dispatch<Reac
                 <Button icon={null} label="Submit" action={() => handleGradeSubmit()}/>
             </div>
             {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">Imported successfully!</p></div>}
-            {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">Import failed, please ensure values are correct and try again.</p></div>}
+            {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">{error}</p></div>}
             <div className="w-1/2 text-white rounded-xl p-2 text-sm border-none mx-auto">
                 <Button icon={null} label="Back" action={() => Promise.resolve(setView('grades'))}/>
             </div>

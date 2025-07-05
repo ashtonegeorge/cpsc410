@@ -5,6 +5,7 @@ import uploadIcon from '../assets/upload.png';
 export default function ImportCourseEval({setView}: {setView: React.Dispatch<React.SetStateAction<string>>}) {
     const [filePath, setFilePath] = useState(''); // state to store the file path to be used for uploading
     const [success, setSuccess] = useState(false);
+    const [error, setError] = useState('');
     // the following three state variables are arrays of tuples, where the first element is the id and the second is the name
     const [courses, setCourses] = useState<[string, string][]>([]);
     const [semesters, setSemesters] = useState<[string, string][]>([]);
@@ -50,12 +51,19 @@ export default function ImportCourseEval({setView}: {setView: React.Dispatch<Rea
     const handleUpload = async () => {
         if (filePath) { // if there is a file path, read the file
             const records = await window.ipcRenderer.readCourseEvalFile(filePath); // read the file and get student id and grade pairs
-            window.ipcRenderer.importCourseEvaluation(selectedCourse, selectedSemester, selectedAcademicYear, records);
+            const response = await window.ipcRenderer.importCourseEvaluation(selectedCourse, selectedSemester, selectedAcademicYear, records);
 
-            setSuccess(true);
-            setTimeout(() => { // hides success message after ten seconds
-                setSuccess(false);
-            }, 3000); 
+            if(response.success) {
+                setSuccess(true);
+                setTimeout(() => { // hides success message after ten seconds
+                    setSuccess(false);
+                }, 3000); 
+            } else {
+                setError(response.message);
+                setTimeout(() => {
+                    setError('');
+                }, 8000)
+            }
         }
     };
 
@@ -111,6 +119,7 @@ export default function ImportCourseEval({setView}: {setView: React.Dispatch<Rea
             <div className='mt-2'>
             </div>
         {success && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-green-700 text-white font-semibold">File uploaded successfully!</p></div>}
+        {error && <div className='w-full flex justify-center'><p className="p-4 mb-6 rounded-lg shadow-md shadow-black bg-red-700 text-white font-semibold">{error}</p></div>}
         <div className="flex justify-center pb-12">
             <div className="w-3/2 text-white rounded-xl p-2 text-sm border-none">
             <Button icon={null} label="Back" action={() => Promise.resolve(setView('courseEval'))}/>
