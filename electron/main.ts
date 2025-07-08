@@ -6,6 +6,7 @@ import ExcelJS from 'exceljs';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import { spawn } from 'child_process';
+import { getStemmedFreqMap, cosineSimilarity } from '../src/utils/frequency.ts';
 
 dotenv.config();
 
