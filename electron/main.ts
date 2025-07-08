@@ -307,7 +307,7 @@ ipcMain.handle('import-course-evaluation-manual', async (_event, courseId: strin
     const existingEval = db.prepare('SELECT * FROM "course-evaluation" WHERE course_id = ? AND semester_id = ? AND academic_year_id = ?').all(courseId, semesterId, academicYearId);
     let courseEvalId = "0";
     if(existingEval.length > 0) {
-        return { success: false, message:"Already imported course evaluation with selected fields. If necessary, please delete it and try again." };
+        courseEvalId = existingEval[0].id;
     } else { // otherwise, create a new course evaluation and use the new id
         const courseResult = db.prepare('INSERT INTO "course-evaluation" (course_id, semester_id, academic_year_id) VALUES (?, ?, ?)').run(courseId, semesterId, academicYearId);
         courseEvalId = courseResult.lastInsertRowid;
@@ -326,7 +326,7 @@ ipcMain.handle('import-guest-evaluation-manual', async (_event, courseId: string
     const existingEval = db.prepare('SELECT * FROM "guest-evaluation" WHERE course_id = ? AND guest_id = ? AND semester_id = ? AND academic_year_id = ?').all(courseId, guestId, semesterId, academicYearId);
     let guestEvalId = "0";
     if(existingEval.length > 0) {
-        return { success: false, message:"Already imported guest evaluation with selected fields. If necessary, please delete it and try again." };
+        guestEvalId = existingEval[0].id;
     } else { // otherwise, create a new guest evaluation and use the new id
         const guestResult = db.prepare('INSERT INTO "guest-evaluation" (guest_id, course_id, semester_id, academic_year_id) VALUES (?, ?, ?, ?)').run(guestId, courseId, semesterId, academicYearId);
         guestEvalId = guestResult.lastInsertRowid;
