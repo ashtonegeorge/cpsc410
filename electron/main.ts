@@ -351,9 +351,8 @@ ipcMain.handle('read-grade-file', async (_event, filePath) => {
     // create an excel instance, retrieve the file extension, and specify desired columns
     const workbook = new ExcelJS.Workbook(); 
     const ext = path.extname(filePath).toLowerCase();
-    const idCol = 2;
-    const gradeCol = 60;
-
+    let idCol = 0;
+    let gradeCol = 0;
 
     if (ext === '.xlsx') { // if the file is an xlsx file, read the file
         await workbook.xlsx.readFile(filePath);
@@ -365,6 +364,15 @@ ipcMain.handle('read-grade-file', async (_event, filePath) => {
     }
 
     const worksheet = workbook.worksheets[0]; // grab the first worksheet, as the grade workbooks only have one
+    const headerRow = worksheet.getRow(1);
+    for(let i = 1, n = headerRow.cellCount; i<n; i++) { // get the grade and id columns dynamically
+        const val = headerRow.getCell(i).value;
+        if(val === "Final Grade") {
+            gradeCol = i;
+        } else if(val === "ID") {
+            idCol = i;
+        }
+    }
 
     const pairs = [];
     // for each row in the worksheet, extract the student's id and grade
@@ -560,8 +568,14 @@ ipcMain.handle('read-course-eval-file', async (_event, filePath) => {
 });
 
 ipcMain.handle('import-grades', async (_event, studentId, courseId, semesterId, academicYearId, isRetake, grade) => {
-    const result = db.prepare('INSERT INTO grade (student_id, course_id, semester_id, academic_year_id, retake, final_grade) VALUES (?, ?, ?, ?, ?, ?)').run(studentId, courseId, semesterId, academicYearId, isRetake, grade);
-    return result;
+    const existingGrade = db.prepare('SELECT * FROM grade WHERE student_id = ? AND course_id = ? AND semester_id = ? AND academic_year_id = ? AND retake = ? AND final_grade = ?').all(studentId, courseId, semesterId, academicYearId, isRetake, grade);
+
+    if(existingGrade !== null && existingGrade !== undefined && existingGrade.length > 0) {
+        return { success: false, message:"Already imported grade with selected fields. If necessary, please delete it and try again." };
+    }
+
+    db.prepare('INSERT INTO grade (student_id, course_id, semester_id, academic_year_id, retake, final_grade) VALUES (?, ?, ?, ?, ?, ?)').run(studentId, courseId, semesterId, academicYearId, isRetake, grade);
+    return { success: true, message:"" };
 })
 
 ipcMain.handle('read-grades', async (_event, studentId?, courseId?, semesterId?, academicYearId?, isRetake?, grade?) => {
