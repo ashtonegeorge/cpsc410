@@ -1104,18 +1104,19 @@ ipcMain.handle('save-grade-report', async (_event, buffer: Buffer) => {
 function thematic_analysis(inputText: string) {
     return new Promise((resolve, reject) => {
         const scriptPath = devMode
-            ? './src/utils/analyze_responses.py'
-            : path.join(process.resourcesPath, './src/utils/analyze_responses.py');
+            ? path.join(process.env.APP_ROOT!, 'src', 'utils', 'analyze_responses.py')
+            : path.join(process.resourcesPath, 'src', 'utils', 'analyze_responses.py');
 
-            const pythonPath = process.env.NODE_ENV === 'development'
-            ? 'python' // Use system Python in development
-            : path.join(
-                  process.resourcesPath,
-                  'venv',
-                  process.platform === 'win32' ? 'Scripts' : 'bin',
-                  process.platform === 'win32' ? 'python.exe' : 'python'
-              );
-            const pythonProcess = spawn(pythonPath, [scriptPath]);
+        const pythonPath = devMode
+            ? path.join(process.env.APP_ROOT!, 'src', 'python', 'python.exe')
+            : path.join(process.resourcesPath, 'src', 'python', 'python.exe')
+            
+        const pythonProcess = spawn(pythonPath, [scriptPath], {
+            cwd: path.dirname(pythonPath),
+            env: {
+                ...process.env,
+            }
+        });
 
         let data = '';
         let error = '';
