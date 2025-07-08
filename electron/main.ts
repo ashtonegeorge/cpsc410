@@ -869,7 +869,9 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
 
                 questionAndAnswer.push([q.question_text, aggregateAverage.toString()]);
             } else if (q.type === "open") {
-                const answerTexts = answers.map((answer) => answer.answer_text);
+                let answerTexts = answers.map((answer) => answer.answer_text);
+                answerTexts = answerTexts.filter((a) => typeof(a) === "string" && a.length>=5)
+
                 const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
                 questionAndAnswer.push([q.question_text, res]);
             }
@@ -1006,7 +1008,9 @@ ipcMain.handle('generate-course-report', async (_event, courseId, semesterId, ac
 
                 questionAndAnswer.push([q.question_text, aggregateAverage.toString()]);
             } else if (q.type === "open") {
-                const answerTexts = answers.map((answer) => answer.answer_text);
+                let answerTexts = answers.map((answer) => answer.answer_text);
+                answerTexts = answerTexts.filter((a) => typeof(a) === "string" && a.length>=5)
+
                 const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
                 questionAndAnswer.push([q.question_text, res]);
             }
