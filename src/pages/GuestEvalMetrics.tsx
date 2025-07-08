@@ -21,6 +21,7 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [didGenerateReport, setDidGenerateReport] = useState(false);
 
     // const [workbook, setWorkbook] = useState<ExcelJS.Buffer>();
     const [result, setResult] = useState<[string, string | TopicSummary[]][]>([]);
@@ -90,6 +91,7 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
             console.log(error);
         }
         setLoading(false);
+        setDidGenerateReport(true);
         setTimeout(() => {
             setSuccess(false);
             setError(false);
@@ -188,8 +190,11 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
             <div className="w-full h-full">
                 <div className="h-1/12 text-2xl">Output</div>
                 <div className="bg-stone-300 w-full min-h-11/12 border-2 border-stone-600 rounded-xl overflow-y-auto max-h-[500px] text-stone-900 p-4 text-left">
-                    {(result.length === 0 || !result) && loading === false &&
+                    {!didGenerateReport && (result.length === 0 || !result) && loading === false &&
                         <div>Run a report to show metrics here.</div>
+                    }
+                    {didGenerateReport && (result.length === 0 || !result) && loading === false &&
+                        <div>Your report came back with no results, adjust your inputs and try again.</div>
                     }
                     {loading && 
                         <div className='flex space-x-2 justify-center items-center h-min pt-8'>
@@ -198,7 +203,7 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
                             <div className='h-6 w-6 bg-stone-800 rounded-full animate-bounce'></div>
                         </div>
                     }
-                    {result.map((qa, i) => {
+                    { result !== null && result.length > 0 && result.map((qa, i) => {
                         return (
                             <Fragment key={i}>
                                 <p className="font-semibold">
