@@ -441,23 +441,23 @@ ipcMain.handle('read-guest-eval-file', async (_event, filePath) => {
         let qText: string;
         const likertAnswers: number[] = [];
         const openResponses: string[] = [];
-        if(!(col.values[1]?.toString() === "0")) {
+        if(!(col.values[1]?.toString() === "0") && !(col.values[1]?.toString() === "1")) {
             qText = col.values[1]!.toString();
             col.values.map((cell) => {
-                switch(cell?.toString()) {
-                    case "Strongly Agree":
+                switch(cell?.toString().toLowerCase()) {
+                    case "strongly agree":
                         likertAnswers.push(5);
                         break;
-                    case "Agree":
+                    case "agree":
                         likertAnswers.push(4);
                         break;
-                    case "Neutral":
+                    case "neutral":
                         likertAnswers.push(3);
                         break;
-                    case "Disagree":
+                    case "disagree":
                         likertAnswers.push(2);
                         break;
-                    case "Strongly Disagree":
+                    case "strongly disagree":
                         likertAnswers.push(1);
                         break;
                     default:
@@ -534,20 +534,20 @@ ipcMain.handle('read-course-eval-file', async (_event, filePath) => {
         if(!(col.values[1]?.toString() === "0") && !(col.values[1]?.toString() === "1")) {
             qText = col.values[1]!.toString();
             col.values.map((cell) => {
-                switch(cell?.toString()) {
-                    case "Strongly Agree":
+                switch(cell?.toString().toLowerCase()) {
+                    case "strongly agree":
                         likertAnswers.push(5);
                         break;
-                    case "Agree":
+                    case "agree":
                         likertAnswers.push(4);
                         break;
-                    case "Neutral":
+                    case "neutral":
                         likertAnswers.push(3);
                         break;
-                    case "Disagree":
+                    case "disagree":
                         likertAnswers.push(2);
                         break;
-                    case "Strongly Disagree":
+                    case "strongly disagree":
                         likertAnswers.push(1);
                         break;
                     default:
@@ -672,8 +672,14 @@ ipcMain.handle('read-questions', async () => {
 })
 
 ipcMain.handle('add-question', async (_event, question_text, type, category, manual) => {
-    const result = db.prepare('INSERT INTO question (question_text, type, category, manual) VALUES (?, ?, ?, ?)').run(question_text, type, category, manual);
-    return result;
+    const existingQuestion = db.prepare('SELECT * FROM question WHERE question_text = ? AND type = ? AND category = ? AND manual = ?').all(question_text, type, category, manual);
+
+    if(existingQuestion !== null && existingQuestion !== undefined && existingQuestion.length > 0) {
+        return { success: false, message:"Already imported question with selected fields. If necessary, please delete it and try again." };
+    }
+
+    db.prepare('INSERT INTO question (question_text, type, category, manual) VALUES (?, ?, ?, ?)').run(question_text, type, category, manual);
+    return { success: true, message:"" };
 })
 
 ipcMain.handle('read-guest-evaluations', async () => {
