@@ -7,6 +7,8 @@ src/
 ├── assets/
 ├── components/
 ├── pages/
+├── python/
+├── utils/
 ├── App.css
 ├── App.tsx
 ├── index.css
@@ -22,6 +24,9 @@ The components folder contains various React components that are reused througho
 
 ### pages
 The pages folder contains all of the pages (window sized components) within the application.
+
+### python
+The python folder contains the embedded python environment used to perform thematic analysis on open response answers for evaluation metrics.
 
 ### utils
 This folder is a container for miscellaneous scripts, however it primarily contains python scripts to accomplish thematic analysis via node child processes.

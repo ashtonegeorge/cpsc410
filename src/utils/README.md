@@ -28,6 +28,9 @@ This file converts each response into a fixed-length numerical vector using the 
 ### extract.py
 This file examines the vectors created in the embed.py file by getting the top keywords and features from the vectors.
 
+### frequency.ts
+This file provides utilities to the main thread to compute cosine similarity between question text frequency maps.
+
 ### preprocessor.py
 This file preprocesses the responses to filter out misspellings, redudant phrases, and special characters that can't be analyzed.
 
