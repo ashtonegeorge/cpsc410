@@ -30,19 +30,17 @@ From here, you must run the postinstall script to initialize the database.
 ```bash
 npm run postinstall
 ```
-After running the postinstall, you must create a Python virtual environment using the command below.
+After running the postinstall, you must set up the Python embedded environment by first installing pip in the scope of the embedded interpreter.
 ```bash
-virtualenv venv
+./src/python/python.exe get-pip.py
 ```
-Now activate the virtual environment.
+Then install the necessary pip packages to the embedded environment by running the command below. 
 ```bash
-.\venv\Scripts\activate.ps1 # Windows PowerShell
-.\venv\Scripts\activate.bat # Windows Command Prompt
-source ./venv/bin/activate # macOS/Linux
+./src/python/python.exe -m pip install --target ./src/python/Lib/site-packages -r ./requirements.txt
 ```
-From here we can finally install the pip dependencies from requirements.txt. 
+You can confirm that the embedded environment is sourcing the packages correctly by running the following command. 
 ```bash
-pip install -r requirements.txt
+./src/python/python.exe -c "import sys; print('\n'.join(sys.path))"
 ```
 
 ## Usage
@@ -51,11 +49,18 @@ You can start the application by running the following command. Ensure the Pytho
 npm run dev
 ```
 
+You can build an executable of the application by running the following command. The build is placed in /dist.
+```bash
+npm run build
+```
+
 ## Technologies
 This project was built using the following technologies:
 - [Node.js](https://nodejs.org/docs/latest/api/)
 - [Electron](https://www.electronjs.org/docs/latest/)
 - [React](https://react.dev/learn)
 - [Typescript](https://www.typescriptlang.org/docs/)
+- [Python3.12.3](https://www.python.org/downloads/release/python-3123/)
+- [OnnxRuntime](https://onnxruntime.ai/)
 - [SQLite3](https://www.npmjs.com/package/better-sqlite3) 
 - [TailwindCSS](https://tailwindcss.com/docs/installation/using-vite)
