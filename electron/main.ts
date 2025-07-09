@@ -13,7 +13,7 @@ dotenv.config();
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const devMode = process.env.NODE_ENV === 'development';
-const dbPath = devMode ? './dev.db' : path.join(process.resourcesPath, "./dev.db") 
+const dbPath = devMode ? './dev.db' : path.join(process.resourcesPath, "prod.db");
 const db = require('better-sqlite3')(dbPath);
 
 // The built directory structure
