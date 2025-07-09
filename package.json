@@ -11,16 +11,14 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "@huggingface/transformers": "^3.4.1",
     "@tailwindcss/vite": "^4.0.6",
     "better-sqlite3": "^11.8.1",
     "dotenv": "^16.4.7",
-    "electron-store": "^10.0.1",
     "exceljs": "^4.4.0",
     "onnxruntime-node": "^1.21.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwindcss": "^4.0.6"
+    "stemmer": "^2.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",
@@ -47,6 +45,7 @@
       "dist/**/*",
       "src/utils/**/*",
       "src/models/**/*",
+      "src/python/**/*",
       "src/assets/Evalu8UserManual.docx",
       "dist-electron/",
       "node_modules/**/*",
@@ -61,10 +60,12 @@
     "extraResources": [
       "./venv/",
       "./venv/*/**",
-      "./dev.db",
+      "./prod.db",
+      "./template.db",
       "src/assets/Evalu8UserManual.docx",
       "src/utils/**/*",
       "src/models/**/*",
+      "src/python/**/*",
       "assets/**/*"
     ]
   }
