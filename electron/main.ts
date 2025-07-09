@@ -872,8 +872,12 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
                 let answerTexts = answers.map((answer) => answer.answer_text);
                 answerTexts = answerTexts.filter((a) => typeof(a) === "string" && a.length>=5)
 
-                const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
-                questionAndAnswer.push([q.question_text, res]);
+                if(answerTexts.length > 5) {
+                    const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
+                    questionAndAnswer.push([q.question_text, res]);
+                } else {
+                    questionAndAnswer.push([q.question_text, "Not enough open response data to produce an accurate response. Please adjust inputs and try again."]);
+                }
             }
         }
     } catch(e) {
@@ -1011,8 +1015,12 @@ ipcMain.handle('generate-course-report', async (_event, courseId, semesterId, ac
                 let answerTexts = answers.map((answer) => answer.answer_text);
                 answerTexts = answerTexts.filter((a) => typeof(a) === "string" && a.length>=5)
 
-                const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
-                questionAndAnswer.push([q.question_text, res]);
+                if(answerTexts.length > 5) {
+                    const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
+                    questionAndAnswer.push([q.question_text, res]);
+                } else {
+                    questionAndAnswer.push([q.question_text, "Not enough open response data to produce an accurate response. Please adjust inputs and try again."]);
+                }
             }
         }
     } catch(e) {
