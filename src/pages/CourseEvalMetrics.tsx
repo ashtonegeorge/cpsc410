@@ -22,6 +22,7 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
     const [didGenerateReport, setDidGenerateReport] = useState(false);
 
     const [result, setResult] = useState<[string, string | TopicSummary[]][]>([]);
+    const [rawText, setRawText] = useState<string[]>([]);
 
     useEffect(() => {
         window.ipcRenderer.readCourses().then((result: any) => {
@@ -60,7 +61,7 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
         setResult([]);
         setLoading(true);
         try {
-            const res: [string, string | TopicSummary[]][] = await window.ipcRenderer.generateCourseReport(
+            const { res, raw } = await window.ipcRenderer.generateCourseReport(
                 selectedCourse,
                 selectedSemester,
                 selectedAcademicYears.length > 0 ? selectedAcademicYears : ['*']
@@ -68,6 +69,7 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
 
             if (res) { // set the response data to corresponding state to be used in the UI
                 setResult(res);
+                setRawText(raw);
                 setSuccess(true);
             } else {
                 setError(true);
@@ -216,6 +218,16 @@ export default function CourseEvalMetrics({setView}: {setView: React.Dispatch<Re
                             </Fragment>
                         );
                     })}
+                    { rawText !== null && rawText.length > 0 && 
+                        <div>
+                            <h3 className="font-bold pt-4">Raw Response Text:</h3>
+                            <div className="flex flex-col gap-2 w-full">
+                                { rawText.map((answerText, i) => (
+                                    <p key={i}>{answerText}</p>
+                                ))}
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

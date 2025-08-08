@@ -855,6 +855,7 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
     }
 
     const questionAndAnswer: [string, string | { count: number, keywords: string[], responses: string[], summary: string, topic: string }[]][] = []; 
+    const rawText: string[] = [];
 
     try {
         for (const [question_id, answers] of Object.entries(groupedAnswers)) {
@@ -871,6 +872,7 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
             } else if (q.type === "open") {
                 let answerTexts = answers.map((answer) => answer.answer_text);
                 answerTexts = answerTexts.filter((a) => typeof(a) === "string" && a.length>=5)
+                rawText.push( ...answerTexts );
 
                 if(answerTexts.length > 5) {
                     const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
@@ -884,7 +886,7 @@ ipcMain.handle('generate-guest-report', async (_event, guestId, courseId, semest
         return e;
     }
 
-    return questionAndAnswer;
+    return { res: questionAndAnswer, raw: rawText };
 });
 
 ipcMain.handle('delete-grade', async (_event, gradeId) => {
@@ -998,6 +1000,7 @@ ipcMain.handle('generate-course-report', async (_event, courseId, semesterId, ac
         }
 
     const questionAndAnswer: [string, string | { count: number, keywords: string[], responses: string[], summary: string, topic: string }[]][] = []; 
+    const rawText: string[] = [];
 
     try {
         for (const [question_id, answers] of Object.entries(groupedAnswers)) {
@@ -1014,6 +1017,7 @@ ipcMain.handle('generate-course-report', async (_event, courseId, semesterId, ac
             } else if (q.type === "open") {
                 let answerTexts = answers.map((answer) => answer.answer_text);
                 answerTexts = answerTexts.filter((a) => typeof(a) === "string" && a.length>=5)
+                rawText.push( ...answerTexts );
 
                 if(answerTexts.length > 5) {
                     const res = await thematic_analysis(answerTexts.join('|')) as { count: number, keywords: string[], responses: string[], summary: string, topic: string }[];
@@ -1027,7 +1031,7 @@ ipcMain.handle('generate-course-report', async (_event, courseId, semesterId, ac
         return e;
     }
 
-    return questionAndAnswer;
+    return { res: questionAndAnswer, raw: rawText };
 });
 
 ipcMain.handle('save-eval-report', async (_event, data: [string, string | { topic: string; summary: string; keywords: string[]; count: number; responses: string[]; }[]][]) => {

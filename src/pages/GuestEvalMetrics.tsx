@@ -23,9 +23,9 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
     const [loading, setLoading] = useState(false);
     const [didGenerateReport, setDidGenerateReport] = useState(false);
 
-    // const [workbook, setWorkbook] = useState<ExcelJS.Buffer>();
     const [result, setResult] = useState<[string, string | TopicSummary[]][]>([]);
-
+    const [rawText, setRawText] = useState<string[]>([]);
+    
     useEffect(() => {
         window.ipcRenderer.readCourses().then((result: any) => {
             // unfortunately we can't directly reference the state variable, so we have to create a new array
@@ -71,7 +71,7 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
         setResult([]);
         setLoading(true);
         try {
-            const res: [string, string | TopicSummary[]][] = await window.ipcRenderer.generateGuestReport(
+            const { res, raw } = await window.ipcRenderer.generateGuestReport(
                 selectedGuest,
                 selectedCourse,
                 selectedSemester,
@@ -79,8 +79,8 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
             );
 
             if (res) { // set the response data to corresponding state to be used in the UI
-                // const preprocessedResult = preprocessResult(res);
                 setResult(res);
+                setRawText(raw);
                 setSuccess(true);
             } else {
                 setError(true);
@@ -234,6 +234,16 @@ export default function GuestEvalMetrics({setView}: {setView: React.Dispatch<Rea
                             </Fragment>
                         );
                     })}
+                    { rawText !== null && rawText.length > 0 && 
+                        <div>
+                            <h3 className="font-bold pt-4">Raw Response Text:</h3>
+                            <div className="flex flex-col gap-2 w-full">
+                                { rawText.map((answerText, i) => (
+                                    <p key={i}>{answerText}</p>
+                                ))}
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
